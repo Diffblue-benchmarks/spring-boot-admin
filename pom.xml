@@ -90,6 +90,7 @@
         <module>spring-boot-admin-starter-server</module>
         <module>spring-boot-admin-starter-client</module>
         <module>spring-boot-admin-samples</module>
+        <module>spring-boot-admin-pitest-aggregation</module>
     </modules>
     <organization>
         <name>codecentric AG</name>
@@ -236,6 +237,35 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+	    <plugin>
+		<groupId>org.pitest</groupId>
+		<artifactId>pitest-maven</artifactId>
+		<version>1.17.1</version>
+		<configuration>
+		  <failWhenNoMutations>false</failWhenNoMutations>
+		  <targetTests>
+		    <param>**DiffblueTest*</param>
+		  </targetTests>
+		  <exportLineCoverage>true</exportLineCoverage>
+		  <outputFormats>
+		    <value>XML</value>
+		    <value>HTML</value>
+		  </outputFormats>
+		  <timestampedReports>false</timestampedReports>
+		</configuration>
+		<executions>
+		  <execution>
+		    <id>run-mutation-tests</id>
+		    <goals>
+		      <goal>mutationCoverage</goal>
+		    </goals>
+		  </execution>
+		</executions>
+	    </plugin>
+
+
         </plugins>
         <pluginManagement>
             <plugins>
