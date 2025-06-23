@@ -442,7 +442,11 @@ public class ApplicationsControllerDiffblueTest {
 		doNothing().when(applicationEventPublisher).publishEvent(Mockito.<ApplicationEvent>any());
 
 		// Act
-		applicationsController.refreshApplications();
+		new ApplicationsController(new ApplicationRegistry(
+				new InstanceRegistry(new EventsourcingInstanceRepository(new InMemoryEventStore()),
+						mock(InstanceIdGenerator.class), mock(InstanceFilter.class)),
+				mock(InstanceEventPublisher.class)), applicationEventPublisher)
+			.refreshApplications();
 
 		// Assert
 		verify(applicationEventPublisher).publishEvent(isA(ApplicationEvent.class));

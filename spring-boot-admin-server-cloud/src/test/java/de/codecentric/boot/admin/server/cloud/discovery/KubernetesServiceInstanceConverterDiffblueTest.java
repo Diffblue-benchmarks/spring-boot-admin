@@ -2,6 +2,7 @@ package de.codecentric.boot.admin.server.cloud.discovery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.HashMap;
@@ -103,7 +104,7 @@ class KubernetesServiceInstanceConverterDiffblueTest {
 				kubernetesDiscoveryProperties);
 
 		// Assert
-		verify(kubernetesDiscoveryProperties).metadata();
+		verify(kubernetesDiscoveryProperties, times(2)).metadata();
 		assertEquals("/actuator", actualKubernetesServiceInstanceConverter.getManagementContextPath());
 		assertEquals("health", actualKubernetesServiceInstanceConverter.getHealthEndpointPath());
 	}

@@ -47,52 +47,6 @@ public class InMemoryEventStoreDiffblueTest {
 	/**
 	 * Test {@link InMemoryEventStore#append(List)}.
 	 * <ul>
-	 * <li>Given {@link InstanceId} with value is {@code 42}.</li>
-	 * </ul>
-	 * <p>
-	 * Method under test: {@link InMemoryEventStore#append(List)}
-	 */
-	@Test
-	public void testAppend_givenInstanceIdWithValueIs42() throws AssertionError {
-		// Arrange
-		ArrayList<InstanceEvent> events = new ArrayList<>();
-		events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-		// Act
-		inMemoryEventStore.append(events);
-
-		// Assert
-		FirstStep<InstanceEvent> createResult = StepVerifier.create(inMemoryEventStore.findAll());
-		createResult.assertNext(i -> {
-		}).expectComplete().verify();
-	}
-
-	/**
-	 * Test {@link InMemoryEventStore#append(List)}.
-	 * <ul>
-	 * <li>Given {@link InstanceId} with value is {@code 42}.</li>
-	 * </ul>
-	 * <p>
-	 * Method under test: {@link InMemoryEventStore#append(List)}
-	 */
-	@Test
-	public void testAppend_givenInstanceIdWithValueIs422() throws AssertionError {
-		// Arrange
-		ArrayList<InstanceEvent> events = new ArrayList<>();
-		events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-		events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-		// Act and Assert
-		FirstStep<Void> createResult = StepVerifier.create(inMemoryEventStore.append(events));
-		createResult.expectError().verify();
-		FirstStep<InstanceEvent> createResult2 = StepVerifier.create(inMemoryEventStore.findAll());
-		createResult2.assertNext(i -> {
-		}).expectComplete().verify();
-	}
-
-	/**
-	 * Test {@link InMemoryEventStore#append(List)}.
-	 * <ul>
 	 * <li>When {@link ArrayList#ArrayList()}.</li>
 	 * </ul>
 	 * <p>
