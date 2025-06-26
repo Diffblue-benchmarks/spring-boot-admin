@@ -1,0 +1,947 @@
+{
+  "meta" : {
+    "reportVersion" : "2.7"
+  },
+  "run" : {
+    "version" : "2025.06.02-fd4f1ca-licensed",
+    "creationTimestamp" : "2025-06-20T13:38:27.102128665Z",
+    "command" : "dcover coverage-reports ",
+    "totalTime" : 115.092,
+    "environmentDetectionTime" : 69.952,
+    "indexingTime" : 0.0,
+    "entryPointsTime" : 0.0,
+    "generationTime" : 0.0,
+    "timeToFirstTest" : 115.092,
+    "timeToLastTest" : 115.092,
+    "indexQueryTime" : 0.0,
+    "verificationTime" : 0.0,
+    "validationTime" : 0.0
+  },
+  "codes" : {
+    "T000" : "Method eligible for test creation",
+    "T001" : "Trivial getter",
+    "T002" : "Trivial setter",
+    "T003" : "Private method",
+    "T005" : "Trivial constructor",
+    "T010" : "Abstract or interface method",
+    "T012" : "Synthetic method",
+    "T023" : "Testability unknown"
+  },
+  "summary" : {
+    "classesCount" : 11,
+    "methodsCount" : 66,
+    "cumulativeDiffblueTestCount" : 135,
+    "cumulativeManualTestCount" : 36,
+    "completeTestCount" : 0,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 453,
+    "perMethodTestability" : {
+      "T000" : 30,
+      "T001" : 6,
+      "T002" : 7,
+      "T003" : 8,
+      "T005" : 5,
+      "T010" : 1,
+      "T012" : 7,
+      "T023" : 2
+    },
+    "perMethodOutcome" : {
+      "T000" : 30,
+      "T001" : 6,
+      "T002" : 7,
+      "T003" : 8,
+      "T005" : 5,
+      "T010" : 1,
+      "T012" : 7,
+      "T023" : 2
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration" : {
+      "methodsCount" : 3,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T000" : 2,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$EurekaConverterConfiguration" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T000" : 1,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesConverterConfiguration" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T000" : 1,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesDiscoveryClientCondition" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T003" : 1
+      },
+      "perMethodOutcome" : {
+        "T003" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesDiscoveryClientCondition$Fabric8KubernetesCondition" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T003" : 1
+      },
+      "perMethodOutcome" : {
+        "T003" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesDiscoveryClientCondition$OfficialKubernetesCondition" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T003" : 1
+      },
+      "perMethodOutcome" : {
+        "T003" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter" : {
+      "methodsCount" : 18,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 10,
+        "T001" : 2,
+        "T002" : 2,
+        "T003" : 1,
+        "T005" : 1,
+        "T012" : 1,
+        "T023" : 1
+      },
+      "perMethodOutcome" : {
+        "T000" : 10,
+        "T001" : 2,
+        "T002" : 2,
+        "T003" : 1,
+        "T005" : 1,
+        "T012" : 1,
+        "T023" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.EurekaServiceInstanceConverter" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T000" : 1,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener" : {
+      "methodsCount" : 33,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 13,
+        "T001" : 4,
+        "T002" : 5,
+        "T003" : 4,
+        "T012" : 6,
+        "T023" : 1
+      },
+      "perMethodOutcome" : {
+        "T000" : 13,
+        "T001" : 4,
+        "T002" : 5,
+        "T003" : 4,
+        "T012" : 6,
+        "T023" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.KubernetesServiceInstanceConverter" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2
+      },
+      "perMethodOutcome" : {
+        "T000" : 2
+      }
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.ServiceInstanceConverter" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T010" : 1
+      },
+      "perMethodOutcome" : {
+        "T010" : 1
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$EurekaConverterConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        74
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$EurekaConverterConfiguration.serviceInstanceConverter:()Lde/codecentric/boot/admin/server/cloud/discovery/EurekaServiceInstanceConverter;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        79
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesConverterConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        87
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesConverterConfiguration.serviceInstanceConverter:(Lorg/springframework/cloud/kubernetes/commons/discovery/KubernetesDiscoveryProperties;)Lde/codecentric/boot/admin/server/cloud/discovery/KubernetesServiceInstanceConverter;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        93
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesDiscoveryClientCondition$Fabric8KubernetesCondition.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        110
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesDiscoveryClientCondition$OfficialKubernetesCondition.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        105
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$KubernetesDiscoveryClientCondition.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        101,
+        102
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        52
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration.instanceDiscoveryListener:(Lde/codecentric/boot/admin/server/cloud/discovery/ServiceInstanceConverter;Lorg/springframework/cloud/client/discovery/DiscoveryClient;Lde/codecentric/boot/admin/server/services/InstanceRegistry;Lde/codecentric/boot/admin/server/domain/entities/InstanceRepository;)Lde/codecentric/boot/admin/server/cloud/discovery/InstanceDiscoveryListener;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        59,
+        60,
+        61
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration.serviceInstanceConverter:()Lde/codecentric/boot/admin/server/cloud/discovery/DefaultServiceInstanceConverter;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        68
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T023",
+      "perMethodOutcome" : "T023"
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        45,
+        63,
+        69
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.convert:(Lorg/springframework/cloud/client/ServiceInstance;)Lde/codecentric/boot/admin/server/domain/values/Registration;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        84,
+        85,
+        84,
+        87,
+        88,
+        89,
+        91,
+        92,
+        93,
+        94,
+        95,
+        91
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getHealthEndpointPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "T001",
+      "lineNumbers" : [
+        188
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getHealthPath:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        107,
+        108,
+        109,
+        111
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getHealthUrl:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/net/URI;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        99,
+        100,
+        101,
+        102,
+        103,
+        99
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getManagementContextPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "T001",
+      "lineNumbers" : [
+        180
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getManagementHost:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        144,
+        145,
+        146,
+        148
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getManagementPath:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        160,
+        161,
+        162,
+        164
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getManagementPort:(Lorg/springframework/cloud/client/ServiceInstance;)I" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        152,
+        153,
+        154,
+        156
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getManagementScheme:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        136,
+        137,
+        138,
+        140
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getManagementUrl:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/net/URI;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        115,
+        116,
+        117,
+        118,
+        121,
+        122,
+        123,
+        126,
+        127,
+        128,
+        132
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getMetadata:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/util/Map;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        172,
+        176,
+        172,
+        173,
+        174,
+        175,
+        176,
+        172
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getMetadataValue:(Lorg/springframework/cloud/client/ServiceInstance;[Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        72,
+        73,
+        74,
+        75,
+        76,
+        73,
+        79
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.getServiceUrl:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/net/URI;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        168
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.lambda$getMetadata$0:(Ljava/util/Map$Entry;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        175
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.setHealthEndpointPath:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "T002",
+      "lineNumbers" : [
+        192,
+        193
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.DefaultServiceInstanceConverter.setManagementContextPath:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "T002",
+      "lineNumbers" : [
+        184,
+        185
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.EurekaServiceInstanceConverter.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        33
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.EurekaServiceInstanceConverter.getHealthUrl:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/net/URI;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        37,
+        38,
+        41,
+        42,
+        43,
+        44,
+        46
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T023",
+      "perMethodOutcome" : "T023"
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.<init>:(Lorg/springframework/cloud/client/discovery/DiscoveryClient;Lde/codecentric/boot/admin/server/services/InstanceRegistry;Lde/codecentric/boot/admin/server/domain/entities/InstanceRepository;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        93,
+        64,
+        66,
+        72,
+        78,
+        84,
+        90,
+        94,
+        95,
+        96,
+        97
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.discover:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        141
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.discoverIfNeeded:(Ljava/lang/Object;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        125,
+        126,
+        128
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.getIgnoredInstancesMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "T001",
+      "lineNumbers" : [
+        225
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.getIgnoredServices:()Ljava/util/Set;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "T001",
+      "lineNumbers" : [
+        205
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.getInstancesMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "T001",
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.getServices:()Ljava/util/Set;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "T001",
+      "lineNumbers" : [
+        209
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.isInstanceAllowedBasedOnMetadata:(Lorg/springframework/cloud/client/ServiceInstance;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        233,
+        234,
+        237,
+        238,
+        239,
+        241,
+        243
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.isInstanceIgnoredBasedOnMetadata:(Lorg/springframework/cloud/client/ServiceInstance;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        247,
+        248,
+        251,
+        252,
+        253,
+        255,
+        257
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.isMapContainsEntry:(Ljava/util/Map;Ljava/util/Map$Entry;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        261,
+        262
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.lambda$discover$0:(Ljava/lang/Void;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        140
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.lambda$discover$1:(Ljava/lang/Throwable;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        140
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.lambda$matchesPattern$5:(Ljava/lang/String;Ljava/lang/String;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        164
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.lambda$removeStaleInstances$2:(Lde/codecentric/boot/admin/server/domain/entities/Instance;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        146
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.lambda$removeStaleInstances$3:(Ljava/util/Set;Lde/codecentric/boot/admin/server/domain/values/InstanceId;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        148
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.lambda$removeStaleInstances$4:(Lde/codecentric/boot/admin/server/domain/values/InstanceId;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        149
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.matchesPattern:(Ljava/lang/String;Ljava/util/Set;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        163,
+        164,
+        163
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.onApplicationEvent:(Lorg/springframework/cloud/client/discovery/event/HeartbeatEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        121,
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.onApplicationReady:(Lorg/springframework/boot/context/event/ApplicationReadyEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        101,
+        102
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.onInstanceRegistered:(Lorg/springframework/cloud/client/discovery/event/InstanceRegisteredEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        106,
+        107
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.onParentHeartbeat:(Lorg/springframework/cloud/client/discovery/event/ParentHeartbeatEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        116,
+        117
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.onRefreshInstances:(Lde/codecentric/boot/admin/server/web/client/RefreshInstancesEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        111,
+        112
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.registerInstance:(Lorg/springframework/cloud/client/ServiceInstance;)Lreactor/core/publisher/Mono;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        179,
+        180,
+        181,
+        183,
+        184,
+        185
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.removeStaleInstances:(Ljava/util/Set;)Lreactor/core/publisher/Mono;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        144
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.setConverter:(Lde/codecentric/boot/admin/server/cloud/discovery/ServiceInstanceConverter;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "T002",
+      "lineNumbers" : [
+        197,
+        198
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.setIgnoredInstancesMetadata:(Ljava/util/Map;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "T002",
+      "lineNumbers" : [
+        229,
+        230
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.setIgnoredServices:(Ljava/util/Set;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "T002",
+      "lineNumbers" : [
+        201,
+        202
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.setInstancesMetadata:(Ljava/util/Map;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "T002",
+      "lineNumbers" : [
+        221,
+        222
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.setServices:(Ljava/util/Set;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "T002",
+      "lineNumbers" : [
+        213,
+        214
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.shouldRegisterInstanceBasedOnMetadata:(Lorg/springframework/cloud/client/ServiceInstance;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        168,
+        169,
+        170,
+        171,
+        172,
+        171,
+        174
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.shouldRegisterService:(Ljava/lang/String;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        155,
+        156,
+        157,
+        159
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.InstanceDiscoveryListener.toString:(Lorg/springframework/cloud/client/ServiceInstance;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        190,
+        191,
+        192,
+        193,
+        191
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.KubernetesServiceInstanceConverter.<init>:(Lorg/springframework/cloud/kubernetes/commons/discovery/KubernetesDiscoveryProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        30,
+        31,
+        32,
+        35,
+        37
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.KubernetesServiceInstanceConverter.getManagementPort:(Lorg/springframework/cloud/client/ServiceInstance;)I" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        44,
+        45,
+        46,
+        48
+      ]
+    },
+    "de.codecentric.boot.admin.server.cloud.discovery.ServiceInstanceConverter.convert:(Lorg/springframework/cloud/client/ServiceInstance;)Lde/codecentric/boot/admin/server/domain/values/Registration;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    }
+  },
+  "validationMetrics" : { }
+}
