@@ -1,0 +1,232 @@
+{
+  "meta" : {
+    "reportVersion" : "2.7"
+  },
+  "run" : {
+    "version" : "2025.06.02-fd4f1ca-licensed",
+    "creationTimestamp" : "2025-06-20T13:35:02.471337692Z",
+    "command" : "dcover coverage-reports ",
+    "totalTime" : 107.345,
+    "environmentDetectionTime" : 79.102,
+    "indexingTime" : 0.0,
+    "entryPointsTime" : 0.0,
+    "generationTime" : 0.0,
+    "timeToFirstTest" : 107.345,
+    "timeToLastTest" : 107.345,
+    "indexQueryTime" : 0.0,
+    "verificationTime" : 0.0,
+    "validationTime" : 0.0
+  },
+  "codes" : {
+    "T000" : "Method eligible for test creation",
+    "T005" : "Trivial constructor",
+    "T006" : "Main method",
+    "T012" : "Synthetic method"
+  },
+  "summary" : {
+    "classesCount" : 3,
+    "methodsCount" : 12,
+    "cumulativeDiffblueTestCount" : 0,
+    "cumulativeManualTestCount" : 1,
+    "completeTestCount" : 0,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 75,
+    "perMethodTestability" : {
+      "T000" : 4,
+      "T005" : 1,
+      "T006" : 1,
+      "T012" : 6
+    },
+    "perMethodOutcome" : {
+      "T000" : 4,
+      "T005" : 1,
+      "T006" : 1,
+      "T012" : 6
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T005" : 1,
+        "T006" : 1
+      },
+      "perMethodOutcome" : {
+        "T005" : 1,
+        "T006" : 1
+      }
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecurityPermitAllConfig" : {
+      "methodsCount" : 4,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T012" : 2
+      },
+      "perMethodOutcome" : {
+        "T000" : 2,
+        "T012" : 2
+      }
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecuritySecureConfig" : {
+      "methodsCount" : 6,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T012" : 4
+      },
+      "perMethodOutcome" : {
+        "T000" : 2,
+        "T012" : 4
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecurityPermitAllConfig.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        51,
+        52,
+        53
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecurityPermitAllConfig.filterChain:(Lorg/springframework/security/config/annotation/web/builders/HttpSecurity;)Lorg/springframework/security/web/SecurityFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        57,
+        58,
+        64
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecurityPermitAllConfig.lambda$filterChain$0:(Lorg/springframework/security/config/annotation/web/configurers/AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecurityPermitAllConfig.lambda$filterChain$1:(Lorg/springframework/security/config/annotation/web/configurers/CsrfConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        58,
+        60,
+        62,
+        59,
+        58
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecuritySecureConfig.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        75,
+        76,
+        77
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecuritySecureConfig.filterChain:(Lorg/springframework/security/config/annotation/web/builders/HttpSecurity;)Lorg/springframework/security/web/SecurityFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "T000",
+      "lineNumbers" : [
+        81,
+        82,
+        83,
+        85,
+        92,
+        94,
+        95,
+        96,
+        103
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecuritySecureConfig.lambda$filterChain$0:(Lorg/springframework/security/config/annotation/web/configurers/AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        90,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        90
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecuritySecureConfig.lambda$filterChain$1:(Lorg/springframework/security/web/authentication/SavedRequestAwareAuthenticationSuccessHandler;Lorg/springframework/security/config/annotation/web/configurers/FormLoginConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        92,
+        93,
+        92
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecuritySecureConfig.lambda$filterChain$2:(Lorg/springframework/security/config/annotation/web/configurers/LogoutConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        94
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication$SecuritySecureConfig.lambda$filterChain$3:(Lorg/springframework/security/config/annotation/web/configurers/CsrfConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        96,
+        98,
+        100,
+        97,
+        96
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        39
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminConsulApplication.main:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T006",
+      "perMethodOutcome" : "T006",
+      "lineNumbers" : [
+        42,
+        43
+      ]
+    }
+  },
+  "validationMetrics" : { }
+}
