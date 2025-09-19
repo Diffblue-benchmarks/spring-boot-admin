@@ -1,0 +1,329 @@
+{
+  "meta" : {
+    "reportVersion" : "2.7"
+  },
+  "run" : {
+    "version" : "2025.09.01-44e352d-licensed",
+    "creationTimestamp" : "2025-09-19T11:44:32.051712765Z",
+    "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
+    "totalTime" : 130.767,
+    "environmentDetectionTime" : 0.052,
+    "indexingTime" : 0.421,
+    "entryPointsTime" : 0.04,
+    "generationTime" : 5803.562,
+    "timeToFirstTest" : 3070.163,
+    "timeToLastTest" : 6454.645,
+    "indexQueryTime" : 7.223,
+    "verificationTime" : 240.047,
+    "validationTime" : 14.795
+  },
+  "codes" : {
+    "R000" : "Success",
+    "R006" : "Static initializer failed",
+    "R027" : "Missing beans when creating Spring context",
+    "T000" : "Method eligible for test creation",
+    "T005" : "Trivial constructor",
+    "T006" : "Main method",
+    "T012" : "Synthetic method",
+    "T023" : "Testability unknown",
+    "V000" : "Validated successfully"
+  },
+  "summary" : {
+    "classesCount" : 3,
+    "methodsCount" : 17,
+    "cumulativeDiffblueTestCount" : 0,
+    "cumulativeManualTestCount" : 0,
+    "completeTestCount" : 2,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 117,
+    "perMethodTestability" : {
+      "T000" : 4,
+      "T005" : 3,
+      "T006" : 1,
+      "T012" : 8,
+      "T023" : 1
+    },
+    "perMethodOutcome" : {
+      "R000" : 1,
+      "R006" : 1,
+      "R027" : 2,
+      "T005" : 3,
+      "T006" : 1,
+      "T012" : 8,
+      "T023" : 1
+    },
+    "perTestOutcome" : {
+      "R000" : 2
+    },
+    "perTestValidation" : {
+      "V000" : 2
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication" : {
+      "methodsCount" : 7,
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T005" : 1,
+        "T006" : 1,
+        "T012" : 2,
+        "T023" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R006" : 1,
+        "T005" : 1,
+        "T006" : 1,
+        "T012" : 2,
+        "T023" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 2
+      }
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecurityPermitAllConfig" : {
+      "methodsCount" : 4,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1,
+        "T012" : 2
+      },
+      "perMethodOutcome" : {
+        "R027" : 1,
+        "T005" : 1,
+        "T012" : 2
+      }
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecuritySecureConfig" : {
+      "methodsCount" : 6,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1,
+        "T012" : 4
+      },
+      "perMethodOutcome" : {
+        "R027" : 1,
+        "T005" : 1,
+        "T012" : 4
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecurityPermitAllConfig.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        108,
+        109,
+        110
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecurityPermitAllConfig.filterChain:(Lorg/springframework/security/config/annotation/web/builders/HttpSecurity;)Lorg/springframework/security/web/SecurityFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        114,
+        115,
+        123
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecurityPermitAllConfig.lambda$filterChain$0:(Lorg/springframework/security/config/annotation/web/configurers/AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        114
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecurityPermitAllConfig.lambda$filterChain$1:(Lorg/springframework/security/config/annotation/web/configurers/CsrfConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        115,
+        116,
+        118,
+        119,
+        120,
+        121,
+        117,
+        115
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecuritySecureConfig.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        134,
+        135,
+        136
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecuritySecureConfig.filterChain:(Lorg/springframework/security/config/annotation/web/builders/HttpSecurity;)Lorg/springframework/security/web/SecurityFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        140,
+        141,
+        142,
+        144,
+        151,
+        153,
+        154,
+        155,
+        163
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecuritySecureConfig.lambda$filterChain$0:(Lorg/springframework/security/config/annotation/web/configurers/AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        149,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        149
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecuritySecureConfig.lambda$filterChain$1:(Lorg/springframework/security/web/authentication/SavedRequestAwareAuthenticationSuccessHandler;Lorg/springframework/security/config/annotation/web/configurers/FormLoginConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        151,
+        152,
+        151
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecuritySecureConfig.lambda$filterChain$2:(Lorg/springframework/security/config/annotation/web/configurers/LogoutConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        153
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication$SecuritySecureConfig.lambda$filterChain$3:(Lorg/springframework/security/config/annotation/web/configurers/CsrfConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        155,
+        156,
+        158,
+        159,
+        160,
+        161,
+        157,
+        155
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T023",
+      "perMethodOutcome" : "T023"
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        54
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication.hazelcastConfig:()Lcom/hazelcast/config/Config;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R006",
+      "lineNumbers" : [
+        68,
+        69,
+        70,
+        76,
+        77,
+        78,
+        80,
+        79,
+        81,
+        83,
+        84,
+        85,
+        86,
+        89,
+        90,
+        91,
+        92,
+        93
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication.lambda$loggingNotifier$0:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        99
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication.lambda$loggingNotifier$1:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;)Lreactor/core/publisher/Mono;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        99
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication.loggingNotifier:()Lde/codecentric/boot/admin/server/notify/Notifier;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        99
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminHazelcastApplication.main:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T006",
+      "perMethodOutcome" : "T006",
+      "lineNumbers" : [
+        59,
+        60
+      ]
+    }
+  },
+  "validationMetrics" : { }
+}
