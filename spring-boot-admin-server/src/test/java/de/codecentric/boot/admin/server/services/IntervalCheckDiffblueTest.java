@@ -64,29 +64,4 @@ class IntervalCheckDiffblueTest {
     FirstStep<Void> createResult = StepVerifier.create(intervalCheck.checkAllInstances());
     createResult.expectComplete().verify();
   }
-
-  /**
-   * Test {@link IntervalCheck#checkAllInstances()}.
-   *
-   * <p>Method under test: {@link IntervalCheck#checkAllInstances()}
-   */
-  @Test
-  @DisplayName("Test checkAllInstances()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"reactor.core.publisher.Mono IntervalCheck.checkAllInstances()"})
-  void testCheckAllInstances2() throws AssertionError {
-    // Arrange
-    IntervalCheck intervalCheck =
-        new IntervalCheck(
-            "42",
-            mock(Function.class),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act and Assert
-    FirstStep<Void> createResult = StepVerifier.create(intervalCheck.checkAllInstances());
-    createResult.expectComplete().verify();
-  }
 }

@@ -17,6 +17,7 @@ import de.codecentric.boot.admin.server.domain.entities.Instance;
 import de.codecentric.boot.admin.server.domain.entities.InstanceRepository;
 import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
+import de.codecentric.boot.admin.server.domain.events.InstanceRegisteredEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import de.codecentric.boot.admin.server.domain.values.Registration;
@@ -99,16 +100,44 @@ class RocketChatNotifierDiffblueTest {
   /**
    * Test {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}.
    *
+   * <ul>
+   *   <li>When {@link InstanceEvent}.
+   * </ul>
+   *
    * <p>Method under test: {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName("Test doNotify(InstanceEvent, Instance)")
+  @DisplayName("Test doNotify(InstanceEvent, Instance); when InstanceEvent")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({
     "reactor.core.publisher.Mono RocketChatNotifier.doNotify(InstanceEvent, Instance)"
   })
-  void testDoNotify() throws AssertionError {
+  void testDoNotify_whenInstanceEvent() throws AssertionError {
+    // Arrange, Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(
+            rocketChatNotifier.doNotify(mock(InstanceEvent.class), mock(Instance.class)));
+    createResult.expectError().verify();
+  }
+
+  /**
+   * Test {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>When {@link InstanceId} with value is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName("Test doNotify(InstanceEvent, Instance); when InstanceId with value is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "reactor.core.publisher.Mono RocketChatNotifier.doNotify(InstanceEvent, Instance)"
+  })
+  void testDoNotify_whenInstanceIdWithValueIs42() throws AssertionError {
     // Arrange, Act and Assert
     FirstStep<Void> createResult =
         StepVerifier.create(
@@ -118,53 +147,65 @@ class RocketChatNotifierDiffblueTest {
   }
 
   /**
+   * Test {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>When {@link InstanceId} with value is {@code X-Auth-Token}.
+   * </ul>
+   *
+   * <p>Method under test: {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName(
+      "Test doNotify(InstanceEvent, Instance); when InstanceId with value is 'X-Auth-Token'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "reactor.core.publisher.Mono RocketChatNotifier.doNotify(InstanceEvent, Instance)"
+  })
+  void testDoNotify_whenInstanceIdWithValueIsXAuthToken() throws AssertionError {
+    // Arrange, Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(
+            rocketChatNotifier.doNotify(
+                new InstanceDeregisteredEvent(InstanceId.of("X-Auth-Token"), 1L),
+                mock(Instance.class)));
+    createResult.expectError().verify();
+  }
+
+  /**
    * Test {@link RocketChatNotifier#createMessage(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Given {@code Status}.
-   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Status}.
    *   <li>Then return {@link Map}.
    * </ul>
    *
    * <p>Method under test: {@link RocketChatNotifier#createMessage(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName(
-      "Test createMessage(InstanceEvent, Instance); given 'Status'; when StatusInfo getStatus() return 'Status'; then return Map")
+  @DisplayName("Test createMessage(InstanceEvent, Instance); then return Map")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Object RocketChatNotifier.createMessage(InstanceEvent, Instance)"})
-  void testCreateMessage_givenStatus_whenStatusInfoGetStatusReturnStatus_thenReturnMap() {
+  void testCreateMessage_thenReturnMap() {
     // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
-
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(InstanceId.of("42"));
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("Name")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
+    RocketChatNotifier rocketChatNotifier =
+        new RocketChatNotifier(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(RestTemplate.class));
+    rocketChatNotifier.setMessage("Not all who wander are lost");
 
     // Act
-    Object actualCreateMessageResult = rocketChatNotifier.createMessage(event, instance);
+    Object actualCreateMessageResult =
+        rocketChatNotifier.createMessage(
+            new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), mock(Instance.class));
 
     // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
     assertTrue(actualCreateMessageResult instanceof Map);
     assertEquals(1, ((Map<String, HashMap>) actualCreateMessageResult).size());
     HashMap getResult = ((Map<String, HashMap>) actualCreateMessageResult).get("message");
     assertEquals(2, getResult.size());
-    assertEquals("*Name* (42) is *Status*", getResult.get("msg"));
+    assertEquals("Not all who wander are lost", getResult.get("msg"));
     assertNull(getResult.get("rid"));
   }
 
@@ -198,196 +239,28 @@ class RocketChatNotifierDiffblueTest {
    * Test {@link RocketChatNotifier#getText(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Given {@code instance}.
-   *   <li>Then return {@code *Name* (42) is *instance*}.
+   *   <li>Given {@link IllegalStateException#IllegalStateException()}.
+   *   <li>Then throw {@link IllegalStateException}.
    * </ul>
    *
    * <p>Method under test: {@link RocketChatNotifier#getText(InstanceEvent, Instance)}
    */
   @Test
   @DisplayName(
-      "Test getText(InstanceEvent, Instance); given 'instance'; then return '*Name* (42) is *instance*'")
+      "Test getText(InstanceEvent, Instance); given IllegalStateException(); then throw IllegalStateException")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"String RocketChatNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_givenInstance_thenReturnName42IsInstance() {
+  void testGetText_givenIllegalStateException_thenThrowIllegalStateException() {
     // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("instance");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
+    InstanceRegisteredEvent event = mock(InstanceRegisteredEvent.class);
+    when(event.getInstance()).thenThrow(new IllegalStateException());
 
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(InstanceId.of("42"));
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("Name")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
-
-    // Act
-    String actualText = rocketChatNotifier2.getText(event, instance);
-
-    // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
-    Expression message = rocketChatNotifier2.getMessage();
-    assertTrue(message instanceof CompositeStringExpression);
-    Expression[] expressions = ((CompositeStringExpression) message).getExpressions();
-    Expression expression = expressions[1];
-    SpelNode aST = ((SpelExpression) expression).getAST();
-    assertTrue(aST instanceof CompoundExpression);
-    Expression expression2 = expressions[3];
-    SpelNode aST2 = ((SpelExpression) expression2).getAST();
-    assertTrue(aST2 instanceof CompoundExpression);
-    Expression expression3 = expressions[5];
-    SpelNode aST3 = ((SpelExpression) expression3).getAST();
-    assertTrue(aST3 instanceof CompoundExpression);
-    assertTrue(expression instanceof SpelExpression);
-    assertTrue(expression2 instanceof SpelExpression);
-    assertTrue(expression3 instanceof SpelExpression);
-    assertEquals("*Name* (42) is *instance*", actualText);
-    assertEquals(
-        "Lde/codecentric/boot/admin/server/domain/values/InstanceId",
-        ((CompoundExpression) aST2).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST3).getExitDescriptor());
-    assertEquals(7, expressions.length);
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Given {@code instance}.
-   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code instance}.
-   * </ul>
-   *
-   * <p>Method under test: {@link RocketChatNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName(
-      "Test getText(InstanceEvent, Instance); given 'instance'; when StatusInfo getStatus() return 'instance'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String RocketChatNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_givenInstance_whenStatusInfoGetStatusReturnInstance() {
-    // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("instance");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
-
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(mock(InstanceId.class));
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("Name")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
-
-    // Act
-    rocketChatNotifier2.getText(event, instance);
-
-    // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
-    Expression message = rocketChatNotifier2.getMessage();
-    assertTrue(message instanceof CompositeStringExpression);
-    Expression[] expressions = ((CompositeStringExpression) message).getExpressions();
-    Expression expression = expressions[1];
-    SpelNode aST = ((SpelExpression) expression).getAST();
-    assertTrue(aST instanceof CompoundExpression);
-    Expression expression2 = expressions[3];
-    SpelNode aST2 = ((SpelExpression) expression2).getAST();
-    assertTrue(aST2 instanceof CompoundExpression);
-    Expression expression3 = expressions[5];
-    SpelNode aST3 = ((SpelExpression) expression3).getAST();
-    assertTrue(aST3 instanceof CompoundExpression);
-    assertTrue(expression instanceof SpelExpression);
-    assertTrue(expression2 instanceof SpelExpression);
-    assertTrue(expression3 instanceof SpelExpression);
-    assertEquals(
-        "Lde/codecentric/boot/admin/server/domain/values/InstanceId",
-        ((CompoundExpression) aST2).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST3).getExitDescriptor());
-    assertEquals(7, expressions.length);
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Given {@code Map}.
-   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Map}.
-   * </ul>
-   *
-   * <p>Method under test: {@link RocketChatNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName(
-      "Test getText(InstanceEvent, Instance); given 'java.util.Map'; when StatusInfo getStatus() return 'java.util.Map'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String RocketChatNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_givenJavaUtilMap_whenStatusInfoGetStatusReturnJavaUtilMap() {
-    // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("java.util.Map");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
-
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(mock(InstanceId.class));
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("Name")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
-
-    // Act
-    rocketChatNotifier2.getText(event, instance);
-
-    // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
-    Expression message = rocketChatNotifier2.getMessage();
-    assertTrue(message instanceof CompositeStringExpression);
-    Expression[] expressions = ((CompositeStringExpression) message).getExpressions();
-    Expression expression = expressions[1];
-    SpelNode aST = ((SpelExpression) expression).getAST();
-    assertTrue(aST instanceof CompoundExpression);
-    Expression expression2 = expressions[3];
-    SpelNode aST2 = ((SpelExpression) expression2).getAST();
-    assertTrue(aST2 instanceof CompoundExpression);
-    Expression expression3 = expressions[5];
-    SpelNode aST3 = ((SpelExpression) expression3).getAST();
-    assertTrue(aST3 instanceof CompoundExpression);
-    assertTrue(expression instanceof SpelExpression);
-    assertTrue(expression2 instanceof SpelExpression);
-    assertTrue(expression3 instanceof SpelExpression);
-    assertEquals(
-        "Lde/codecentric/boot/admin/server/domain/values/InstanceId",
-        ((CompoundExpression) aST2).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST3).getExitDescriptor());
-    assertEquals(7, expressions.length);
+    // Act and Assert
+    assertThrows(
+        IllegalStateException.class,
+        () -> rocketChatNotifier2.getText(event, mock(Instance.class)));
+    verify(event).getInstance();
   }
 
   /**
@@ -395,18 +268,18 @@ class RocketChatNotifierDiffblueTest {
    *
    * <ul>
    *   <li>Given {@code Status}.
-   *   <li>Then return {@code *Name* (42) is *Status*}.
+   *   <li>Then {@link RocketChatNotifier} Message {@link CompositeStringExpression}.
    * </ul>
    *
    * <p>Method under test: {@link RocketChatNotifier#getText(InstanceEvent, Instance)}
    */
   @Test
   @DisplayName(
-      "Test getText(InstanceEvent, Instance); given 'Status'; then return '*Name* (42) is *Status*'")
+      "Test getText(InstanceEvent, Instance); given 'Status'; then RocketChatNotifier Message CompositeStringExpression")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"String RocketChatNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_givenStatus_thenReturnName42IsStatus() {
+  void testGetText_givenStatus_thenRocketChatNotifierMessageCompositeStringExpression() {
     // Arrange
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.getStatus()).thenReturn("Status");
@@ -535,47 +408,6 @@ class RocketChatNotifierDiffblueTest {
     assertTrue(message instanceof LiteralExpression);
     assertEquals("Not all who wander are lost", message.getExpressionString());
     assertEquals("Not all who wander are lost", message.getValue());
-    TypeDescriptor valueTypeDescriptor = message.getValueTypeDescriptor();
-    assertEquals("java.lang.String", valueTypeDescriptor.getName());
-    assertNull(valueTypeDescriptor.getElementTypeDescriptor());
-    assertEquals(0, valueTypeDescriptor.getAnnotations().length);
-    assertFalse(valueTypeDescriptor.isArray());
-    assertFalse(valueTypeDescriptor.isCollection());
-    assertFalse(valueTypeDescriptor.isMap());
-    assertFalse(valueTypeDescriptor.isPrimitive());
-    Class<String> expectedValueType = String.class;
-    Class<?> valueType = message.getValueType();
-    assertEquals(expectedValueType, valueType);
-    assertSame(valueType, valueTypeDescriptor.getObjectType());
-    assertSame(valueType, valueTypeDescriptor.getSource());
-    assertSame(valueType, valueTypeDescriptor.getType());
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#setMessage(String)}.
-   *
-   * <ul>
-   *   <li>Then {@link RocketChatNotifier} Message ExpressionString is {@code Message42Message}.
-   * </ul>
-   *
-   * <p>Method under test: {@link RocketChatNotifier#setMessage(String)}
-   */
-  @Test
-  @DisplayName(
-      "Test setMessage(String); then RocketChatNotifier Message ExpressionString is 'Message42Message'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void RocketChatNotifier.setMessage(String)"})
-  void testSetMessage_thenRocketChatNotifierMessageExpressionStringIsMessage42Message()
-      throws EvaluationException {
-    // Arrange and Act
-    rocketChatNotifier.setMessage("Message42Message");
-
-    // Assert
-    Expression message = rocketChatNotifier.getMessage();
-    assertTrue(message instanceof LiteralExpression);
-    assertEquals("Message42Message", message.getExpressionString());
-    assertEquals("Message42Message", message.getValue());
     TypeDescriptor valueTypeDescriptor = message.getValueTypeDescriptor();
     assertEquals("java.lang.String", valueTypeDescriptor.getName());
     assertNull(valueTypeDescriptor.getElementTypeDescriptor());

@@ -144,20 +144,18 @@ class NotificationFilterControllerDiffblueTest {
    * Test {@link NotificationFilterController#addFilter(String, String, Long)}.
    *
    * <ul>
-   *   <li>Given {@link FilteringNotifier}.
-   *   <li>When {@code null}.
-   *   <li>Then StatusCode return {@link HttpStatus}.
+   *   <li>Then return Body is {@code Either 'instanceId' or 'applicationName' must be set}.
    * </ul>
    *
    * <p>Method under test: {@link NotificationFilterController#addFilter(String, String, Long)}
    */
   @Test
   @DisplayName(
-      "Test addFilter(String, String, Long); given FilteringNotifier; when 'null'; then StatusCode return HttpStatus")
+      "Test addFilter(String, String, Long); then return Body is 'Either 'instanceId' or 'applicationName' must be set'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"ResponseEntity NotificationFilterController.addFilter(String, String, Long)"})
-  void testAddFilter_givenFilteringNotifier_whenNull_thenStatusCodeReturnHttpStatus() {
+  void testAddFilter_thenReturnBodyIsEitherInstanceIdOrApplicationNameMustBeSet() {
     // Arrange and Act
     ResponseEntity<?> actualAddFilterResult =
         notificationFilterController.addFilter(null, null, null);
@@ -300,7 +298,11 @@ class NotificationFilterControllerDiffblueTest {
     verify(filteringNotifier).addFilter(isA(NotificationFilter.class));
     Object body = actualAddFilterResult.getBody();
     assertTrue(body instanceof ApplicationNameNotificationFilter);
+    HttpStatusCode statusCode = actualAddFilterResult.getStatusCode();
+    assertTrue(statusCode instanceof HttpStatus);
     assertEquals("Name", ((ApplicationNameNotificationFilter) body).getApplicationName());
+    assertEquals(200, actualAddFilterResult.getStatusCodeValue());
+    assertEquals(HttpStatus.OK, statusCode);
   }
 
   /**

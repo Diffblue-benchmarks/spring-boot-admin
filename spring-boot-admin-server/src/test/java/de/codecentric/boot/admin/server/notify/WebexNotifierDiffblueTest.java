@@ -21,6 +21,7 @@ import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import de.codecentric.boot.admin.server.domain.values.Registration;
 import de.codecentric.boot.admin.server.domain.values.StatusInfo;
+import de.codecentric.boot.admin.server.eventstore.HazelcastEventStore;
 import de.codecentric.boot.admin.server.eventstore.InMemoryEventStore;
 import java.net.URI;
 import java.util.Map;
@@ -28,17 +29,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.CompositeStringExpression;
 import org.springframework.expression.common.LiteralExpression;
-import org.springframework.expression.spel.SpelNode;
-import org.springframework.expression.spel.ast.CompoundExpression;
-import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -52,7 +48,6 @@ import reactor.test.StepVerifier.FirstStep;
 @ContextConfiguration(classes = {WebexNotifier.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @DisabledInAotMode
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 class WebexNotifierDiffblueTest {
   @MockitoBean private InstanceRepository instanceRepository;
@@ -60,8 +55,6 @@ class WebexNotifierDiffblueTest {
   @MockitoBean private RestTemplate restTemplate;
 
   @Autowired private WebexNotifier webexNotifier;
-
-  @InjectMocks private WebexNotifier webexNotifier2;
 
   /**
    * Test {@link WebexNotifier#WebexNotifier(InstanceRepository, RestTemplate)}.
@@ -254,131 +247,62 @@ class WebexNotifierDiffblueTest {
    * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Given {@code Status}.
-   *   <li>Then return {@code <strong>Name</strong>/ is <strong>Status</strong>}.
+   *   <li>Then return {@code Not all who wander are lost}.
    * </ul>
    *
    * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName(
-      "Test getText(InstanceEvent, Instance); given 'Status'; then return '<strong>Name</strong>/ is <strong>Status</strong>'")
+  @DisplayName("Test getText(InstanceEvent, Instance); then return 'Not all who wander are lost'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_givenStatus_thenReturnStrongNameStrongIsStrongStatusStrong() {
+  void testGetText_thenReturnNotAllWhoWanderAreLost() {
     // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
+    WebexNotifier webexNotifier =
+        new WebexNotifier(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(RestTemplate.class));
+    webexNotifier.setMessage("Not all who wander are lost");
 
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(null);
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("Name")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
-
-    // Act
-    String actualText = webexNotifier2.getText(event, instance);
-
-    // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
-    Expression message = webexNotifier2.getMessage();
-    assertTrue(message instanceof CompositeStringExpression);
-    Expression[] expressions = ((CompositeStringExpression) message).getExpressions();
-    Expression expression = expressions[1];
-    SpelNode aST = ((SpelExpression) expression).getAST();
-    assertTrue(aST instanceof CompoundExpression);
-    Expression expression2 = expressions[3];
-    SpelNode aST2 = ((SpelExpression) expression2).getAST();
-    assertTrue(aST2 instanceof CompoundExpression);
-    Expression expression3 = expressions[5];
-    SpelNode aST3 = ((SpelExpression) expression3).getAST();
-    assertTrue(aST3 instanceof CompoundExpression);
-    assertTrue(expression instanceof SpelExpression);
-    assertTrue(expression2 instanceof SpelExpression);
-    assertTrue(expression3 instanceof SpelExpression);
-    assertEquals("<strong>Name</strong>/ is <strong>Status</strong>", actualText);
+    // Act and Assert
     assertEquals(
-        "Lde/codecentric/boot/admin/server/domain/values/InstanceId",
-        ((CompoundExpression) aST2).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST3).getExitDescriptor());
-    assertEquals(7, expressions.length);
+        "Not all who wander are lost",
+        webexNotifier.getText(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), null));
   }
 
   /**
    * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Then return {@code <strong>event</strong>/ is <strong>Status</strong>}.
+   *   <li>When {@link Instance}.
+   *   <li>Then calls {@link InstanceDeregisteredEvent#getInstance()}.
    * </ul>
    *
    * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName(
-      "Test getText(InstanceEvent, Instance); then return '<strong>event</strong>/ is <strong>Status</strong>'")
+  @DisplayName("Test getText(InstanceEvent, Instance); when Instance; then calls getInstance()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_thenReturnStrongEventStrongIsStrongStatusStrong() {
+  void testGetText_whenInstance_thenCallsGetInstance() {
     // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
 
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(null);
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("event")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
+    WebexNotifier webexNotifier = new WebexNotifier(repository, mock(RestTemplate.class));
+    webexNotifier.setMessage("Not all who wander are lost");
+
+    InstanceDeregisteredEvent event = mock(InstanceDeregisteredEvent.class);
+    when(event.getInstance()).thenReturn(InstanceId.of("42"));
 
     // Act
-    String actualText = webexNotifier2.getText(event, instance);
+    String actualText = webexNotifier.getText(event, mock(Instance.class));
 
     // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
-    Expression message = webexNotifier2.getMessage();
-    assertTrue(message instanceof CompositeStringExpression);
-    Expression[] expressions = ((CompositeStringExpression) message).getExpressions();
-    Expression expression = expressions[1];
-    SpelNode aST = ((SpelExpression) expression).getAST();
-    assertTrue(aST instanceof CompoundExpression);
-    Expression expression2 = expressions[3];
-    SpelNode aST2 = ((SpelExpression) expression2).getAST();
-    assertTrue(aST2 instanceof CompoundExpression);
-    Expression expression3 = expressions[5];
-    SpelNode aST3 = ((SpelExpression) expression3).getAST();
-    assertTrue(aST3 instanceof CompoundExpression);
-    assertTrue(expression instanceof SpelExpression);
-    assertTrue(expression2 instanceof SpelExpression);
-    assertTrue(expression3 instanceof SpelExpression);
-    assertEquals("<strong>event</strong>/ is <strong>Status</strong>", actualText);
-    assertEquals(
-        "Lde/codecentric/boot/admin/server/domain/values/InstanceId",
-        ((CompoundExpression) aST2).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST3).getExitDescriptor());
-    assertEquals(7, expressions.length);
+    verify(event).getInstance();
+    assertEquals("Not all who wander are lost", actualText);
   }
 
   /**

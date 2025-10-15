@@ -4,18 +4,18 @@
   },
   "run" : {
     "version" : "2025.09.01-44e352d-licensed",
-    "creationTimestamp" : "2025-09-19T11:44:32.051712765Z",
+    "creationTimestamp" : "2025-10-15T16:00:20.277407012Z",
     "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
-    "totalTime" : 1648.3,
-    "environmentDetectionTime" : 0.17,
+    "totalTime" : 1369.548,
+    "environmentDetectionTime" : 0.18,
     "indexingTime" : 0.401,
-    "entryPointsTime" : 0.157,
-    "generationTime" : 5461.28,
-    "timeToFirstTest" : 2498.422,
-    "timeToLastTest" : 5982.094,
-    "indexQueryTime" : 11.831,
-    "verificationTime" : 225.93,
-    "validationTime" : 10.157
+    "entryPointsTime" : 0.169,
+    "generationTime" : 4938.774,
+    "timeToFirstTest" : 2101.869,
+    "timeToLastTest" : 5418.88,
+    "indexQueryTime" : 10.383000000000001,
+    "verificationTime" : 206.61,
+    "validationTime" : 8.509
   },
   "codes" : {
     "F009" : "Internal error",

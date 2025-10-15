@@ -2,6 +2,7 @@ package de.codecentric.boot.admin.server.services;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -29,15 +30,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.server.reactive.ChannelSendOperator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.DirectProcessor;
+import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.GroupedFlux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ReplayProcessor;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.FirstStep;
 
@@ -206,78 +208,6 @@ class InstanceRegistryDiffblueTest {
   }
 
   /**
-   * Test {@link InstanceRegistry#register(Registration)}.
-   *
-   * <ul>
-   *   <li>Then return just {@link InstanceId} with value is {@code 42}.
-   * </ul>
-   *
-   * <p>Method under test: {@link InstanceRegistry#register(Registration)}
-   */
-  @Test
-  @DisplayName("Test register(Registration); then return just InstanceId with value is '42'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InstanceRegistry.register(Registration)"})
-  void testRegister_thenReturnJustInstanceIdWithValueIs42() {
-    // Arrange
-    Mono<Instance> mono = mock(Mono.class);
-    Mono<Object> justResult = Mono.just(InstanceId.of("42"));
-    when(mono.map(Mockito.<Function<Instance, Object>>any())).thenReturn(justResult);
-    when(instanceRepository.compute(
-            Mockito.<InstanceId>any(),
-            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
-        .thenReturn(mono);
-    when(instanceIdGenerator.generateId(Mockito.<Registration>any()))
-        .thenReturn(InstanceId.of("Value"));
-
-    // Act
-    Mono<InstanceId> actualRegisterResult = instanceRegistry.register(mock(Registration.class));
-
-    // Assert
-    verify(instanceRepository).compute(isA(InstanceId.class), isA(BiFunction.class));
-    verify(instanceIdGenerator).generateId(isA(Registration.class));
-    verify(mono).map(isA(Function.class));
-    assertSame(justResult, actualRegisterResult);
-  }
-
-  /**
-   * Test {@link InstanceRegistry#register(Registration)}.
-   *
-   * <ul>
-   *   <li>Then return just {@link InstanceId} with value is {@code 42Value}.
-   * </ul>
-   *
-   * <p>Method under test: {@link InstanceRegistry#register(Registration)}
-   */
-  @Test
-  @DisplayName("Test register(Registration); then return just InstanceId with value is '42Value'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InstanceRegistry.register(Registration)"})
-  void testRegister_thenReturnJustInstanceIdWithValueIs42Value() {
-    // Arrange
-    Mono<Instance> mono = mock(Mono.class);
-    Mono<Object> justResult = Mono.just(InstanceId.of("42Value"));
-    when(mono.map(Mockito.<Function<Instance, Object>>any())).thenReturn(justResult);
-    when(instanceRepository.compute(
-            Mockito.<InstanceId>any(),
-            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
-        .thenReturn(mono);
-    when(instanceIdGenerator.generateId(Mockito.<Registration>any()))
-        .thenReturn(InstanceId.of("Value"));
-
-    // Act
-    Mono<InstanceId> actualRegisterResult = instanceRegistry.register(mock(Registration.class));
-
-    // Assert
-    verify(instanceRepository).compute(isA(InstanceId.class), isA(BiFunction.class));
-    verify(instanceIdGenerator).generateId(isA(Registration.class));
-    verify(mono).map(isA(Function.class));
-    assertSame(justResult, actualRegisterResult);
-  }
-
-  /**
    * Test {@link InstanceRegistry#getInstances()}.
    *
    * <p>Method under test: {@link InstanceRegistry#getInstances()}
@@ -394,6 +324,134 @@ class InstanceRegistryDiffblueTest {
    * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
    *
    * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} addAll {@link ArrayList#ArrayList()}.
+   *   <li>When empty string.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getInstances(String) with 'String'; given ArrayList() addAll ArrayList(); when empty string")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
+  void testGetInstancesWithString_givenArrayListAddAllArrayList_whenEmptyString()
+      throws AssertionError {
+    // Arrange
+    ArrayList<Instance> it = new ArrayList<>();
+    it.addAll(new ArrayList<>());
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act and Assert
+    FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances(""));
+    createResult.expectComplete().verify();
+    verify(instanceRepository).findByName("");
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
+   *
+   * <ul>
+   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#filter(Predicate)} return {@link
+   *       Flux}.
+   *   <li>When {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getInstances(String) with 'String'; given DirectProcessor filter(Predicate) return Flux; when '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
+  void testGetInstancesWithString_givenDirectProcessorFilterReturnFlux_when42() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(mock(Flux.class));
+    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act
+    instanceRegistry.getInstances("42");
+
+    // Assert
+    verify(instanceRepository).findByName("42");
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
+   *
+   * <ul>
+   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#filter(Predicate)} return
+   *       fromIterable {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getInstances(String) with 'String'; given DirectProcessor filter(Predicate) return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
+  void testGetInstancesWithString_givenDirectProcessorFilterReturnFromIterableArrayList()
+      throws AssertionError {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act and Assert
+    FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances("Name"));
+    createResult.expectComplete().verify();
+    verify(instanceRepository).findByName("Name");
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
+   *
+   * <ul>
+   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#filter(Predicate)} return {@code
+   *       null}.
+   *   <li>Then return {@code null}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getInstances(String) with 'String'; given DirectProcessor filter(Predicate) return 'null'; then return 'null'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
+  void testGetInstancesWithString_givenDirectProcessorFilterReturnNull_thenReturnNull() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(null);
+    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act
+    Flux<Instance> actualInstances = instanceRegistry.getInstances("NameName");
+
+    // Assert
+    verify(instanceRepository).findByName("NameName");
+    verify(directProcessor).filter(isA(Predicate.class));
+    assertNull(actualInstances);
+  }
+
+  /**
+   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
+   *
+   * <ul>
    *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findByName(String)} return
    *       create.
    * </ul>
@@ -416,34 +474,6 @@ class InstanceRegistryDiffblueTest {
 
     // Assert
     verify(instanceRepository).findByName("Name");
-  }
-
-  /**
-   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
-   *
-   * <ul>
-   *   <li>Then calls {@link DirectProcessor#filter(Predicate)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
-   */
-  @Test
-  @DisplayName("Test getInstances(String) with 'String'; then calls filter(Predicate)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
-  void testGetInstancesWithString_thenCallsFilter() throws AssertionError {
-    // Arrange
-    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
-    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
-    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
-
-    // Act and Assert
-    FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances("Name"));
-    createResult.expectComplete().verify();
-    verify(instanceRepository).findByName("Name");
-    verify(directProcessor).filter(isA(Predicate.class));
   }
 
   /**
@@ -636,20 +666,25 @@ class InstanceRegistryDiffblueTest {
    * Test {@link InstanceRegistry#getInstances()}.
    *
    * <ul>
-   *   <li>Then return create three and {@code true}.
+   *   <li>Then return Error is {@link ArrayStoreException#ArrayStoreException()}.
    * </ul>
    *
    * <p>Method under test: {@link InstanceRegistry#getInstances()}
    */
   @Test
-  @DisplayName("Test getInstances(); then return create three and 'true'")
+  @DisplayName("Test getInstances(); then return Error is ArrayStoreException()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Flux InstanceRegistry.getInstances()"})
-  void testGetInstances_thenReturnCreateThreeAndTrue() {
+  void testGetInstances_thenReturnErrorIsArrayStoreException() {
     // Arrange
+    ArrayStoreException t = new ArrayStoreException();
+    t.addSuppressed(new Throwable());
+
+    EmitterProcessor<Instance> createResult = EmitterProcessor.create(3, true);
+    createResult.tryEmitError(t);
+
     DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
-    ReplayProcessor<Instance> createResult = ReplayProcessor.create(3, true);
     when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(createResult);
     when(instanceRepository.findAll()).thenReturn(directProcessor);
 
@@ -659,7 +694,42 @@ class InstanceRegistryDiffblueTest {
     // Assert
     verify(instanceRepository).findAll();
     verify(directProcessor).filter(isA(Predicate.class));
-    assertSame(createResult, actualInstances);
+    assertTrue(actualInstances instanceof EmitterProcessor);
+    assertSame(t, ((EmitterProcessor<Instance>) actualInstances).getError());
+  }
+
+  /**
+   * Test {@link InstanceRegistry#getInstances()}.
+   *
+   * <ul>
+   *   <li>Then return Error is {@link Throwable#Throwable()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstances()}
+   */
+  @Test
+  @DisplayName("Test getInstances(); then return Error is Throwable()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux InstanceRegistry.getInstances()"})
+  void testGetInstances_thenReturnErrorIsThrowable() {
+    // Arrange
+    EmitterProcessor<Instance> createResult = EmitterProcessor.create(3, true);
+    Throwable t = new Throwable();
+    createResult.tryEmitError(t);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(createResult);
+    when(instanceRepository.findAll()).thenReturn(directProcessor);
+
+    // Act
+    Flux<Instance> actualInstances = instanceRegistry.getInstances();
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(directProcessor).filter(isA(Predicate.class));
+    assertTrue(actualInstances instanceof EmitterProcessor);
+    assertSame(t, ((EmitterProcessor<Instance>) actualInstances).getError());
   }
 
   /**
@@ -886,6 +956,32 @@ class InstanceRegistryDiffblueTest {
   }
 
   /**
+   * Test {@link InstanceRegistry#getInstance(InstanceId)}.
+   *
+   * <ul>
+   *   <li>When {@link InstanceId} with {@code Value}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstance(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test getInstance(InstanceId); when InstanceId with 'Value'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceRegistry.getInstance(InstanceId)"})
+  void testGetInstance_whenInstanceIdWithValue() throws AssertionError {
+    // Arrange
+    Mono<Instance> justResult = Mono.just(mock(Instance.class));
+    when(instanceRepository.find(Mockito.<InstanceId>any())).thenReturn(justResult);
+
+    // Act and Assert
+    FirstStep<Instance> createResult =
+        StepVerifier.create(instanceRegistry.getInstance(InstanceId.of("Value")));
+    createResult.expectComplete().verify();
+    verify(instanceRepository).find(isA(InstanceId.class));
+  }
+
+  /**
    * Test {@link InstanceRegistry#deregister(InstanceId)}.
    *
    * <p>Method under test: {@link InstanceRegistry#deregister(InstanceId)}
@@ -895,7 +991,39 @@ class InstanceRegistryDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono InstanceRegistry.deregister(InstanceId)"})
-  void testDeregister() throws AssertionError {
+  void testDeregister() {
+    // Arrange
+    Mono<Instance> mono = mock(Mono.class);
+    Flux<?> source = Flux.fromIterable(new ArrayList<>());
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+    Mono<Object> justResult = Mono.just(channelSendOperator);
+    when(mono.map(Mockito.<Function<Instance, Object>>any())).thenReturn(justResult);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<InstanceId> actualDeregisterResult = instanceRegistry.deregister(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).map(isA(Function.class));
+    assertSame(justResult, actualDeregisterResult);
+  }
+
+  /**
+   * Test {@link InstanceRegistry#deregister(InstanceId)}.
+   *
+   * <p>Method under test: {@link InstanceRegistry#deregister(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test deregister(InstanceId)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceRegistry.deregister(InstanceId)"})
+  void testDeregister2() throws AssertionError {
     // Arrange
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
@@ -919,7 +1047,7 @@ class InstanceRegistryDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono InstanceRegistry.deregister(InstanceId)"})
-  void testDeregister2() throws AssertionError {
+  void testDeregister3() throws AssertionError {
     // Arrange
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(

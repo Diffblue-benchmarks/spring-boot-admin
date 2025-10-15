@@ -185,6 +185,57 @@ class AbstractEventHandlerDiffblueTest {
    * Test {@link AbstractEventHandler#start()}.
    *
    * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
+   *   <li>Then calls {@link Function#apply(Object)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link AbstractEventHandler#start()}
+   */
+  @Test
+  @DisplayName("Test start(); given ArrayList() add '42'; then calls apply(Object)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void AbstractEventHandler.start()"})
+  void testStart_givenArrayListAdd42_thenCallsApply2() {
+    // Arrange
+    ArrayList<Object> it = new ArrayList<>();
+    it.add("42");
+    it.add("42");
+    Flux<?> source = Flux.fromIterable(it);
+
+    Function<Publisher<Object>, Publisher<Void>> writeFunction = mock(Function.class);
+    Flux<Void> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(writeFunction.apply(Mockito.<Publisher<Object>>any())).thenReturn(fromIterableResult);
+
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, writeFunction);
+
+    Notifier notifier = mock(Notifier.class);
+    when(notifier.notify(Mockito.<InstanceEvent>any())).thenReturn(channelSendOperator);
+
+    ArrayList<InstanceEvent> it2 = new ArrayList<>();
+    it2.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> fromIterableResult2 = Flux.fromIterable(it2);
+
+    DirectProcessor<InstanceEvent> events = mock(DirectProcessor.class);
+    when(events.subscribeOn(Mockito.<Scheduler>any())).thenReturn(fromIterableResult2);
+
+    HazelcastNotificationTrigger hazelcastNotificationTrigger =
+        new HazelcastNotificationTrigger(notifier, events, new ConcurrentHashMap<>());
+
+    // Act
+    hazelcastNotificationTrigger.start();
+
+    // Assert
+    verify(notifier).notify(isA(InstanceEvent.class));
+    verify(writeFunction).apply(isA(Publisher.class));
+    verify(events).subscribeOn(isA(Scheduler.class));
+  }
+
+  /**
+   * Test {@link AbstractEventHandler#start()}.
+   *
+   * <ul>
    *   <li>Given {@link ArrayList#ArrayList()} add {@code null}.
    *   <li>Then calls {@link DirectProcessor#subscribeOn(Scheduler)}.
    * </ul>
@@ -269,39 +320,6 @@ class AbstractEventHandlerDiffblueTest {
     // Arrange
     DirectProcessor<InstanceEvent> events = mock(DirectProcessor.class);
     ReplayProcessor<InstanceEvent> createResult = ReplayProcessor.create(3, true);
-    when(events.subscribeOn(Mockito.<Scheduler>any())).thenReturn(createResult);
-    Notifier notifier = mock(Notifier.class);
-
-    HazelcastNotificationTrigger hazelcastNotificationTrigger =
-        new HazelcastNotificationTrigger(notifier, events, new ConcurrentHashMap<>());
-
-    // Act
-    hazelcastNotificationTrigger.start();
-
-    // Assert
-    verify(events).subscribeOn(isA(Scheduler.class));
-  }
-
-  /**
-   * Test {@link AbstractEventHandler#start()}.
-   *
-   * <ul>
-   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#subscribeOn(Scheduler)} return
-   *       create three and {@code true}.
-   * </ul>
-   *
-   * <p>Method under test: {@link AbstractEventHandler#start()}
-   */
-  @Test
-  @DisplayName(
-      "Test start(); given DirectProcessor subscribeOn(Scheduler) return create three and 'true'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void AbstractEventHandler.start()"})
-  void testStart_givenDirectProcessorSubscribeOnReturnCreateThreeAndTrue3() {
-    // Arrange
-    DirectProcessor<InstanceEvent> events = mock(DirectProcessor.class);
-    EmitterProcessor<InstanceEvent> createResult = EmitterProcessor.create(3, true);
     when(events.subscribeOn(Mockito.<Scheduler>any())).thenReturn(createResult);
     Notifier notifier = mock(Notifier.class);
 
@@ -469,14 +487,49 @@ class AbstractEventHandlerDiffblueTest {
   /**
    * Test {@link AbstractEventHandler#createScheduler()}.
    *
+   * <ul>
+   *   <li>Given {@link ConcurrentHashMap#ConcurrentHashMap()} {@link InstanceId} with value is
+   *       {@code 42} is one.
+   * </ul>
+   *
    * <p>Method under test: {@link AbstractEventHandler#createScheduler()}
    */
   @Test
-  @DisplayName("Test createScheduler()")
+  @DisplayName(
+      "Test createScheduler(); given ConcurrentHashMap() InstanceId with value is '42' is one")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Scheduler AbstractEventHandler.createScheduler()"})
-  void testCreateScheduler() {
+  void testCreateScheduler_givenConcurrentHashMapInstanceIdWithValueIs42IsOne() {
+    // Arrange
+    ConcurrentHashMap<InstanceId, Long> sentNotifications = new ConcurrentHashMap<>();
+    sentNotifications.put(InstanceId.of("42"), 1L);
+    sentNotifications.putIfAbsent(InstanceId.of("42"), 1L);
+    Notifier notifier = mock(Notifier.class);
+    Flux<InstanceEvent> events = Flux.fromIterable(new ArrayList<>());
+
+    HazelcastNotificationTrigger hazelcastNotificationTrigger =
+        new HazelcastNotificationTrigger(notifier, events, sentNotifications);
+
+    // Act and Assert
+    assertFalse(hazelcastNotificationTrigger.createScheduler().isDisposed());
+  }
+
+  /**
+   * Test {@link AbstractEventHandler#createScheduler()}.
+   *
+   * <ul>
+   *   <li>Given {@link Notifier}.
+   * </ul>
+   *
+   * <p>Method under test: {@link AbstractEventHandler#createScheduler()}
+   */
+  @Test
+  @DisplayName("Test createScheduler(); given Notifier")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Scheduler AbstractEventHandler.createScheduler()"})
+  void testCreateScheduler_givenNotifier() {
     // Arrange, Act and Assert
     assertFalse(abstractEventHandler.createScheduler().isDisposed());
   }

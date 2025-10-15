@@ -4,18 +4,18 @@
   },
   "run" : {
     "version" : "2025.09.01-44e352d-licensed",
-    "creationTimestamp" : "2025-09-19T11:44:32.051712765Z",
+    "creationTimestamp" : "2025-10-15T16:00:20.277407012Z",
     "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
-    "totalTime" : 3732.023,
-    "environmentDetectionTime" : 1.488,
-    "indexingTime" : 0.391,
-    "entryPointsTime" : 1.366,
-    "generationTime" : 3388.455,
-    "timeToFirstTest" : 155.461,
-    "timeToLastTest" : 3687.044,
-    "indexQueryTime" : 19.249,
-    "verificationTime" : 194.869,
-    "validationTime" : 22.385
+    "totalTime" : 3548.374,
+    "environmentDetectionTime" : 1.569,
+    "indexingTime" : 0.392,
+    "entryPointsTime" : 1.442,
+    "generationTime" : 3228.523,
+    "timeToFirstTest" : 154.836,
+    "timeToLastTest" : 3511.923,
+    "indexQueryTime" : 19.125,
+    "verificationTime" : 180.039,
+    "validationTime" : 18.175
   },
   "codes" : {
     "F009" : "Internal error",
@@ -47,7 +47,7 @@
     "methodsCount" : 1385,
     "cumulativeDiffblueTestCount" : 0,
     "cumulativeManualTestCount" : 0,
-    "completeTestCount" : 1126,
+    "completeTestCount" : 1137,
     "incompleteTestCount" : 0,
     "skeletonTestCount" : 0,
     "totalPhysicalLineCount" : 7342,
@@ -84,14 +84,14 @@
       "W002" : 9
     },
     "perTestOutcome" : {
-      "R000" : 1126
+      "R000" : 1137
     },
     "perTestValidation" : {
-      "V000" : 1126
+      "V000" : 1137
     },
     "warnings" : {
-      "W001" : 16,
-      "W002" : 110
+      "W001" : 8,
+      "W002" : 68
     }
   },
   "classes" : {
@@ -1658,7 +1658,7 @@
     },
     "de.codecentric.boot.admin.server.notify.RocketChatNotifier" : {
       "methodsCount" : 17,
-      "completeTestCount" : 11,
+      "completeTestCount" : 10,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 5,
@@ -1673,12 +1673,12 @@
         "T012" : 1
       },
       "perTestOutcome" : {
-        "R000" : 11
+        "R000" : 10
       }
     },
     "de.codecentric.boot.admin.server.notify.SlackNotifier" : {
       "methodsCount" : 17,
-      "completeTestCount" : 15,
+      "completeTestCount" : 19,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 7,
@@ -1691,12 +1691,12 @@
         "T012" : 1
       },
       "perTestOutcome" : {
-        "R000" : 15
+        "R000" : 19
       }
     },
     "de.codecentric.boot.admin.server.notify.TelegramNotifier" : {
       "methodsCount" : 18,
-      "completeTestCount" : 5,
+      "completeTestCount" : 7,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 5,
@@ -1712,7 +1712,7 @@
         "T012" : 1
       },
       "perTestOutcome" : {
-        "R000" : 5
+        "R000" : 7
       }
     },
     "de.codecentric.boot.admin.server.notify.WebexNotifier" : {
@@ -1768,7 +1768,7 @@
     },
     "de.codecentric.boot.admin.server.notify.filter.ExpiringNotificationFilter" : {
       "methodsCount" : 5,
-      "completeTestCount" : 5,
+      "completeTestCount" : 4,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 3,
@@ -1779,7 +1779,7 @@
         "T010" : 2
       },
       "perTestOutcome" : {
-        "R000" : 5
+        "R000" : 4
       }
     },
     "de.codecentric.boot.admin.server.notify.filter.FilteringNotifier" : {
@@ -1848,7 +1848,7 @@
     },
     "de.codecentric.boot.admin.server.services.AbstractEventHandler" : {
       "methodsCount" : 7,
-      "completeTestCount" : 12,
+      "completeTestCount" : 13,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 3,
@@ -1862,10 +1862,10 @@
         "T012" : 2
       },
       "perTestOutcome" : {
-        "R000" : 12
+        "R000" : 13
       },
       "warnings" : {
-        "W001" : 1
+        "W001" : 2
       }
     },
     "de.codecentric.boot.admin.server.services.ApiMediaTypeHandler" : {
@@ -1888,7 +1888,7 @@
     },
     "de.codecentric.boot.admin.server.services.ApplicationRegistry" : {
       "methodsCount" : 20,
-      "completeTestCount" : 54,
+      "completeTestCount" : 67,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 9,
@@ -1901,11 +1901,11 @@
         "T012" : 10
       },
       "perTestOutcome" : {
-        "R000" : 54
+        "R000" : 67
       },
       "warnings" : {
-        "W001" : 1,
-        "W002" : 2
+        "W001" : 3,
+        "W002" : 3
       }
     },
     "de.codecentric.boot.admin.server.services.CloudFoundryInstanceIdGenerator" : {
@@ -1926,7 +1926,7 @@
     },
     "de.codecentric.boot.admin.server.services.EndpointDetectionTrigger" : {
       "methodsCount" : 6,
-      "completeTestCount" : 14,
+      "completeTestCount" : 17,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 3,
@@ -1939,12 +1939,12 @@
         "T023" : 1
       },
       "perTestOutcome" : {
-        "R000" : 14
+        "R000" : 17
       }
     },
     "de.codecentric.boot.admin.server.services.EndpointDetector" : {
       "methodsCount" : 5,
-      "completeTestCount" : 5,
+      "completeTestCount" : 8,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 1,
@@ -1961,7 +1961,7 @@
         "T023" : 1
       },
       "perTestOutcome" : {
-        "R000" : 5
+        "R000" : 8
       }
     },
     "de.codecentric.boot.admin.server.services.HashingInstanceUrlIdGenerator" : {
@@ -1986,7 +1986,7 @@
     },
     "de.codecentric.boot.admin.server.services.InfoUpdateTrigger" : {
       "methodsCount" : 12,
-      "completeTestCount" : 57,
+      "completeTestCount" : 88,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 7,
@@ -1999,15 +1999,15 @@
         "T023" : 1
       },
       "perTestOutcome" : {
-        "R000" : 57
+        "R000" : 88
       },
       "warnings" : {
-        "W002" : 50
+        "W002" : 6
       }
     },
     "de.codecentric.boot.admin.server.services.InfoUpdater" : {
       "methodsCount" : 10,
-      "completeTestCount" : 13,
+      "completeTestCount" : 12,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 4,
@@ -2022,10 +2022,7 @@
         "T023" : 1
       },
       "perTestOutcome" : {
-        "R000" : 13
-      },
-      "warnings" : {
-        "W002" : 3
+        "R000" : 12
       }
     },
     "de.codecentric.boot.admin.server.services.InfoUpdater$1" : {
@@ -2063,7 +2060,7 @@
     },
     "de.codecentric.boot.admin.server.services.InstanceRegistry" : {
       "methodsCount" : 8,
-      "completeTestCount" : 32,
+      "completeTestCount" : 36,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 5,
@@ -2075,15 +2072,16 @@
         "T012" : 2
       },
       "perTestOutcome" : {
-        "R000" : 32
+        "R000" : 36
       },
       "warnings" : {
-        "W002" : 2
+        "W001" : 1,
+        "W002" : 4
       }
     },
     "de.codecentric.boot.admin.server.services.IntervalCheck" : {
       "methodsCount" : 15,
-      "completeTestCount" : 3,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 4,
@@ -2099,12 +2097,12 @@
         "T023" : 1
       },
       "perTestOutcome" : {
-        "R000" : 3
+        "R000" : 2
       }
     },
     "de.codecentric.boot.admin.server.services.StatusUpdateTrigger" : {
       "methodsCount" : 12,
-      "completeTestCount" : 141,
+      "completeTestCount" : 92,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 7,
@@ -2117,16 +2115,16 @@
         "T023" : 1
       },
       "perTestOutcome" : {
-        "R000" : 141
+        "R000" : 92
       },
       "warnings" : {
-        "W001" : 13,
-        "W002" : 15
+        "W001" : 1,
+        "W002" : 17
       }
     },
     "de.codecentric.boot.admin.server.services.StatusUpdater" : {
       "methodsCount" : 14,
-      "completeTestCount" : 16,
+      "completeTestCount" : 19,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 6,
@@ -2143,7 +2141,7 @@
         "T023" : 1
       },
       "perTestOutcome" : {
-        "R000" : 16
+        "R000" : 19
       }
     },
     "de.codecentric.boot.admin.server.services.StatusUpdater$1" : {
@@ -12017,12 +12015,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.RocketChatNotifier.doNotify:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;Lde/codecentric/boot/admin/server/domain/entities/Instance;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 1,
+      "completeTestCount" : 3,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 1
+        "R000" : 3
       },
       "lineNumbers" : [
         90,
@@ -12057,12 +12055,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.RocketChatNotifier.getText:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;Lde/codecentric/boot/admin/server/domain/entities/Instance;)Ljava/lang/String;" : {
-      "completeTestCount" : 4,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 4
+        "R000" : 2
       },
       "lineNumbers" : [
         116,
@@ -12136,12 +12134,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.RocketChatNotifier.setMessage:(Ljava/lang/String;)V" : {
-      "completeTestCount" : 2,
+      "completeTestCount" : 1,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 2
+        "R000" : 1
       },
       "lineNumbers" : [
         173,
@@ -12231,12 +12229,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.SlackNotifier.createMessage:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;Lde/codecentric/boot/admin/server/domain/entities/Instance;)Ljava/lang/Object;" : {
-      "completeTestCount" : 2,
+      "completeTestCount" : 3,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 2
+        "R000" : 3
       },
       "lineNumbers" : [
         105,
@@ -12256,12 +12254,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.SlackNotifier.doNotify:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;Lde/codecentric/boot/admin/server/domain/entities/Instance;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 2,
+      "completeTestCount" : 3,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 2
+        "R000" : 3
       },
       "lineNumbers" : [
         93,
@@ -12324,12 +12322,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.SlackNotifier.getText:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;Lde/codecentric/boot/admin/server/domain/entities/Instance;)Ljava/lang/String;" : {
-      "completeTestCount" : 1,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 1
+        "R000" : 2
       },
       "lineNumbers" : [
         127,
@@ -12403,12 +12401,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.SlackNotifier.setMessage:(Ljava/lang/String;)V" : {
-      "completeTestCount" : 1,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 1
+        "R000" : 2
       },
       "lineNumbers" : [
         190,
@@ -12562,12 +12560,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.notify.TelegramNotifier.getText:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;Lde/codecentric/boot/admin/server/domain/entities/Instance;)Ljava/lang/String;" : {
-      "completeTestCount" : 1,
+      "completeTestCount" : 3,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 1
+        "R000" : 3
       },
       "lineNumbers" : [
         106,
@@ -12984,12 +12982,12 @@
       "perMethodOutcome" : "T010"
     },
     "de.codecentric.boot.admin.server.notify.filter.ExpiringNotificationFilter.filter:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;Lde/codecentric/boot/admin/server/domain/entities/Instance;)Z" : {
-      "completeTestCount" : 3,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 3
+        "R000" : 2
       },
       "lineNumbers" : [
         41
@@ -13295,12 +13293,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.AbstractEventHandler.createScheduler:()Lreactor/core/scheduler/Scheduler;" : {
-      "completeTestCount" : 1,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 1
+        "R000" : 2
       },
       "lineNumbers" : [
         67
@@ -13339,7 +13337,7 @@
         "R000" : 11
       },
       "warnings" : {
-        "W001" : 1
+        "W001" : 2
       },
       "lineNumbers" : [
         52,
@@ -13427,7 +13425,7 @@
         "R000" : 7
       },
       "warnings" : {
-        "W001" : 1
+        "W002" : 1
       },
       "lineNumbers" : [
         89,
@@ -13436,14 +13434,15 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.ApplicationRegistry.getApplication:(Ljava/lang/String;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 9,
+      "completeTestCount" : 11,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 9
+        "R000" : 11
       },
       "warnings" : {
+        "W001" : 1,
         "W002" : 1
       },
       "lineNumbers" : [
@@ -13453,12 +13452,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.ApplicationRegistry.getApplicationForInstance:(Lde/codecentric/boot/admin/server/domain/entities/Instance;)Lreactor/util/function/Tuple2;" : {
-      "completeTestCount" : 7,
+      "completeTestCount" : 11,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 7
+        "R000" : 11
       },
       "lineNumbers" : [
         94,
@@ -13479,12 +13478,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.ApplicationRegistry.getApplications:()Lreactor/core/publisher/Flux;" : {
-      "completeTestCount" : 11,
+      "completeTestCount" : 10,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 11
+        "R000" : 10
       },
       "lineNumbers" : [
         65,
@@ -13495,12 +13494,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.ApplicationRegistry.getBuildVersion:(Ljava/util/List;)Lde/codecentric/boot/admin/server/domain/values/BuildVersion;" : {
-      "completeTestCount" : 8,
+      "completeTestCount" : 14,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 8
+        "R000" : 14
       },
       "lineNumbers" : [
         112,
@@ -13529,12 +13528,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.ApplicationRegistry.getStatus:(Ljava/util/List;)Lreactor/util/function/Tuple2;" : {
-      "completeTestCount" : 7,
+      "completeTestCount" : 9,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 7
+        "R000" : 9
       },
       "lineNumbers" : [
         131,
@@ -13665,6 +13664,7 @@
         "R000" : 2
       },
       "warnings" : {
+        "W001" : 2,
         "W002" : 1
       },
       "lineNumbers" : [
@@ -13719,24 +13719,24 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.EndpointDetectionTrigger.detectEndpoints:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 6,
+      "completeTestCount" : 8,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 6
+        "R000" : 8
       },
       "lineNumbers" : [
         49
       ]
     },
     "de.codecentric.boot.admin.server.services.EndpointDetectionTrigger.handle:(Lreactor/core/publisher/Flux;)Lorg/reactivestreams/Publisher;" : {
-      "completeTestCount" : 7,
+      "completeTestCount" : 8,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 7
+        "R000" : 8
       },
       "lineNumbers" : [
         42,
@@ -13783,12 +13783,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.EndpointDetector.detectEndpoints:(Lde/codecentric/boot/admin/server/domain/values/InstanceId;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 5,
+      "completeTestCount" : 8,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 5
+        "R000" : 8
       },
       "lineNumbers" : [
         46
@@ -13884,12 +13884,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InfoUpdateTrigger.handle:(Lreactor/core/publisher/Flux;)Lorg/reactivestreams/Publisher;" : {
-      "completeTestCount" : 5,
+      "completeTestCount" : 4,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 5
+        "R000" : 4
       },
       "lineNumbers" : [
         50,
@@ -13936,12 +13936,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InfoUpdateTrigger.setInterval:(Ljava/time/Duration;)V" : {
-      "completeTestCount" : 2,
+      "completeTestCount" : 1,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 2
+        "R000" : 1
       },
       "lineNumbers" : [
         76,
@@ -13962,15 +13962,15 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InfoUpdateTrigger.start:()V" : {
-      "completeTestCount" : 22,
+      "completeTestCount" : 41,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 22
+        "R000" : 41
       },
       "warnings" : {
-        "W002" : 50
+        "W002" : 6
       },
       "lineNumbers" : [
         65,
@@ -13979,12 +13979,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InfoUpdateTrigger.stop:()V" : {
-      "completeTestCount" : 5,
+      "completeTestCount" : 8,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 5
+        "R000" : 8
       },
       "lineNumbers" : [
         71,
@@ -13993,12 +13993,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InfoUpdateTrigger.updateInfo:(Lde/codecentric/boot/admin/server/domain/values/InstanceId;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 20,
+      "completeTestCount" : 31,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 20
+        "R000" : 31
       },
       "lineNumbers" : [
         57,
@@ -14035,12 +14035,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InfoUpdater.convertInfo:(Lde/codecentric/boot/admin/server/domain/entities/Instance;Ljava/lang/Throwable;)Lde/codecentric/boot/admin/server/domain/values/Info;" : {
-      "completeTestCount" : 2,
+      "completeTestCount" : 1,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 2
+        "R000" : 1
       },
       "lineNumbers" : [
         97,
@@ -14054,9 +14054,6 @@
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
         "R000" : 2
-      },
-      "warnings" : {
-        "W002" : 3
       },
       "lineNumbers" : [
         85,
@@ -14171,12 +14168,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InstanceRegistry.deregister:(Lde/codecentric/boot/admin/server/domain/values/InstanceId;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 4,
+      "completeTestCount" : 5,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 4
+        "R000" : 5
       },
       "warnings" : {
         "W002" : 1
@@ -14188,18 +14185,6 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InstanceRegistry.getInstance:(Lde/codecentric/boot/admin/server/domain/values/InstanceId;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 7,
-      "incompleteTestCount" : 0,
-      "perMethodTestability" : "T000",
-      "perMethodOutcome" : "R000",
-      "perTestOutcome" : {
-        "R000" : 7
-      },
-      "lineNumbers" : [
-        87
-      ]
-    },
-    "de.codecentric.boot.admin.server.services.InstanceRegistry.getInstances:()Lreactor/core/publisher/Flux;" : {
       "completeTestCount" : 8,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
@@ -14208,16 +14193,31 @@
         "R000" : 8
       },
       "lineNumbers" : [
-        69
+        87
       ]
     },
-    "de.codecentric.boot.admin.server.services.InstanceRegistry.getInstances:(Ljava/lang/String;)Lreactor/core/publisher/Flux;" : {
-      "completeTestCount" : 6,
+    "de.codecentric.boot.admin.server.services.InstanceRegistry.getInstances:()Lreactor/core/publisher/Flux;" : {
+      "completeTestCount" : 9,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 6
+        "R000" : 9
+      },
+      "lineNumbers" : [
+        69
+      ]
+    },
+    "de.codecentric.boot.admin.server.services.InstanceRegistry.getInstances:(Ljava/lang/String;)Lreactor/core/publisher/Flux;" : {
+      "completeTestCount" : 9,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 9
+      },
+      "warnings" : {
+        "W001" : 1
       },
       "lineNumbers" : [
         78
@@ -14244,15 +14244,15 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.InstanceRegistry.register:(Lde/codecentric/boot/admin/server/domain/values/Registration;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 6,
+      "completeTestCount" : 4,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 6
+        "R000" : 4
       },
       "warnings" : {
-        "W002" : 1
+        "W002" : 3
       },
       "lineNumbers" : [
         53,
@@ -14289,12 +14289,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.IntervalCheck.checkAllInstances:()Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 2,
+      "completeTestCount" : 1,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 2
+        "R000" : 1
       },
       "lineNumbers" : [
         98,
@@ -14440,12 +14440,12 @@
       "perMethodOutcome" : "T023"
     },
     "de.codecentric.boot.admin.server.services.StatusUpdateTrigger.<init>:(Lde/codecentric/boot/admin/server/services/StatusUpdater;Lorg/reactivestreams/Publisher;Ljava/time/Duration;Ljava/time/Duration;Ljava/time/Duration;)V" : {
-      "completeTestCount" : 15,
+      "completeTestCount" : 8,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 15
+        "R000" : 8
       },
       "lineNumbers" : [
         42,
@@ -14455,15 +14455,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdateTrigger.handle:(Lreactor/core/publisher/Flux;)Lorg/reactivestreams/Publisher;" : {
-      "completeTestCount" : 17,
+      "completeTestCount" : 9,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 17
-      },
-      "warnings" : {
-        "W001" : 1
+        "R000" : 9
       },
       "lineNumbers" : [
         50,
@@ -14510,15 +14507,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdateTrigger.setInterval:(Ljava/time/Duration;)V" : {
-      "completeTestCount" : 8,
+      "completeTestCount" : 5,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 8
-      },
-      "warnings" : {
-        "W001" : 3
+        "R000" : 5
       },
       "lineNumbers" : [
         79,
@@ -14526,15 +14520,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdateTrigger.setLifetime:(Ljava/time/Duration;)V" : {
-      "completeTestCount" : 7,
+      "completeTestCount" : 4,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 7
-      },
-      "warnings" : {
-        "W001" : 5
+        "R000" : 4
       },
       "lineNumbers" : [
         83,
@@ -14542,15 +14533,15 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdateTrigger.start:()V" : {
-      "completeTestCount" : 54,
+      "completeTestCount" : 36,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 54
+        "R000" : 36
       },
       "warnings" : {
-        "W002" : 13
+        "W002" : 17
       },
       "lineNumbers" : [
         68,
@@ -14566,10 +14557,6 @@
       "perTestOutcome" : {
         "R000" : 13
       },
-      "warnings" : {
-        "W001" : 4,
-        "W002" : 2
-      },
       "lineNumbers" : [
         74,
         75,
@@ -14577,12 +14564,15 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdateTrigger.updateStatus:(Lde/codecentric/boot/admin/server/domain/values/InstanceId;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 27,
+      "completeTestCount" : 17,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 27
+        "R000" : 17
+      },
+      "warnings" : {
+        "W001" : 1
       },
       "lineNumbers" : [
         57,
@@ -14690,12 +14680,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdater.handleError:(Ljava/lang/Throwable;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 3,
+      "completeTestCount" : 6,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 3
+        "R000" : 6
       },
       "lineNumbers" : [
         136,
@@ -14745,12 +14735,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdater.logError:(Lde/codecentric/boot/admin/server/domain/entities/Instance;Ljava/lang/Throwable;)V" : {
-      "completeTestCount" : 3,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 3
+        "R000" : 2
       },
       "lineNumbers" : [
         143,
@@ -14773,12 +14763,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.services.StatusUpdater.updateStatus:(Lde/codecentric/boot/admin/server/domain/values/InstanceId;)Lreactor/core/publisher/Mono;" : {
-      "completeTestCount" : 5,
+      "completeTestCount" : 6,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 5
+        "R000" : 6
       },
       "lineNumbers" : [
         71

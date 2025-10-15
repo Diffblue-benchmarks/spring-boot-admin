@@ -4,18 +4,18 @@
   },
   "run" : {
     "version" : "2025.09.01-44e352d-licensed",
-    "creationTimestamp" : "2025-09-19T11:44:32.051712765Z",
+    "creationTimestamp" : "2025-10-15T16:00:20.277407012Z",
     "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
-    "totalTime" : 456.477,
-    "environmentDetectionTime" : 0.14,
-    "indexingTime" : 0.441,
-    "entryPointsTime" : 0.122,
-    "generationTime" : 6356.337,
-    "timeToFirstTest" : 3880.168,
-    "timeToLastTest" : 7159.011,
-    "indexQueryTime" : 12.455,
-    "verificationTime" : 280.392,
-    "validationTime" : 17.574
+    "totalTime" : 372.492,
+    "environmentDetectionTime" : 0.131,
+    "indexingTime" : 0.432,
+    "entryPointsTime" : 0.117,
+    "generationTime" : 5666.593,
+    "timeToFirstTest" : 3236.655,
+    "timeToLastTest" : 6383.546,
+    "indexQueryTime" : 11.507,
+    "verificationTime" : 252.027,
+    "validationTime" : 14.315
   },
   "codes" : {
     "R000" : "Success",
@@ -36,7 +36,7 @@
     "methodsCount" : 66,
     "cumulativeDiffblueTestCount" : 0,
     "cumulativeManualTestCount" : 0,
-    "completeTestCount" : 154,
+    "completeTestCount" : 153,
     "incompleteTestCount" : 0,
     "skeletonTestCount" : 0,
     "totalPhysicalLineCount" : 453,
@@ -60,10 +60,10 @@
       "T023" : 2
     },
     "perTestOutcome" : {
-      "R000" : 154
+      "R000" : 153
     },
     "perTestValidation" : {
-      "V000" : 154
+      "V000" : 153
     },
     "warnings" : {
       "W002" : 1
@@ -72,7 +72,7 @@
   "classes" : {
     "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration" : {
       "methodsCount" : 3,
-      "completeTestCount" : 3,
+      "completeTestCount" : 2,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
         "T000" : 2,
@@ -83,7 +83,7 @@
         "T005" : 1
       },
       "perTestOutcome" : {
-        "R000" : 3
+        "R000" : 2
       }
     },
     "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration$EurekaConverterConfiguration" : {
@@ -322,12 +322,12 @@
       ]
     },
     "de.codecentric.boot.admin.server.cloud.config.AdminServerDiscoveryAutoConfiguration.instanceDiscoveryListener:(Lde/codecentric/boot/admin/server/cloud/discovery/ServiceInstanceConverter;Lorg/springframework/cloud/client/discovery/DiscoveryClient;Lde/codecentric/boot/admin/server/services/InstanceRegistry;Lde/codecentric/boot/admin/server/domain/entities/InstanceRepository;)Lde/codecentric/boot/admin/server/cloud/discovery/InstanceDiscoveryListener;" : {
-      "completeTestCount" : 2,
+      "completeTestCount" : 1,
       "incompleteTestCount" : 0,
       "perMethodTestability" : "T000",
       "perMethodOutcome" : "R000",
       "perTestOutcome" : {
-        "R000" : 2
+        "R000" : 1
       },
       "lineNumbers" : [
         59,

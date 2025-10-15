@@ -1,5 +1,6 @@
 package de.codecentric.boot.admin.server.services;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -32,6 +33,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.ByteBufMono;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.FirstStep;
 
@@ -86,7 +88,37 @@ class EndpointDetectorDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
-  void testDetectEndpoints2() throws AssertionError {
+  void testDetectEndpoints2() {
+    // Arrange
+    Mono<Instance> mono = mock(Mono.class);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(mock(ByteBufMono.class), mock(Function.class));
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualDetectEndpointsResult = endpointDetector.detectEndpoints(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualDetectEndpointsResult);
+  }
+
+  /**
+   * Test {@link EndpointDetector#detectEndpoints(InstanceId)}.
+   *
+   * <p>Method under test: {@link EndpointDetector#detectEndpoints(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test detectEndpoints(InstanceId)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
+  void testDetectEndpoints3() throws AssertionError {
     // Arrange
     EndpointDetector endpointDetector =
         new EndpointDetector(
@@ -109,7 +141,7 @@ class EndpointDetectorDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
-  void testDetectEndpoints3() throws AssertionError {
+  void testDetectEndpoints4() throws AssertionError {
     // Arrange
     EndpointDetector endpointDetector =
         new EndpointDetector(
@@ -120,6 +152,44 @@ class EndpointDetectorDiffblueTest {
     FirstStep<Void> createResult =
         StepVerifier.create(endpointDetector.detectEndpoints(InstanceId.of("42")));
     createResult.expectComplete().verify();
+  }
+
+  /**
+   * Test {@link EndpointDetector#detectEndpoints(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link EndpointDetector#detectEndpoints(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test detectEndpoints(InstanceId); given ArrayList() add '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
+  void testDetectEndpoints_givenArrayListAdd42() {
+    // Arrange
+    ArrayList<Object> it = new ArrayList<>();
+    it.add("42");
+    Flux<?> source = Flux.fromIterable(it);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+
+    Mono<Instance> mono = mock(Mono.class);
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualDetectEndpointsResult = endpointDetector.detectEndpoints(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualDetectEndpointsResult);
   }
 
   /**
@@ -152,6 +222,40 @@ class EndpointDetectorDiffblueTest {
         StepVerifier.create(endpointDetector.detectEndpoints(InstanceId.of("42")));
     createResult.expectComplete().verify();
     verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+  }
+
+  /**
+   * Test {@link EndpointDetector#detectEndpoints(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link Mono} {@link Mono#then()} return {@code null}.
+   *   <li>Then return {@code null}.
+   * </ul>
+   *
+   * <p>Method under test: {@link EndpointDetector#detectEndpoints(InstanceId)}
+   */
+  @Test
+  @DisplayName(
+      "Test detectEndpoints(InstanceId); given Mono then() return 'null'; then return 'null'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
+  void testDetectEndpoints_givenMonoThenReturnNull_thenReturnNull() {
+    // Arrange
+    Mono<Instance> mono = mock(Mono.class);
+    when(mono.then()).thenReturn(null);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualDetectEndpointsResult = endpointDetector.detectEndpoints(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertNull(actualDetectEndpointsResult);
   }
 
   /**

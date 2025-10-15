@@ -358,101 +358,19 @@ class InfoUpdaterDiffblueTest {
   /**
    * Test {@link InfoUpdater#convertInfo(Instance, Throwable)} with {@code instance}, {@code ex}.
    *
-   * <ul>
-   *   <li>Given {@link Throwable#Throwable()}.
-   *   <li>When {@link Throwable#Throwable()} addSuppressed {@link Throwable#Throwable()}.
-   * </ul>
-   *
    * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, Throwable)}
    */
   @Test
-  @DisplayName(
-      "Test convertInfo(Instance, Throwable) with 'instance', 'ex'; given Throwable(); when Throwable() addSuppressed Throwable()")
+  @DisplayName("Test convertInfo(Instance, Throwable) with 'instance', 'ex'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Info InfoUpdater.convertInfo(Instance, Throwable)"})
-  void testConvertInfoWithInstanceEx_givenThrowable_whenThrowableAddSuppressedThrowable() {
-    // Arrange
-    Instance instance = mock(Instance.class);
-
-    Throwable ex = new Throwable();
-    ex.addSuppressed(new Throwable());
-
-    // Act and Assert
-    assertTrue(infoUpdater.convertInfo(instance, ex).getValues().isEmpty());
-  }
-
-  /**
-   * Test {@link InfoUpdater#convertInfo(Instance, Throwable)} with {@code instance}, {@code ex}.
-   *
-   * <ul>
-   *   <li>When {@link Throwable#Throwable()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, Throwable)}
-   */
-  @Test
-  @DisplayName("Test convertInfo(Instance, Throwable) with 'instance', 'ex'; when Throwable()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Info InfoUpdater.convertInfo(Instance, Throwable)"})
-  void testConvertInfoWithInstanceEx_whenThrowable() {
+  void testConvertInfoWithInstanceEx() {
     // Arrange
     Instance instance = mock(Instance.class);
 
     // Act and Assert
     assertTrue(infoUpdater.convertInfo(instance, new Throwable()).getValues().isEmpty());
-  }
-
-  /**
-   * Test {@link InfoUpdater#convertInfo(Instance, ClientResponse)} with {@code instance}, {@code
-   * response}.
-   *
-   * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, ClientResponse)}
-   */
-  @Test
-  @DisplayName("Test convertInfo(Instance, ClientResponse) with 'instance', 'response'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InfoUpdater.convertInfo(Instance, ClientResponse)"})
-  void testConvertInfoWithInstanceResponse() throws AssertionError {
-    // Arrange
-    Instance instance = mock(Instance.class);
-
-    MediaType mediaType = mock(MediaType.class);
-    when(mediaType.isCompatibleWith(Mockito.<MediaType>any())).thenReturn(true);
-    Optional<MediaType> ofResult = Optional.of(mediaType);
-
-    HeadersWrapper headers = mock(HeadersWrapper.class);
-    when(headers.contentType()).thenReturn(ofResult);
-    HeadersWrapper headersWrapper = new HeadersWrapper(headers);
-
-    ClientResponseWrapper delegate = mock(ClientResponseWrapper.class);
-    Mono<Map<String, Object>> justResult = Mono.just(new HashMap<>());
-    when(delegate.bodyToMono(Mockito.<ParameterizedTypeReference<Map<String, Object>>>any()))
-        .thenReturn(justResult);
-    when(delegate.headers()).thenReturn(headersWrapper);
-    when(delegate.statusCode()).thenReturn(HttpStatus.OK);
-
-    // Act
-    Mono<Info> actualPublisher =
-        infoUpdater.convertInfo(instance, new ClientResponseWrapper(delegate));
-
-    // Assert
-    FirstStep<Info> createResult = StepVerifier.create(actualPublisher);
-    createResult
-        .assertNext(
-            i -> {
-              assertTrue(i.getValues().isEmpty());
-              return;
-            })
-        .expectComplete()
-        .verify();
-    verify(mediaType).isCompatibleWith(isA(MediaType.class));
-    verify(delegate).bodyToMono(isA(ParameterizedTypeReference.class));
-    verify(delegate).headers();
-    verify(delegate).statusCode();
-    verify(headers).contentType();
   }
 
   /**
@@ -504,6 +422,62 @@ class InfoUpdaterDiffblueTest {
         .expectComplete()
         .verify();
     verify(apiMediaTypeHandler).isApiMediaType(isA(MediaType.class));
+    verify(delegate).bodyToMono(isA(ParameterizedTypeReference.class));
+    verify(delegate).headers();
+    verify(delegate).statusCode();
+    verify(headers).contentType();
+  }
+
+  /**
+   * Test {@link InfoUpdater#convertInfo(Instance, ClientResponse)} with {@code instance}, {@code
+   * response}.
+   *
+   * <ul>
+   *   <li>Then calls {@link MediaType#isCompatibleWith(MediaType)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, ClientResponse)}
+   */
+  @Test
+  @DisplayName(
+      "Test convertInfo(Instance, ClientResponse) with 'instance', 'response'; then calls isCompatibleWith(MediaType)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdater.convertInfo(Instance, ClientResponse)"})
+  void testConvertInfoWithInstanceResponse_thenCallsIsCompatibleWith() throws AssertionError {
+    // Arrange
+    Instance instance = mock(Instance.class);
+
+    MediaType mediaType = mock(MediaType.class);
+    when(mediaType.isCompatibleWith(Mockito.<MediaType>any())).thenReturn(true);
+    Optional<MediaType> ofResult = Optional.of(mediaType);
+
+    HeadersWrapper headers = mock(HeadersWrapper.class);
+    when(headers.contentType()).thenReturn(ofResult);
+    HeadersWrapper headersWrapper = new HeadersWrapper(headers);
+
+    ClientResponseWrapper delegate = mock(ClientResponseWrapper.class);
+    Mono<Map<String, Object>> justResult = Mono.just(new HashMap<>());
+    when(delegate.bodyToMono(Mockito.<ParameterizedTypeReference<Map<String, Object>>>any()))
+        .thenReturn(justResult);
+    when(delegate.headers()).thenReturn(headersWrapper);
+    when(delegate.statusCode()).thenReturn(HttpStatus.OK);
+
+    // Act
+    Mono<Info> actualPublisher =
+        infoUpdater.convertInfo(instance, new ClientResponseWrapper(delegate));
+
+    // Assert
+    FirstStep<Info> createResult = StepVerifier.create(actualPublisher);
+    createResult
+        .assertNext(
+            i -> {
+              assertTrue(i.getValues().isEmpty());
+              return;
+            })
+        .expectComplete()
+        .verify();
+    verify(mediaType).isCompatibleWith(isA(MediaType.class));
     verify(delegate).bodyToMono(isA(ParameterizedTypeReference.class));
     verify(delegate).headers();
     verify(delegate).statusCode();

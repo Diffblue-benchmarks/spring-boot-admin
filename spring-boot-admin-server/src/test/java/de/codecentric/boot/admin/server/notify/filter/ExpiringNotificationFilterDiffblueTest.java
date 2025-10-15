@@ -48,35 +48,6 @@ class ExpiringNotificationFilterDiffblueTest {
    * Test {@link ExpiringNotificationFilter#filter(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Given {@link LocalDate} with {@code 1970} and one and one atStartOfDay atZone {@link
-   *       ZoneOffset#UTC} toInstant.
-   * </ul>
-   *
-   * <p>Method under test: {@link ExpiringNotificationFilter#filter(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName(
-      "Test filter(InstanceEvent, Instance); given LocalDate with '1970' and one and one atStartOfDay atZone UTC toInstant")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"boolean ExpiringNotificationFilter.filter(InstanceEvent, Instance)"})
-  void testFilter_givenLocalDateWith1970AndOneAndOneAtStartOfDayAtZoneUtcToInstant() {
-    // Arrange
-    ApplicationNameNotificationFilter applicationNameNotificationFilter =
-        new ApplicationNameNotificationFilter(
-            "Application Name",
-            LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-
-    // Act and Assert
-    assertFalse(
-        applicationNameNotificationFilter.filter(
-            new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), mock(Instance.class)));
-  }
-
-  /**
-   * Test {@link ExpiringNotificationFilter#filter(InstanceEvent, Instance)}.
-   *
-   * <ul>
    *   <li>Then return {@code false}.
    * </ul>
    *

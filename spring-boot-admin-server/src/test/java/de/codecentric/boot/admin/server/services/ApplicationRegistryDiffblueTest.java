@@ -36,10 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,29 +44,22 @@ import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.DirectProcessor;
-import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.GroupedFlux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ReplayProcessor;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.FirstStep;
 import reactor.util.function.Tuple2;
 
 @ContextConfiguration(classes = {ApplicationRegistry.class})
 @DisabledInAotMode
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 class ApplicationRegistryDiffblueTest {
   @Autowired private ApplicationRegistry applicationRegistry;
 
-  @InjectMocks private ApplicationRegistry applicationRegistry2;
-
   @MockitoBean private InstanceEventPublisher instanceEventPublisher;
 
   @MockitoBean private InstanceRegistry instanceRegistry;
-
-  @Mock private InstanceRegistry instanceRegistry2;
 
   /**
    * Test {@link ApplicationRegistry#ApplicationRegistry(InstanceRegistry, InstanceEventPublisher)}.
@@ -155,66 +145,6 @@ class ApplicationRegistryDiffblueTest {
   /**
    * Test {@link ApplicationRegistry#getApplications()}.
    *
-   * <p>Method under test: {@link ApplicationRegistry#getApplications()}
-   */
-  @Test
-  @DisplayName("Test getApplications()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Flux ApplicationRegistry.getApplications()"})
-  void testGetApplications3() throws AssertionError {
-    // Arrange
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(repository.findAll()).thenReturn(fromIterableResult);
-    InstanceRegistry instanceRegistry =
-        new InstanceRegistry(
-            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
-    ApplicationRegistry applicationRegistry =
-        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
-
-    // Act and Assert
-    FirstStep<Application> createResult =
-        StepVerifier.create(applicationRegistry.getApplications());
-    createResult.expectComplete().verify();
-    verify(repository).findAll();
-  }
-
-  /**
-   * Test {@link ApplicationRegistry#getApplications()}.
-   *
-   * <p>Method under test: {@link ApplicationRegistry#getApplications()}
-   */
-  @Test
-  @DisplayName("Test getApplications()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Flux ApplicationRegistry.getApplications()"})
-  void testGetApplications4() throws AssertionError {
-    // Arrange
-    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
-    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
-
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-    when(repository.findAll()).thenReturn(directProcessor);
-    InstanceRegistry instanceRegistry =
-        new InstanceRegistry(
-            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
-    ApplicationRegistry applicationRegistry =
-        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
-
-    // Act and Assert
-    FirstStep<Application> createResult =
-        StepVerifier.create(applicationRegistry.getApplications());
-    createResult.expectComplete().verify();
-    verify(repository).findAll();
-    verify(directProcessor).filter(isA(Predicate.class));
-  }
-
-  /**
-   * Test {@link ApplicationRegistry#getApplications()}.
-   *
    * <ul>
    *   <li>Given {@link DirectProcessor} {@link DirectProcessor#filter(Predicate)} return
    *       fromIterable {@link ArrayList#ArrayList()}.
@@ -234,14 +164,50 @@ class ApplicationRegistryDiffblueTest {
     DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
     Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
     when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
-    when(instanceRegistry2.getInstances()).thenReturn(directProcessor);
+    when(instanceRegistry.getInstances()).thenReturn(directProcessor);
 
     // Act and Assert
     FirstStep<Application> createResult =
-        StepVerifier.create(applicationRegistry2.getApplications());
+        StepVerifier.create(applicationRegistry.getApplications());
     createResult.expectComplete().verify();
-    verify(instanceRegistry2).getInstances();
+    verify(instanceRegistry).getInstances();
     verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplications()}.
+   *
+   * <ul>
+   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#groupBy(Function)} return create.
+   *   <li>Then calls {@link DirectProcessor#groupBy(Function)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplications()}
+   */
+  @Test
+  @DisplayName(
+      "Test getApplications(); given DirectProcessor groupBy(Function) return create; then calls groupBy(Function)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux ApplicationRegistry.getApplications()"})
+  void testGetApplications_givenDirectProcessorGroupByReturnCreate_thenCallsGroupBy() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    DirectProcessor<GroupedFlux<Object, Instance>> createResult = DirectProcessor.create();
+    when(directProcessor.groupBy(Mockito.<Function<Instance, Object>>any()))
+        .thenReturn(createResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRegistry.getInstances()).thenReturn(directProcessor2);
+
+    // Act
+    applicationRegistry.getApplications();
+
+    // Assert
+    verify(instanceRegistry).getInstances();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).groupBy(isA(Function.class));
   }
 
   /**
@@ -270,13 +236,13 @@ class ApplicationRegistryDiffblueTest {
 
     DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
     when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
-    when(instanceRegistry2.getInstances()).thenReturn(directProcessor2);
+    when(instanceRegistry.getInstances()).thenReturn(directProcessor2);
 
     // Act and Assert
     FirstStep<Application> createResult =
-        StepVerifier.create(applicationRegistry2.getApplications());
+        StepVerifier.create(applicationRegistry.getApplications());
     createResult.expectComplete().verify();
-    verify(instanceRegistry2).getInstances();
+    verify(instanceRegistry).getInstances();
     verify(directProcessor2).filter(isA(Predicate.class));
     verify(directProcessor).groupBy(isA(Function.class));
   }
@@ -298,13 +264,13 @@ class ApplicationRegistryDiffblueTest {
   void testGetApplications_givenInstanceRegistryGetInstancesReturnCreate() {
     // Arrange
     DirectProcessor<Instance> createResult = DirectProcessor.create();
-    when(instanceRegistry2.getInstances()).thenReturn(createResult);
+    when(instanceRegistry.getInstances()).thenReturn(createResult);
 
     // Act
-    applicationRegistry2.getApplications();
+    applicationRegistry.getApplications();
 
     // Assert
-    verify(instanceRegistry2).getInstances();
+    verify(instanceRegistry).getInstances();
   }
 
   /**
@@ -327,13 +293,13 @@ class ApplicationRegistryDiffblueTest {
       throws AssertionError {
     // Arrange
     Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(instanceRegistry2.getInstances()).thenReturn(fromIterableResult);
+    when(instanceRegistry.getInstances()).thenReturn(fromIterableResult);
 
     // Act and Assert
     FirstStep<Application> createResult =
-        StepVerifier.create(applicationRegistry2.getApplications());
+        StepVerifier.create(applicationRegistry.getApplications());
     createResult.expectComplete().verify();
-    verify(instanceRegistry2).getInstances();
+    verify(instanceRegistry).getInstances();
   }
 
   /**
@@ -373,6 +339,38 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getApplications()}.
    *
    * <ul>
+   *   <li>Then calls {@link EventsourcingInstanceRepository#findAll()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplications()}
+   */
+  @Test
+  @DisplayName("Test getApplications(); then calls findAll()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux ApplicationRegistry.getApplications()"})
+  void testGetApplications_thenCallsFindAll2() throws AssertionError {
+    // Arrange
+    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(repository.findAll()).thenReturn(fromIterableResult);
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
+    // Act and Assert
+    FirstStep<Application> createResult =
+        StepVerifier.create(applicationRegistry.getApplications());
+    createResult.expectComplete().verify();
+    verify(repository).findAll();
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplications()}.
+   *
+   * <ul>
    *   <li>Then calls {@link DirectProcessor#flatMap(Function, int)}.
    * </ul>
    *
@@ -397,57 +395,16 @@ class ApplicationRegistryDiffblueTest {
 
     DirectProcessor<Instance> directProcessor3 = mock(DirectProcessor.class);
     when(directProcessor3.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor2);
-    when(instanceRegistry2.getInstances()).thenReturn(directProcessor3);
+    when(instanceRegistry.getInstances()).thenReturn(directProcessor3);
 
     // Act and Assert
     FirstStep<Application> createResult =
-        StepVerifier.create(applicationRegistry2.getApplications());
+        StepVerifier.create(applicationRegistry.getApplications());
     createResult.expectComplete().verify();
-    verify(instanceRegistry2).getInstances();
+    verify(instanceRegistry).getInstances();
     verify(directProcessor3).filter(isA(Predicate.class));
     verify(directProcessor).flatMap(isA(Function.class), eq(2147483647));
     verify(directProcessor2).groupBy(isA(Function.class));
-  }
-
-  /**
-   * Test {@link ApplicationRegistry#getApplications()}.
-   *
-   * <ul>
-   *   <li>Then return create three and {@code true}.
-   * </ul>
-   *
-   * <p>Method under test: {@link ApplicationRegistry#getApplications()}
-   */
-  @Test
-  @DisplayName("Test getApplications(); then return create three and 'true'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Flux ApplicationRegistry.getApplications()"})
-  void testGetApplications_thenReturnCreateThreeAndTrue() {
-    // Arrange
-    ReplayProcessor<GroupedFlux<Object, Instance>> replayProcessor = mock(ReplayProcessor.class);
-    EmitterProcessor<Object> createResult = EmitterProcessor.create(3, true);
-    when(replayProcessor.flatMap(
-            Mockito.<Function<GroupedFlux<Object, Instance>, Publisher<Object>>>any(), anyInt()))
-        .thenReturn(createResult);
-
-    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
-    when(directProcessor.groupBy(Mockito.<Function<Instance, Object>>any()))
-        .thenReturn(replayProcessor);
-
-    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
-    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
-    when(instanceRegistry2.getInstances()).thenReturn(directProcessor2);
-
-    // Act
-    Flux<Application> actualApplications = applicationRegistry2.getApplications();
-
-    // Assert
-    verify(instanceRegistry2).getInstances();
-    verify(directProcessor2).filter(isA(Predicate.class));
-    verify(replayProcessor).flatMap(isA(Function.class), eq(2147483647));
-    verify(directProcessor).groupBy(isA(Function.class));
-    assertSame(createResult, actualApplications);
   }
 
   /**
@@ -506,6 +463,42 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getApplication(String)}.
    *
    * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@link Instance}.
+   *   <li>When {@code Name}.
+   *   <li>Then calls {@link DirectProcessor#filter(Predicate)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplication(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getApplication(String); given ArrayList() add Instance; when 'Name'; then calls filter(Predicate)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono ApplicationRegistry.getApplication(String)"})
+  void testGetApplication_givenArrayListAddInstance_whenName_thenCallsFilter()
+      throws AssertionError {
+    // Arrange
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(mock(Instance.class));
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act and Assert
+    FirstStep<Application> createResult =
+        StepVerifier.create(applicationRegistry.getApplication("Name"));
+    createResult.expectError().verify();
+    verify(instanceRegistry).getInstances("Name");
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplication(String)}.
+   *
+   * <ul>
    *   <li>Given {@link DirectProcessor} {@link DirectProcessor#collectList()} return just {@link
    *       ArrayList#ArrayList()}.
    * </ul>
@@ -536,6 +529,37 @@ class ApplicationRegistryDiffblueTest {
     verify(instanceRegistry).getInstances("Name");
     verify(directProcessor).collectList();
     verify(directProcessor2).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplication(String)}.
+   *
+   * <ul>
+   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#filter(Predicate)} return create.
+   *   <li>Then calls {@link DirectProcessor#filter(Predicate)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplication(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getApplication(String); given DirectProcessor filter(Predicate) return create; then calls filter(Predicate)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono ApplicationRegistry.getApplication(String)"})
+  void testGetApplication_givenDirectProcessorFilterReturnCreate_thenCallsFilter() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    DirectProcessor<Instance> createResult = DirectProcessor.create();
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(createResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act
+    applicationRegistry.getApplication("Name");
+
+    // Assert
+    verify(instanceRegistry).getInstances("Name");
+    verify(directProcessor).filter(isA(Predicate.class));
   }
 
   /**
@@ -632,6 +656,7 @@ class ApplicationRegistryDiffblueTest {
    *
    * <ul>
    *   <li>Given {@link Mono} {@link Mono#map(Function)} return just {@code Data}.
+   *   <li>When {@code Name}.
    *   <li>Then calls {@link Mono#map(Function)}.
    * </ul>
    *
@@ -639,11 +664,11 @@ class ApplicationRegistryDiffblueTest {
    */
   @Test
   @DisplayName(
-      "Test getApplication(String); given Mono map(Function) return just 'Data'; then calls map(Function)")
+      "Test getApplication(String); given Mono map(Function) return just 'Data'; when 'Name'; then calls map(Function)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono ApplicationRegistry.getApplication(String)"})
-  void testGetApplication_givenMonoMapReturnJustData_thenCallsMap() throws AssertionError {
+  void testGetApplication_givenMonoMapReturnJustData_whenName_thenCallsMap() throws AssertionError {
     // Arrange
     Mono<List<Instance>> mono = mock(Mono.class);
     Mono<Object> justResult = Mono.just("Data");
@@ -787,72 +812,6 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#deregister(String)}.
    *
    * <ul>
-   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#flatMap(Function)} return
-   *       fromIterable {@link ArrayList#ArrayList()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link ApplicationRegistry#deregister(String)}
-   */
-  @Test
-  @DisplayName(
-      "Test deregister(String); given DirectProcessor flatMap(Function) return fromIterable ArrayList()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Flux ApplicationRegistry.deregister(String)"})
-  void testDeregister_givenDirectProcessorFlatMapReturnFromIterableArrayList()
-      throws AssertionError {
-    // Arrange
-    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
-    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.flatMap(Mockito.<Function<Instance, Publisher<Object>>>any()))
-        .thenReturn(fromIterableResult);
-    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
-
-    // Act and Assert
-    FirstStep<InstanceId> createResult =
-        StepVerifier.create(applicationRegistry.deregister("Name"));
-    createResult.expectComplete().verify();
-    verify(instanceRegistry).getInstances("Name");
-    verify(directProcessor).flatMap(isA(Function.class));
-  }
-
-  /**
-   * Test {@link ApplicationRegistry#deregister(String)}.
-   *
-   * <ul>
-   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#flatMap(Function)} return {@code
-   *       null}.
-   *   <li>Then return {@code null}.
-   * </ul>
-   *
-   * <p>Method under test: {@link ApplicationRegistry#deregister(String)}
-   */
-  @Test
-  @DisplayName(
-      "Test deregister(String); given DirectProcessor flatMap(Function) return 'null'; then return 'null'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Flux ApplicationRegistry.deregister(String)"})
-  void testDeregister_givenDirectProcessorFlatMapReturnNull_thenReturnNull() {
-    // Arrange
-    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
-    when(directProcessor.flatMap(Mockito.<Function<Instance, Publisher<Object>>>any()))
-        .thenReturn(null);
-    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
-
-    // Act
-    Flux<InstanceId> actualDeregisterResult = applicationRegistry.deregister("Name");
-
-    // Assert
-    verify(instanceRegistry).getInstances("Name");
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertNull(actualDeregisterResult);
-  }
-
-  /**
-   * Test {@link ApplicationRegistry#deregister(String)}.
-   *
-   * <ul>
    *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#getInstances(String)} return
    *       fromIterable {@link ArrayList#ArrayList()}.
    * </ul>
@@ -944,6 +903,67 @@ class ApplicationRegistryDiffblueTest {
   }
 
   /**
+   * Test {@link ApplicationRegistry#deregister(String)}.
+   *
+   * <ul>
+   *   <li>Then calls {@link DirectProcessor#flatMap(Function)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#deregister(String)}
+   */
+  @Test
+  @DisplayName("Test deregister(String); then calls flatMap(Function)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux ApplicationRegistry.deregister(String)"})
+  void testDeregister_thenCallsFlatMap() throws AssertionError {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.flatMap(Mockito.<Function<Instance, Publisher<Object>>>any()))
+        .thenReturn(fromIterableResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act and Assert
+    FirstStep<InstanceId> createResult =
+        StepVerifier.create(applicationRegistry.deregister("Name"));
+    createResult.expectComplete().verify();
+    verify(instanceRegistry).getInstances("Name");
+    verify(directProcessor).flatMap(isA(Function.class));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#deregister(String)}.
+   *
+   * <ul>
+   *   <li>When {@code List}.
+   *   <li>Then calls {@link DirectProcessor#flatMap(Function)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#deregister(String)}
+   */
+  @Test
+  @DisplayName("Test deregister(String); when 'java.util.List'; then calls flatMap(Function)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux ApplicationRegistry.deregister(String)"})
+  void testDeregister_whenJavaUtilList_thenCallsFlatMap() throws AssertionError {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.flatMap(Mockito.<Function<Instance, Publisher<Object>>>any()))
+        .thenReturn(fromIterableResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act and Assert
+    FirstStep<InstanceId> createResult =
+        StepVerifier.create(applicationRegistry.deregister("java.util.List"));
+    createResult.expectComplete().verify();
+    verify(instanceRegistry).getInstances("java.util.List");
+    verify(directProcessor).flatMap(isA(Function.class));
+  }
+
+  /**
    * Test {@link ApplicationRegistry#getApplicationForInstance(Instance)}.
    *
    * <p>Method under test: {@link ApplicationRegistry#getApplicationForInstance(Instance)}
@@ -993,6 +1013,132 @@ class ApplicationRegistryDiffblueTest {
   @MethodsUnderTest({"Tuple2 ApplicationRegistry.getApplicationForInstance(Instance)"})
   void testGetApplicationForInstance2() {
     // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("java.lang.String")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+
+    // Act
+    Tuple2<String, Flux<Instance>> actualApplicationForInstance =
+        applicationRegistry.getApplicationForInstance(instance);
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instanceRegistry).getInstances("java.lang.String");
+    verify(directProcessor).filter(isA(Predicate.class));
+    List<Object> toListResult = actualApplicationForInstance.toList();
+    assertEquals(2, toListResult.size());
+    assertEquals("java.lang.String", toListResult.get(0));
+    assertSame(fromIterableResult, toListResult.get(1));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplicationForInstance(Instance)}.
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplicationForInstance(Instance)}
+   */
+  @Test
+  @DisplayName("Test getApplicationForInstance(Instance)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getApplicationForInstance(Instance)"})
+  void testGetApplicationForInstance3() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl(null)
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+
+    // Act
+    Tuple2<String, Flux<Instance>> actualApplicationForInstance =
+        applicationRegistry.getApplicationForInstance(instance);
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instanceRegistry).getInstances("Name");
+    verify(directProcessor).filter(isA(Predicate.class));
+    List<Object> toListResult = actualApplicationForInstance.toList();
+    assertEquals(2, toListResult.size());
+    assertEquals("Name", toListResult.get(0));
+    assertSame(fromIterableResult, toListResult.get(1));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplicationForInstance(Instance)}.
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplicationForInstance(Instance)}
+   */
+  @Test
+  @DisplayName("Test getApplicationForInstance(Instance)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getApplicationForInstance(Instance)"})
+  void testGetApplicationForInstance4() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("")
+                .name("java.lang.String")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+
+    // Act
+    Tuple2<String, Flux<Instance>> actualApplicationForInstance =
+        applicationRegistry.getApplicationForInstance(instance);
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instanceRegistry).getInstances("java.lang.String");
+    verify(directProcessor).filter(isA(Predicate.class));
+    List<Object> toListResult = actualApplicationForInstance.toList();
+    assertEquals(2, toListResult.size());
+    assertEquals("java.lang.String", toListResult.get(0));
+    assertSame(fromIterableResult, toListResult.get(1));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplicationForInstance(Instance)}.
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplicationForInstance(Instance)}
+   */
+  @Test
+  @DisplayName("Test getApplicationForInstance(Instance)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getApplicationForInstance(Instance)"})
+  void testGetApplicationForInstance5() {
+    // Arrange
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
             new EventsourcingInstanceRepository(new InMemoryEventStore()),
@@ -1033,7 +1179,7 @@ class ApplicationRegistryDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Tuple2 ApplicationRegistry.getApplicationForInstance(Instance)"})
-  void testGetApplicationForInstance3() {
+  void testGetApplicationForInstance6() {
     // Arrange
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
@@ -1210,6 +1356,51 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getApplicationForInstance(Instance)}.
    *
    * <ul>
+   *   <li>Then return toList second is create.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getApplicationForInstance(Instance)}
+   */
+  @Test
+  @DisplayName("Test getApplicationForInstance(Instance); then return toList second is create")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getApplicationForInstance(Instance)"})
+  void testGetApplicationForInstance_thenReturnToListSecondIsCreate() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    DirectProcessor<Instance> createResult = DirectProcessor.create();
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(createResult);
+    when(instanceRegistry.getInstances(Mockito.<String>any())).thenReturn(directProcessor);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+
+    // Act
+    Tuple2<String, Flux<Instance>> actualApplicationForInstance =
+        applicationRegistry.getApplicationForInstance(instance);
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instanceRegistry).getInstances("Name");
+    verify(directProcessor).filter(isA(Predicate.class));
+    List<Object> toListResult = actualApplicationForInstance.toList();
+    assertEquals(2, toListResult.size());
+    assertSame(createResult, toListResult.get(1));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getApplicationForInstance(Instance)}.
+   *
+   * <ul>
    *   <li>Then return toList second is fromIterable {@link ArrayList#ArrayList()}.
    * </ul>
    *
@@ -1257,6 +1448,46 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#toApplication(String, Flux)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry}.
+   *   <li>When fromIterable {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#toApplication(String, Flux)}
+   */
+  @Test
+  @DisplayName(
+      "Test toApplication(String, Flux); given InstanceRegistry; when fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono ApplicationRegistry.toApplication(String, Flux)"})
+  void testToApplication_givenInstanceRegistry_whenFromIterableArrayList() throws AssertionError {
+    // Arrange
+    Flux<Instance> instances = Flux.fromIterable(new ArrayList<>());
+
+    // Act and Assert
+    FirstStep<Application> createResult =
+        StepVerifier.create(applicationRegistry.toApplication("Name", instances));
+    createResult
+        .assertNext(
+            a -> {
+              Application application = a;
+              assertNull(application.getBuildVersion());
+              assertTrue(application.getInstances().isEmpty());
+              assertEquals("Name", application.getName());
+              assertEquals("UNKNOWN", application.getStatus());
+              Instant statusTimestamp = application.getStatusTimestamp();
+              assertEquals(0L, statusTimestamp.getEpochSecond());
+              assertEquals(0, statusTimestamp.getNano());
+              return;
+            })
+        .expectComplete()
+        .verify();
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#toApplication(String, Flux)}.
+   *
+   * <ul>
    *   <li>Given just {@link ArrayList#ArrayList()}.
    * </ul>
    *
@@ -1295,61 +1526,67 @@ class ApplicationRegistryDiffblueTest {
   }
 
   /**
-   * Test {@link ApplicationRegistry#toApplication(String, Flux)}.
+   * Test {@link ApplicationRegistry#getBuildVersion(List)}.
    *
-   * <ul>
-   *   <li>When fromIterable {@link ArrayList#ArrayList()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link ApplicationRegistry#toApplication(String, Flux)}
+   * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
    */
   @Test
-  @DisplayName("Test toApplication(String, Flux); when fromIterable ArrayList()")
+  @DisplayName("Test getBuildVersion(List)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
-  @MethodsUnderTest({"Mono ApplicationRegistry.toApplication(String, Flux)"})
-  void testToApplication_whenFromIterableArrayList() throws AssertionError {
+  @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
+  void testGetBuildVersion() {
     // Arrange
-    Flux<Instance> instances = Flux.fromIterable(new ArrayList<>());
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
 
-    // Act and Assert
-    FirstStep<Application> createResult =
-        StepVerifier.create(applicationRegistry.toApplication("Name", instances));
-    createResult
-        .assertNext(
-            a -> {
-              Application application = a;
-              assertNull(application.getBuildVersion());
-              assertTrue(application.getInstances().isEmpty());
-              assertEquals("Name", application.getName());
-              assertEquals("UNKNOWN", application.getStatus());
-              Instant statusTimestamp = application.getStatusTimestamp();
-              assertEquals(0L, statusTimestamp.getEpochSecond());
-              assertEquals(0, statusTimestamp.getNano());
-              return;
-            })
-        .expectComplete()
-        .verify();
+    BuildVersion buildVersion = mock(BuildVersion.class);
+    when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(buildVersion);
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getBuildVersion()).thenReturn(mock(BuildVersion.class));
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    applicationRegistry.getBuildVersion(instances);
+
+    // Assert
+    verify(instance2).getBuildVersion();
+    verify(instance).getBuildVersion();
+    verify(buildVersion).compareTo(isA(BuildVersion.class));
   }
 
   /**
    * Test {@link ApplicationRegistry#getBuildVersion(List)}.
    *
-   * <ul>
-   *   <li>Given {@link BuildVersion} {@link BuildVersion#compareTo(BuildVersion)} return minus one.
-   *   <li>Then calls {@link BuildVersion#compareTo(BuildVersion)}.
-   * </ul>
-   *
    * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
    */
   @Test
-  @DisplayName(
-      "Test getBuildVersion(List); given BuildVersion compareTo(BuildVersion) return minus one; then calls compareTo(BuildVersion)")
+  @DisplayName("Test getBuildVersion(List)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
-  void testGetBuildVersion_givenBuildVersionCompareToReturnMinusOne_thenCallsCompareTo() {
+  void testGetBuildVersion2() {
     // Arrange
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
     BuildVersion buildVersion = mock(BuildVersion.class);
     when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(-1);
 
@@ -1376,7 +1613,7 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getBuildVersion(List)}.
    *
    * <ul>
-   *   <li>Given {@link BuildVersion} {@link BuildVersion#compareTo(BuildVersion)} return one.
+   *   <li>Given {@link BuildVersion} {@link BuildVersion#compareTo(BuildVersion)} return minus one.
    *   <li>Then calls {@link BuildVersion#compareTo(BuildVersion)}.
    * </ul>
    *
@@ -1384,22 +1621,26 @@ class ApplicationRegistryDiffblueTest {
    */
   @Test
   @DisplayName(
-      "Test getBuildVersion(List); given BuildVersion compareTo(BuildVersion) return one; then calls compareTo(BuildVersion)")
+      "Test getBuildVersion(List); given BuildVersion compareTo(BuildVersion) return minus one; then calls compareTo(BuildVersion)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
-  void testGetBuildVersion_givenBuildVersionCompareToReturnOne_thenCallsCompareTo() {
+  void testGetBuildVersion_givenBuildVersionCompareToReturnMinusOne_thenCallsCompareTo() {
     // Arrange
-    BuildVersion buildVersion = mock(BuildVersion.class);
-    when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
-
     Instance instance = mock(Instance.class);
-    when(instance.getBuildVersion()).thenReturn(buildVersion);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    BuildVersion buildVersion = mock(BuildVersion.class);
+    when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(-1);
 
     Instance instance2 = mock(Instance.class);
-    when(instance2.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+    when(instance2.getBuildVersion()).thenReturn(buildVersion);
+
+    Instance instance3 = mock(Instance.class);
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
 
     ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance3);
     instances.add(instance2);
     instances.add(instance);
 
@@ -1407,6 +1648,7 @@ class ApplicationRegistryDiffblueTest {
     applicationRegistry.getBuildVersion(instances);
 
     // Assert
+    verify(instance3).getBuildVersion();
     verify(instance2).getBuildVersion();
     verify(instance).getBuildVersion();
     verify(buildVersion).compareTo(isA(BuildVersion.class));
@@ -1428,18 +1670,22 @@ class ApplicationRegistryDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
-  void testGetBuildVersion_givenBuildVersionCompareToReturnOne_thenCallsCompareTo2() {
+  void testGetBuildVersion_givenBuildVersionCompareToReturnOne_thenCallsCompareTo() {
     // Arrange
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
     BuildVersion buildVersion = mock(BuildVersion.class);
     when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
 
-    Instance instance = mock(Instance.class);
-    when(instance.getBuildVersion()).thenReturn(buildVersion);
-
     Instance instance2 = mock(Instance.class);
-    when(instance2.getBuildVersion()).thenReturn(mock(BuildVersion.class));
+    when(instance2.getBuildVersion()).thenReturn(buildVersion);
+
+    Instance instance3 = mock(Instance.class);
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
 
     ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance3);
     instances.add(instance2);
     instances.add(instance);
 
@@ -1447,9 +1693,121 @@ class ApplicationRegistryDiffblueTest {
     applicationRegistry.getBuildVersion(instances);
 
     // Assert
+    verify(instance3).getBuildVersion();
     verify(instance2).getBuildVersion();
     verify(instance).getBuildVersion();
     verify(buildVersion).compareTo(isA(BuildVersion.class));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getBuildVersion(List)}.
+   *
+   * <ul>
+   *   <li>Given {@link BuildVersion} {@link BuildVersion#compareTo(BuildVersion)} return zero.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
+   */
+  @Test
+  @DisplayName("Test getBuildVersion(List); given BuildVersion compareTo(BuildVersion) return zero")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
+  void testGetBuildVersion_givenBuildVersionCompareToReturnZero() {
+    // Arrange
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    BuildVersion buildVersion = mock(BuildVersion.class);
+    when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(0);
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getBuildVersion()).thenReturn(buildVersion);
+
+    Instance instance3 = mock(Instance.class);
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    Instance instance4 = mock(Instance.class);
+    when(instance4.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance4);
+    instances.addAll(new ArrayList<>());
+    instances.add(instance3);
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    applicationRegistry.getBuildVersion(instances);
+
+    // Assert
+    verify(instance4).getBuildVersion();
+    verify(instance3).getBuildVersion();
+    verify(instance2).getBuildVersion();
+    verify(instance).getBuildVersion();
+    verify(buildVersion).compareTo(isA(BuildVersion.class));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getBuildVersion(List)}.
+   *
+   * <ul>
+   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       three.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
+   */
+  @Test
+  @DisplayName(
+      "Test getBuildVersion(List); given InMemoryEventStore(int) with maxLogSizePerAggregate is three")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
+  void testGetBuildVersion_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree() {
+    // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
+    BuildVersion buildVersion = mock(BuildVersion.class);
+    when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(buildVersion);
+
+    BuildVersion buildVersion2 = mock(BuildVersion.class);
+    when(buildVersion2.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getBuildVersion()).thenReturn(buildVersion2);
+
+    Instance instance3 = mock(Instance.class);
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("[.\\-+]"));
+
+    Instance instance4 = mock(Instance.class);
+    when(instance4.getBuildVersion()).thenReturn(BuildVersion.valueOf("[.\\-+][.\\-+]"));
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance4);
+    instances.add(instance3);
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    applicationRegistry.getBuildVersion(instances);
+
+    // Assert
+    verify(instance4).getBuildVersion();
+    verify(instance3).getBuildVersion();
+    verify(instance2).getBuildVersion();
+    verify(instance).getBuildVersion();
+    verify(buildVersion2, atLeast(1)).compareTo(Mockito.<BuildVersion>any());
+    verify(buildVersion, atLeast(1)).compareTo(Mockito.<BuildVersion>any());
   }
 
   /**
@@ -1468,19 +1826,24 @@ class ApplicationRegistryDiffblueTest {
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
   void testGetBuildVersion_givenInstanceGetBuildVersionReturnValueOf42() {
     // Arrange
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
     BuildVersion buildVersion = mock(BuildVersion.class);
     when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
 
-    Instance instance = mock(Instance.class);
-    when(instance.getBuildVersion()).thenReturn(buildVersion);
-
     Instance instance2 = mock(Instance.class);
-    when(instance2.getBuildVersion()).thenReturn(BuildVersion.valueOf("42"));
+    when(instance2.getBuildVersion()).thenReturn(buildVersion);
 
     Instance instance3 = mock(Instance.class);
-    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("42"));
+
+    Instance instance4 = mock(Instance.class);
+    when(instance4.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
 
     ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance4);
+    instances.addAll(new ArrayList<>());
     instances.add(instance3);
     instances.add(instance2);
     instances.add(instance);
@@ -1489,6 +1852,7 @@ class ApplicationRegistryDiffblueTest {
     applicationRegistry.getBuildVersion(instances);
 
     // Assert
+    verify(instance4).getBuildVersion();
     verify(instance3).getBuildVersion();
     verify(instance2).getBuildVersion();
     verify(instance).getBuildVersion();
@@ -1500,32 +1864,37 @@ class ApplicationRegistryDiffblueTest {
    *
    * <ul>
    *   <li>Given {@link Instance} {@link Instance#getBuildVersion()} return valueOf {@code
-   *       foobuild.version}.
+   *       java.util.Map}.
    * </ul>
    *
    * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
    */
   @Test
   @DisplayName(
-      "Test getBuildVersion(List); given Instance getBuildVersion() return valueOf 'foobuild.version'")
+      "Test getBuildVersion(List); given Instance getBuildVersion() return valueOf 'java.util.Map'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
-  void testGetBuildVersion_givenInstanceGetBuildVersionReturnValueOfFoobuildVersion() {
+  void testGetBuildVersion_givenInstanceGetBuildVersionReturnValueOfJavaUtilMap() {
     // Arrange
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
     BuildVersion buildVersion = mock(BuildVersion.class);
     when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
 
-    Instance instance = mock(Instance.class);
-    when(instance.getBuildVersion()).thenReturn(buildVersion);
-
     Instance instance2 = mock(Instance.class);
-    when(instance2.getBuildVersion()).thenReturn(BuildVersion.valueOf("foobuild.version"));
+    when(instance2.getBuildVersion()).thenReturn(buildVersion);
 
     Instance instance3 = mock(Instance.class);
-    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("java.util.Map"));
+
+    Instance instance4 = mock(Instance.class);
+    when(instance4.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
 
     ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance4);
+    instances.addAll(new ArrayList<>());
     instances.add(instance3);
     instances.add(instance2);
     instances.add(instance);
@@ -1534,6 +1903,7 @@ class ApplicationRegistryDiffblueTest {
     applicationRegistry.getBuildVersion(instances);
 
     // Assert
+    verify(instance4).getBuildVersion();
     verify(instance3).getBuildVersion();
     verify(instance2).getBuildVersion();
     verify(instance).getBuildVersion();
@@ -1544,17 +1914,123 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getBuildVersion(List)}.
    *
    * <ul>
+   *   <li>Given {@link Instance} {@link Instance#getBuildVersion()} return valueOf {@code UNKNOWN}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
+   */
+  @Test
+  @DisplayName(
+      "Test getBuildVersion(List); given Instance getBuildVersion() return valueOf 'UNKNOWN'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
+  void testGetBuildVersion_givenInstanceGetBuildVersionReturnValueOfUnknown() {
+    // Arrange
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    BuildVersion buildVersion = mock(BuildVersion.class);
+    when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getBuildVersion()).thenReturn(buildVersion);
+
+    Instance instance3 = mock(Instance.class);
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    Instance instance4 = mock(Instance.class);
+    when(instance4.getBuildVersion()).thenReturn(BuildVersion.valueOf("UNKNOWN"));
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance4);
+    instances.addAll(new ArrayList<>());
+    instances.add(instance3);
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    applicationRegistry.getBuildVersion(instances);
+
+    // Assert
+    verify(instance4).getBuildVersion();
+    verify(instance3).getBuildVersion();
+    verify(instance2).getBuildVersion();
+    verify(instance).getBuildVersion();
+    verify(buildVersion).compareTo(isA(BuildVersion.class));
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getBuildVersion(List)}.
+   *
+   * <ul>
+   *   <li>Given {@link Instance} {@link Instance#getBuildVersion()} return valueOf {@code UNKNOWN}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
+   */
+  @Test
+  @DisplayName(
+      "Test getBuildVersion(List); given Instance getBuildVersion() return valueOf 'UNKNOWN'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
+  void testGetBuildVersion_givenInstanceGetBuildVersionReturnValueOfUnknown2() {
+    // Arrange
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    BuildVersion buildVersion = mock(BuildVersion.class);
+    when(buildVersion.compareTo(Mockito.<BuildVersion>any())).thenReturn(1);
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getBuildVersion()).thenReturn(buildVersion);
+
+    Instance instance3 = mock(Instance.class);
+    when(instance3.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    Instance instance4 = mock(Instance.class);
+    when(instance4.getBuildVersion()).thenReturn(BuildVersion.valueOf("UNKNOWN"));
+
+    Instance instance5 = mock(Instance.class);
+    when(instance5.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance5);
+    instances.add(instance4);
+    instances.addAll(new ArrayList<>());
+    instances.add(instance3);
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    applicationRegistry.getBuildVersion(instances);
+
+    // Assert
+    verify(instance5).getBuildVersion();
+    verify(instance4).getBuildVersion();
+    verify(instance3).getBuildVersion();
+    verify(instance2).getBuildVersion();
+    verify(instance).getBuildVersion();
+    verify(buildVersion, atLeast(1)).compareTo(Mockito.<BuildVersion>any());
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getBuildVersion(List)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRegistry}.
    *   <li>Then return valueOf {@code foo}.
    * </ul>
    *
    * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
    */
   @Test
-  @DisplayName("Test getBuildVersion(List); then return valueOf 'foo'")
+  @DisplayName("Test getBuildVersion(List); given InstanceRegistry; then return valueOf 'foo'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
-  void testGetBuildVersion_thenReturnValueOfFoo() {
+  void testGetBuildVersion_givenInstanceRegistry_thenReturnValueOfFoo() {
     // Arrange
     Instance instance = mock(Instance.class);
     BuildVersion valueOfResult = BuildVersion.valueOf("foo");
@@ -1575,17 +2051,18 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getBuildVersion(List)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry}.
    *   <li>Then return valueOf {@code foo}.
    * </ul>
    *
    * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
    */
   @Test
-  @DisplayName("Test getBuildVersion(List); then return valueOf 'foo'")
+  @DisplayName("Test getBuildVersion(List); given InstanceRegistry; then return valueOf 'foo'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
-  void testGetBuildVersion_thenReturnValueOfFoo2() {
+  void testGetBuildVersion_givenInstanceRegistry_thenReturnValueOfFoo2() {
     // Arrange
     Instance instance = mock(Instance.class);
     when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
@@ -1611,6 +2088,49 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getBuildVersion(List)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry}.
+   *   <li>Then return valueOf {@code foo}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
+   */
+  @Test
+  @DisplayName("Test getBuildVersion(List); given InstanceRegistry; then return valueOf 'foo'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
+  void testGetBuildVersion_givenInstanceRegistry_thenReturnValueOfFoo3() {
+    // Arrange
+    Instance instance = mock(Instance.class);
+    when(instance.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getBuildVersion()).thenReturn(BuildVersion.valueOf("foo"));
+
+    Instance instance3 = mock(Instance.class);
+    BuildVersion valueOfResult = BuildVersion.valueOf("foo");
+    when(instance3.getBuildVersion()).thenReturn(valueOfResult);
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance3);
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    BuildVersion actualBuildVersion = applicationRegistry.getBuildVersion(instances);
+
+    // Assert
+    verify(instance3).getBuildVersion();
+    verify(instance2).getBuildVersion();
+    verify(instance).getBuildVersion();
+    assertSame(valueOfResult, actualBuildVersion);
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getBuildVersion(List)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRegistry}.
    *   <li>When {@link ArrayList#ArrayList()}.
    *   <li>Then return {@code null}.
    * </ul>
@@ -1618,11 +2138,12 @@ class ApplicationRegistryDiffblueTest {
    * <p>Method under test: {@link ApplicationRegistry#getBuildVersion(List)}
    */
   @Test
-  @DisplayName("Test getBuildVersion(List); when ArrayList(); then return 'null'")
+  @DisplayName(
+      "Test getBuildVersion(List); given InstanceRegistry; when ArrayList(); then return 'null'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"BuildVersion ApplicationRegistry.getBuildVersion(List)"})
-  void testGetBuildVersion_whenArrayList_thenReturnNull() {
+  void testGetBuildVersion_givenInstanceRegistry_whenArrayList_thenReturnNull() {
     // Arrange, Act and Assert
     assertNull(applicationRegistry.getBuildVersion(new ArrayList<>()));
   }
@@ -1638,17 +2159,22 @@ class ApplicationRegistryDiffblueTest {
   @ManagedByDiffblue
   @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
   void testGetStatus() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore(3);
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
     ApplicationRegistry applicationRegistry =
         new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
 
     StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
+    when(statusInfo.getStatus()).thenReturn("components");
 
     Instance instance = mock(Instance.class);
     when(instance.getStatusTimestamp())
@@ -1659,10 +2185,12 @@ class ApplicationRegistryDiffblueTest {
     when(statusInfo2.getStatus()).thenReturn("Status");
 
     Instance instance2 = mock(Instance.class);
-
-    LocalDate ofYearDayResult = LocalDate.ofYearDay(1, 1);
     when(instance2.getStatusTimestamp())
-        .thenReturn(ofYearDayResult.atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
+        .thenReturn(
+            LocalDate.of(1970, 1, 1)
+                .atStartOfDay()
+                .atZone(ZoneOffset.ofTotalSeconds(1))
+                .toInstant());
     when(instance2.getStatusInfo()).thenReturn(statusInfo2);
 
     ArrayList<Instance> instances = new ArrayList<>();
@@ -1684,6 +2212,73 @@ class ApplicationRegistryDiffblueTest {
     Object getResult = toListResult.get(1);
     assertTrue(getResult instanceof Instant);
     assertEquals("Status", toListResult.get(0));
+    assertEquals(-1L, ((Instant) getResult).getEpochSecond());
+    assertEquals(0, ((Instant) getResult).getNano());
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getStatus(List)}.
+   *
+   * <ul>
+   *   <li>Given {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code foo}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
+   */
+  @Test
+  @DisplayName("Test getStatus(List); given StatusInfo getStatus() return 'foo'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
+  void testGetStatus_givenStatusInfoGetStatusReturnFoo() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
+    // Arrange
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
+    StatusInfo statusInfo = mock(StatusInfo.class);
+    when(statusInfo.getStatus()).thenReturn("foo");
+
+    Instance instance = mock(Instance.class);
+    when(instance.getStatusTimestamp())
+        .thenReturn(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
+    when(instance.getStatusInfo()).thenReturn(statusInfo);
+
+    StatusInfo statusInfo2 = mock(StatusInfo.class);
+    when(statusInfo2.getStatus()).thenReturn("components");
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getStatusTimestamp())
+        .thenReturn(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
+    when(instance2.getStatusInfo()).thenReturn(statusInfo2);
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    Tuple2<String, Instant> actualStatus = applicationRegistry.getStatus(instances);
+
+    // Assert
+    verify(instance2).getStatusInfo();
+    verify(instance).getStatusInfo();
+    verify(instance2).getStatusTimestamp();
+    verify(instance).getStatusTimestamp();
+    verify(statusInfo2).getStatus();
+    verify(statusInfo).getStatus();
+    List<Object> toListResult = actualStatus.toList();
+    assertEquals(2, toListResult.size());
+    Object getResult = toListResult.get(1);
+    assertTrue(getResult instanceof Instant);
+    assertEquals("components", toListResult.get(0));
     assertEquals(0, ((Instant) getResult).getNano());
     assertEquals(0L, ((Instant) getResult).getEpochSecond());
   }
@@ -1692,19 +2287,32 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getStatus(List)}.
    *
    * <ul>
-   *   <li>Given {@link InstanceRegistry}.
+   *   <li>Given {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Status}.
    *   <li>Then return toList first is {@code Status}.
    * </ul>
    *
    * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
    */
   @Test
-  @DisplayName("Test getStatus(List); given InstanceRegistry; then return toList first is 'Status'")
+  @DisplayName(
+      "Test getStatus(List); given StatusInfo getStatus() return 'Status'; then return toList first is 'Status'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
-  void testGetStatus_givenInstanceRegistry_thenReturnToListFirstIsStatus() {
+  void testGetStatus_givenStatusInfoGetStatusReturnStatus_thenReturnToListFirstIsStatus() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
     // Arrange
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.getStatus()).thenReturn("Status");
 
@@ -1736,79 +2344,7 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getStatus(List)}.
    *
    * <ul>
-   *   <li>Given {@link InstanceRegistry}.
-   *   <li>When {@link ArrayList#ArrayList()}.
-   *   <li>Then return toList first is {@code UNKNOWN}.
-   * </ul>
-   *
-   * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
-   */
-  @Test
-  @DisplayName(
-      "Test getStatus(List); given InstanceRegistry; when ArrayList(); then return toList first is 'UNKNOWN'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
-  void testGetStatus_givenInstanceRegistry_whenArrayList_thenReturnToListFirstIsUnknown() {
-    // Arrange, Act and Assert
-    List<Object> toListResult = applicationRegistry.getStatus(new ArrayList<>()).toList();
-    assertEquals(2, toListResult.size());
-    Object getResult = toListResult.get(1);
-    assertTrue(getResult instanceof Instant);
-    assertEquals("UNKNOWN", toListResult.get(0));
-    assertEquals(0, ((Instant) getResult).getNano());
-    assertEquals(0L, ((Instant) getResult).getEpochSecond());
-  }
-
-  /**
-   * Test {@link ApplicationRegistry#getStatus(List)}.
-   *
-   * <ul>
-   *   <li>Given {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code DOWN}.
-   *   <li>Then return toList first is {@code DOWN}.
-   * </ul>
-   *
-   * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
-   */
-  @Test
-  @DisplayName(
-      "Test getStatus(List); given StatusInfo getStatus() return 'DOWN'; then return toList first is 'DOWN'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
-  void testGetStatus_givenStatusInfoGetStatusReturnDown_thenReturnToListFirstIsDown() {
-    // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("DOWN");
-
-    Instance instance = mock(Instance.class);
-    when(instance.getStatusTimestamp())
-        .thenReturn(LocalDate.now().atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    when(instance.getStatusInfo()).thenReturn(statusInfo);
-
-    ArrayList<Instance> instances = new ArrayList<>();
-    instances.add(instance);
-
-    // Act
-    Tuple2<String, Instant> actualStatus = applicationRegistry.getStatus(instances);
-
-    // Assert
-    verify(instance).getStatusInfo();
-    verify(instance).getStatusTimestamp();
-    verify(statusInfo).getStatus();
-    List<Object> toListResult = actualStatus.toList();
-    assertEquals(2, toListResult.size());
-    Object getResult = toListResult.get(1);
-    assertTrue(getResult instanceof Instant);
-    assertEquals("DOWN", toListResult.get(0));
-    assertEquals(0, ((Instant) getResult).getNano());
-  }
-
-  /**
-   * Test {@link ApplicationRegistry#getStatus(List)}.
-   *
-   * <ul>
-   *   <li>Given {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code foo}.
+   *   <li>Given {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Status}.
    *   <li>Then return toList first is {@code Status}.
    * </ul>
    *
@@ -1816,11 +2352,15 @@ class ApplicationRegistryDiffblueTest {
    */
   @Test
   @DisplayName(
-      "Test getStatus(List); given StatusInfo getStatus() return 'foo'; then return toList first is 'Status'")
+      "Test getStatus(List); given StatusInfo getStatus() return 'Status'; then return toList first is 'Status'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
-  void testGetStatus_givenStatusInfoGetStatusReturnFoo_thenReturnToListFirstIsStatus() {
+  void testGetStatus_givenStatusInfoGetStatusReturnStatus_thenReturnToListFirstIsStatus2() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
     // Arrange
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
@@ -1831,7 +2371,7 @@ class ApplicationRegistryDiffblueTest {
         new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
 
     StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
+    when(statusInfo.getStatus()).thenReturn("components");
 
     Instance instance = mock(Instance.class);
     when(instance.getStatusTimestamp())
@@ -1839,7 +2379,7 @@ class ApplicationRegistryDiffblueTest {
     when(instance.getStatusInfo()).thenReturn(statusInfo);
 
     StatusInfo statusInfo2 = mock(StatusInfo.class);
-    when(statusInfo2.getStatus()).thenReturn("foo");
+    when(statusInfo2.getStatus()).thenReturn("Status");
 
     Instance instance2 = mock(Instance.class);
     when(instance2.getStatusTimestamp())
@@ -1886,6 +2426,10 @@ class ApplicationRegistryDiffblueTest {
   @ManagedByDiffblue
   @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
   void testGetStatus_givenStatusInfoGetStatusReturnUp_thenReturnToListFirstIsRestricted() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
     // Arrange
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
@@ -1896,7 +2440,7 @@ class ApplicationRegistryDiffblueTest {
         new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
 
     StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
+    when(statusInfo.getStatus()).thenReturn("components");
 
     Instance instance = mock(Instance.class);
     when(instance.getStatusTimestamp())
@@ -1938,17 +2482,23 @@ class ApplicationRegistryDiffblueTest {
    * Test {@link ApplicationRegistry#getStatus(List)}.
    *
    * <ul>
-   *   <li>Then return toList first is {@code Status}.
+   *   <li>Given {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code UP}.
+   *   <li>Then return toList first is {@code RESTRICTED}.
    * </ul>
    *
    * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
    */
   @Test
-  @DisplayName("Test getStatus(List); then return toList first is 'Status'")
+  @DisplayName(
+      "Test getStatus(List); given StatusInfo getStatus() return 'UP'; then return toList first is 'RESTRICTED'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
-  void testGetStatus_thenReturnToListFirstIsStatus() {
+  void testGetStatus_givenStatusInfoGetStatusReturnUp_thenReturnToListFirstIsRestricted2() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
     // Arrange
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
@@ -1959,7 +2509,7 @@ class ApplicationRegistryDiffblueTest {
         new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
 
     StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
+    when(statusInfo.getStatus()).thenReturn("UP");
 
     Instance instance = mock(Instance.class);
     when(instance.getStatusTimestamp())
@@ -1968,6 +2518,77 @@ class ApplicationRegistryDiffblueTest {
 
     StatusInfo statusInfo2 = mock(StatusInfo.class);
     when(statusInfo2.getStatus()).thenReturn("Status");
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getStatusTimestamp())
+        .thenReturn(
+            LocalDate.of(1970, 1, 1)
+                .atStartOfDay()
+                .atZone(ZoneOffset.ofTotalSeconds(1))
+                .toInstant());
+    when(instance2.getStatusInfo()).thenReturn(statusInfo2);
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    Tuple2<String, Instant> actualStatus = applicationRegistry.getStatus(instances);
+
+    // Assert
+    verify(instance2).getStatusInfo();
+    verify(instance).getStatusInfo();
+    verify(instance2).getStatusTimestamp();
+    verify(instance).getStatusTimestamp();
+    verify(statusInfo2).getStatus();
+    verify(statusInfo).getStatus();
+    List<Object> toListResult = actualStatus.toList();
+    assertEquals(2, toListResult.size());
+    Object getResult = toListResult.get(1);
+    assertTrue(getResult instanceof Instant);
+    assertEquals("RESTRICTED", toListResult.get(0));
+    assertEquals(0, ((Instant) getResult).getNano());
+    assertEquals(0L, ((Instant) getResult).getEpochSecond());
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getStatus(List)}.
+   *
+   * <ul>
+   *   <li>Then return toList first is {@code components}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
+   */
+  @Test
+  @DisplayName("Test getStatus(List); then return toList first is 'components'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
+  void testGetStatus_thenReturnToListFirstIsComponents() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
+    // Arrange
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
+    StatusInfo statusInfo = mock(StatusInfo.class);
+    when(statusInfo.getStatus()).thenReturn("components");
+
+    Instance instance = mock(Instance.class);
+    when(instance.getStatusTimestamp())
+        .thenReturn(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
+    when(instance.getStatusInfo()).thenReturn(statusInfo);
+
+    StatusInfo statusInfo2 = mock(StatusInfo.class);
+    when(statusInfo2.getStatus()).thenReturn("components");
 
     Instance instance2 = mock(Instance.class);
     when(instance2.getStatusTimestamp())
@@ -1992,7 +2613,117 @@ class ApplicationRegistryDiffblueTest {
     assertEquals(2, toListResult.size());
     Object getResult = toListResult.get(1);
     assertTrue(getResult instanceof Instant);
+    assertEquals("components", toListResult.get(0));
+    assertEquals(0, ((Instant) getResult).getNano());
+    assertEquals(0L, ((Instant) getResult).getEpochSecond());
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getStatus(List)}.
+   *
+   * <ul>
+   *   <li>Then return toList second EpochSecond is minus one.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
+   */
+  @Test
+  @DisplayName("Test getStatus(List); then return toList second EpochSecond is minus one")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
+  void testGetStatus_thenReturnToListSecondEpochSecondIsMinusOne() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
+    // Arrange
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
+    StatusInfo statusInfo = mock(StatusInfo.class);
+    when(statusInfo.getStatus()).thenReturn("components");
+
+    Instance instance = mock(Instance.class);
+    when(instance.getStatusTimestamp())
+        .thenReturn(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
+    when(instance.getStatusInfo()).thenReturn(statusInfo);
+
+    StatusInfo statusInfo2 = mock(StatusInfo.class);
+    when(statusInfo2.getStatus()).thenReturn("Status");
+
+    Instance instance2 = mock(Instance.class);
+    when(instance2.getStatusTimestamp())
+        .thenReturn(
+            LocalDate.of(1970, 1, 1)
+                .atStartOfDay()
+                .atZone(ZoneOffset.ofTotalSeconds(1))
+                .toInstant());
+    when(instance2.getStatusInfo()).thenReturn(statusInfo2);
+
+    ArrayList<Instance> instances = new ArrayList<>();
+    instances.add(instance2);
+    instances.add(instance);
+
+    // Act
+    Tuple2<String, Instant> actualStatus = applicationRegistry.getStatus(instances);
+
+    // Assert
+    verify(instance2).getStatusInfo();
+    verify(instance).getStatusInfo();
+    verify(instance2).getStatusTimestamp();
+    verify(instance).getStatusTimestamp();
+    verify(statusInfo2).getStatus();
+    verify(statusInfo).getStatus();
+    List<Object> toListResult = actualStatus.toList();
+    assertEquals(2, toListResult.size());
+    Object getResult = toListResult.get(1);
+    assertTrue(getResult instanceof Instant);
     assertEquals("Status", toListResult.get(0));
+    assertEquals(-1L, ((Instant) getResult).getEpochSecond());
+    assertEquals(0, ((Instant) getResult).getNano());
+  }
+
+  /**
+   * Test {@link ApplicationRegistry#getStatus(List)}.
+   *
+   * <ul>
+   *   <li>When {@link ArrayList#ArrayList()}.
+   *   <li>Then return toList first is {@code UNKNOWN}.
+   * </ul>
+   *
+   * <p>Method under test: {@link ApplicationRegistry#getStatus(List)}
+   */
+  @Test
+  @DisplayName("Test getStatus(List); when ArrayList(); then return toList first is 'UNKNOWN'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Tuple2 ApplicationRegistry.getStatus(List)"})
+  void testGetStatus_whenArrayList_thenReturnToListFirstIsUnknown() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
+    // Arrange
+    InstanceRegistry instanceRegistry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+    ApplicationRegistry applicationRegistry =
+        new ApplicationRegistry(instanceRegistry, mock(InstanceEventPublisher.class));
+
+    // Act and Assert
+    List<Object> toListResult = applicationRegistry.getStatus(new ArrayList<>()).toList();
+    assertEquals(2, toListResult.size());
+    Object getResult = toListResult.get(1);
+    assertTrue(getResult instanceof Instant);
+    assertEquals("UNKNOWN", toListResult.get(0));
     assertEquals(0, ((Instant) getResult).getNano());
     assertEquals(0L, ((Instant) getResult).getEpochSecond());
   }

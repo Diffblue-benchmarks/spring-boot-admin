@@ -1,6 +1,5 @@
 package de.codecentric.boot.admin.server.services;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
@@ -13,21 +12,13 @@ import de.codecentric.boot.admin.server.domain.entities.EventsourcingInstanceRep
 import de.codecentric.boot.admin.server.domain.entities.InstanceRepository;
 import de.codecentric.boot.admin.server.domain.entities.SnapshottingInstanceRepository;
 import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceEndpointsDetectedEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceRegisteredEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceRegistrationUpdatedEvent;
-import de.codecentric.boot.admin.server.domain.values.Endpoints;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
-import de.codecentric.boot.admin.server.domain.values.Registration;
 import de.codecentric.boot.admin.server.eventstore.HazelcastEventStore;
 import de.codecentric.boot.admin.server.eventstore.InMemoryEventStore;
+import de.codecentric.boot.admin.server.eventstore.InstanceEventStore;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClient;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -114,17 +105,18 @@ class StatusUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     // Act
     new StatusUpdateTrigger(
         statusUpdater,
-        new InMemoryEventStore(3),
+        publisher,
         Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
+        Duration.ofSeconds(-1L),
         Duration.ofSeconds(1L));
 
     // Assert
@@ -151,7 +143,7 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    InstanceRepository repository = mock(InstanceRepository.class);
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -162,7 +154,7 @@ class StatusUpdateTriggerDiffblueTest {
         statusUpdater,
         publisher,
         Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
+        Duration.ofSeconds(-1L),
         Duration.ofSeconds(1L));
 
     // Assert
@@ -190,81 +182,7 @@ class StatusUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        new InMemoryEventStore(3),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger5() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        new InMemoryEventStore(3),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger6() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    InstanceRepository repository = mock(InstanceRepository.class);
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -275,7 +193,91 @@ class StatusUpdateTriggerDiffblueTest {
         statusUpdater,
         publisher,
         Duration.ofSeconds(1L),
+        Duration.ofSeconds(Long.MAX_VALUE),
+        Duration.ofSeconds(1L));
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
+   * Duration, Duration)}.
+   *
+   * <ul>
+   *   <li>When {@link DirectProcessor}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
+   * Duration, Duration, Duration)}
+   */
+  @Test
+  @DisplayName(
+      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when DirectProcessor")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
+  })
+  void testNewStatusUpdateTrigger_whenDirectProcessor() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    // Act
+    new StatusUpdateTrigger(
+        statusUpdater,
+        mock(DirectProcessor.class),
         Duration.ofSeconds(1L),
+        Duration.ofSeconds(-1L),
+        Duration.ofSeconds(1L));
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
+   * Duration, Duration)}.
+   *
+   * <ul>
+   *   <li>When {@link DirectProcessor}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
+   * Duration, Duration, Duration)}
+   */
+  @Test
+  @DisplayName(
+      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when DirectProcessor")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
+  })
+  void testNewStatusUpdateTrigger_whenDirectProcessor2() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    // Act
+    new StatusUpdateTrigger(
+        statusUpdater,
+        mock(DirectProcessor.class),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(-1L),
         Duration.ofSeconds(Long.MAX_VALUE));
 
     // Assert
@@ -286,162 +288,8 @@ class StatusUpdateTriggerDiffblueTest {
    * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
    * Duration, Duration)}.
    *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger7() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        new InMemoryEventStore(3),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(Long.MAX_VALUE),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger8() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(100));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher = Mono.just(mock(InstanceRegisteredEvent.class));
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        publisher,
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger9() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(-1));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher = Mono.just(mock(InstanceRegisteredEvent.class));
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        publisher,
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger10() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(100));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher = Mono.just(mock(InstanceRegisteredEvent.class));
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        publisher,
-        Duration.ofSeconds(Long.MAX_VALUE),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
    * <ul>
-   *   <li>When create.
+   *   <li>When {@link InMemoryEventStore}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
@@ -449,28 +297,26 @@ class StatusUpdateTriggerDiffblueTest {
    */
   @Test
   @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when create")
+      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when InMemoryEventStore")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({
     "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
   })
-  void testNewStatusUpdateTrigger_whenCreate() {
+  void testNewStatusUpdateTrigger_whenInMemoryEventStore() {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(-1));
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     // Act
     new StatusUpdateTrigger(
         statusUpdater,
-        publisher,
+        mock(InMemoryEventStore.class),
         Duration.ofSeconds(1L),
         Duration.ofSeconds(1L),
         Duration.ofSeconds(1L));
@@ -484,7 +330,7 @@ class StatusUpdateTriggerDiffblueTest {
    * Duration, Duration)}.
    *
    * <ul>
-   *   <li>When create three and {@code true}.
+   *   <li>When ofSeconds {@link Long#MAX_VALUE}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
@@ -492,55 +338,13 @@ class StatusUpdateTriggerDiffblueTest {
    */
   @Test
   @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when create three and 'true'")
+      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when ofSeconds MAX_VALUE")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({
     "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
   })
-  void testNewStatusUpdateTrigger_whenCreateThreeAndTrue() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        publisher,
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(Long.MAX_VALUE),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <ul>
-   *   <li>When {@link InstanceId} with value is {@code 42}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when InstanceId with value is '42'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger_whenInstanceIdWithValueIs42() {
+  void testNewStatusUpdateTrigger_whenOfSecondsMax_value() {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
@@ -550,94 +354,7 @@ class StatusUpdateTriggerDiffblueTest {
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        publisher,
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <ul>
-   *   <li>When {@link InstanceId} with value is {@code 42}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when InstanceId with value is '42'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger_whenInstanceIdWithValueIs422() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(100));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    // Act
-    new StatusUpdateTrigger(
-        statusUpdater,
-        publisher,
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher, Duration,
-   * Duration, Duration)}.
-   *
-   * <ul>
-   *   <li>When ofSeconds minus one.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#StatusUpdateTrigger(StatusUpdater, Publisher,
-   * Duration, Duration, Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test new StatusUpdateTrigger(StatusUpdater, Publisher, Duration, Duration, Duration); when ofSeconds minus one")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "void StatusUpdateTrigger.<init>(StatusUpdater, Publisher, Duration, Duration, Duration)"
-  })
-  void testNewStatusUpdateTrigger_whenOfSecondsMinusOne() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     // Act
     new StatusUpdateTrigger(
@@ -645,7 +362,7 @@ class StatusUpdateTriggerDiffblueTest {
         publisher,
         Duration.ofSeconds(1L),
         Duration.ofSeconds(-1L),
-        Duration.ofSeconds(1L));
+        Duration.ofSeconds(Long.MAX_VALUE));
 
     // Assert
     verify(builder).build();
@@ -666,7 +383,8 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -678,14 +396,24 @@ class StatusUpdateTriggerDiffblueTest {
             publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    Flux<InstanceEvent> publisher2 = Flux.fromIterable(new ArrayList<>());
+            Duration.ofSeconds(Long.MIN_VALUE));
+
+    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
+    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
+        .thenReturn(fromIterableResult);
+
+    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
+    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
 
     // Act
-    statusUpdateTrigger.handle(publisher2);
+    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
 
     // Assert
     verify(builder).build();
+    verify(publisher2).filter(isA(Predicate.class));
+    verify(directProcessor).flatMap(isA(Function.class));
+    assertSame(fromIterableResult, actualHandleResult);
   }
 
   /**
@@ -714,16 +442,27 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
+            Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    Flux<InstanceEvent> publisher2 = Flux.fromIterable(new ArrayList<>());
+    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+
+    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
+    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
+        .thenReturn(fromIterableResult);
+
+    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
+    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
 
     // Act
-    statusUpdateTrigger.handle(publisher2);
+    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
 
     // Assert
     verify(builder).build();
+    verify(publisher2).filter(isA(Predicate.class));
+    verify(directProcessor).flatMap(isA(Function.class));
+    assertSame(fromIterableResult, actualHandleResult);
   }
 
   /**
@@ -740,243 +479,6 @@ class StatusUpdateTriggerDiffblueTest {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    Flux<InstanceEvent> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(fromIterableResult);
-
-    // Act
-    statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle4() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
-    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
-        .thenReturn(fromIterableResult);
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
-
-    // Act
-    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertSame(fromIterableResult, actualHandleResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle5() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
-    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
-        .thenReturn(fromIterableResult);
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
-
-    // Act
-    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertSame(fromIterableResult, actualHandleResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle6() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
-    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
-        .thenReturn(fromIterableResult);
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
-
-    // Act
-    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertSame(fromIterableResult, actualHandleResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle7() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(1L));
-
-    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
-    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
-        .thenReturn(fromIterableResult);
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
-
-    // Act
-    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertSame(fromIterableResult, actualHandleResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle8() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
         new EventsourcingInstanceRepository(new InMemoryEventStore());
@@ -987,9 +489,9 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater,
             new InMemoryEventStore(),
-            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MIN_VALUE));
 
     DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
     Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
@@ -1012,20 +514,14 @@ class StatusUpdateTriggerDiffblueTest {
   /**
    * Test {@link StatusUpdateTrigger#handle(Flux)}.
    *
-   * <ul>
-   *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
-   *   <li>Then return fromIterable {@link ArrayList#ArrayList()}.
-   * </ul>
-   *
    * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
    */
   @Test
-  @DisplayName(
-      "Test handle(Flux); given ArrayList() add '42'; then return fromIterable ArrayList()")
+  @DisplayName("Test handle(Flux)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle_givenArrayListAdd42_thenReturnFromIterableArrayList() {
+  void testHandle4() {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
@@ -1035,7 +531,7 @@ class StatusUpdateTriggerDiffblueTest {
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
+    EmitterProcessor<InstanceEvent> publisher = EmitterProcessor.create(3, true);
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
@@ -1043,13 +539,10 @@ class StatusUpdateTriggerDiffblueTest {
             publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    ArrayList<Object> it = new ArrayList<>();
-    it.add("42");
-    Flux<Object> fromIterableResult = Flux.fromIterable(it);
+            Duration.ofSeconds(Long.MIN_VALUE));
 
     DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
+    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
     when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
         .thenReturn(fromIterableResult);
 
@@ -1064,60 +557,6 @@ class StatusUpdateTriggerDiffblueTest {
     verify(publisher2).filter(isA(Predicate.class));
     verify(directProcessor).flatMap(isA(Function.class));
     assertSame(fromIterableResult, actualHandleResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <ul>
-   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#flatMap(Function)} return {@code
-   *       null}.
-   *   <li>Then return {@code null}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName(
-      "Test handle(Flux); given DirectProcessor flatMap(Function) return 'null'; then return 'null'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle_givenDirectProcessorFlatMapReturnNull_thenReturnNull() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
-    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
-        .thenReturn(null);
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
-
-    // Act
-    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertNull(actualHandleResult);
   }
 
   /**
@@ -1170,100 +609,6 @@ class StatusUpdateTriggerDiffblueTest {
    * Test {@link StatusUpdateTrigger#handle(Flux)}.
    *
    * <ul>
-   *   <li>Given {@link InstanceId} with value is {@code 42}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux); given InstanceId with value is '42'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle_givenInstanceIdWithValueIs42() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    ArrayList<InstanceEvent> it = new ArrayList<>();
-    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-    Flux<InstanceEvent> publisher2 = Flux.fromIterable(it);
-
-    // Act
-    statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <ul>
-   *   <li>Given {@link
-   *       SnapshottingInstanceRepository#SnapshottingInstanceRepository(InstanceEventStore)} with
-   *       eventStore is {@link InMemoryEventStore#InMemoryEventStore()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName(
-      "Test handle(Flux); given SnapshottingInstanceRepository(InstanceEventStore) with eventStore is InMemoryEventStore()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher StatusUpdateTrigger.handle(Flux)"})
-  void testHandle_givenSnapshottingInstanceRepositoryWithEventStoreIsInMemoryEventStore() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository =
-        new SnapshottingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    Flux<InstanceEvent> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(fromIterableResult);
-
-    // Act
-    statusUpdateTrigger.handle(publisher2);
-
-    // Assert
-    verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#handle(Flux)}.
-   *
-   * <ul>
    *   <li>Then return create three and {@code true}.
    * </ul>
    *
@@ -1284,30 +629,28 @@ class StatusUpdateTriggerDiffblueTest {
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
+            new InMemoryEventStore(),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MIN_VALUE));
 
     DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
     EmitterProcessor<Object> createResult = EmitterProcessor.create(3, true);
     when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
         .thenReturn(createResult);
 
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
+    DirectProcessor<InstanceEvent> publisher = mock(DirectProcessor.class);
+    when(publisher.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
 
     // Act
-    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher2);
+    Publisher<Void> actualHandleResult = statusUpdateTrigger.handle(publisher);
 
     // Assert
     verify(builder).build();
-    verify(publisher2).filter(isA(Predicate.class));
+    verify(publisher).filter(isA(Predicate.class));
     verify(directProcessor).flatMap(isA(Function.class));
     assertSame(createResult, actualHandleResult);
   }
@@ -1755,10 +1098,9 @@ class StatusUpdateTriggerDiffblueTest {
   void testUpdateStatus8() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> source2 = new ChannelSendOperator<>(source, mock(Function.class));
+    Mono<?> source = Mono.just("Data");
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source2, mock(Function.class));
+        new ChannelSendOperator<>(source, mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -1780,6 +1122,7 @@ class StatusUpdateTriggerDiffblueTest {
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
@@ -1805,8 +1148,9 @@ class StatusUpdateTriggerDiffblueTest {
   void testUpdateStatus9() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
+    Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(mock(HazelcastEventStore.class), mock(Function.class));
+        new ChannelSendOperator<>(source, mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -1827,7 +1171,7 @@ class StatusUpdateTriggerDiffblueTest {
             publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(0L));
 
     // Act
     Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
@@ -1853,7 +1197,7 @@ class StatusUpdateTriggerDiffblueTest {
   void testUpdateStatus10() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
+    Mono<?> source = Mono.just("Data");
     ChannelSendOperator<Object> channelSendOperator2 =
         new ChannelSendOperator<>(source, mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
@@ -1868,13 +1212,10 @@ class StatusUpdateTriggerDiffblueTest {
 
     StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
     when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater2,
-            publisher,
+            mock(HazelcastEventStore.class),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
@@ -1903,9 +1244,8 @@ class StatusUpdateTriggerDiffblueTest {
   void testUpdateStatus11() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(mock(Publisher.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -1918,14 +1258,12 @@ class StatusUpdateTriggerDiffblueTest {
 
     StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
     when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater2,
-            publisher,
+            mock(HazelcastEventStore.class),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
+            Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
 
     // Act
@@ -1952,7 +1290,103 @@ class StatusUpdateTriggerDiffblueTest {
   void testUpdateStatus12() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
+    ChannelSendOperator<Object> channelSendOperator2 =
+        new ChannelSendOperator<>(mock(Publisher.class), mock(Function.class));
+    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
+        .thenReturn(channelSendOperator2);
+
+    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
+    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
+        .thenReturn(channelSendOperator);
+
+    StatusUpdater statusUpdater = mock(StatusUpdater.class);
+    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
+
+    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
+    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater2,
+            mock(HazelcastEventStore.class),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
+
+    // Assert
+    verify(statusUpdater2).timeout(isA(Duration.class));
+    verify(statusUpdater).updateStatus(isA(InstanceId.class));
+    verify(channelSendOperator).doFinally(isA(Consumer.class));
+    verify(channelSendOperator3).onErrorResume(isA(Function.class));
+    assertSame(channelSendOperator2, actualUpdateStatusResult);
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateStatus(InstanceId)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
+  void testUpdateStatus13() {
+    // Arrange
+    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
+    ReplayProcessor<?> source = ReplayProcessor.create(3, true);
+    ChannelSendOperator<Object> channelSendOperator2 =
+        new ChannelSendOperator<>(source, mock(Function.class));
+    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
+        .thenReturn(channelSendOperator2);
+
+    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
+    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
+        .thenReturn(channelSendOperator);
+
+    StatusUpdater statusUpdater = mock(StatusUpdater.class);
+    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
+
+    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
+    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater2,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+
+    // Act
+    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
+
+    // Assert
+    verify(statusUpdater2).timeout(isA(Duration.class));
+    verify(statusUpdater).updateStatus(isA(InstanceId.class));
+    verify(channelSendOperator).doFinally(isA(Consumer.class));
+    verify(channelSendOperator3).onErrorResume(isA(Function.class));
+    assertSame(channelSendOperator2, actualUpdateStatusResult);
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateStatus(InstanceId)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
+  void testUpdateStatus14() {
+    // Arrange
+    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
+    ReplayProcessor<?> source = ReplayProcessor.create(3, true);
     ChannelSendOperator<Object> channelSendOperator2 =
         new ChannelSendOperator<>(source, mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
@@ -1999,210 +1433,11 @@ class StatusUpdateTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus13() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus14() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Mono<?> source = Mono.just(Integer.MIN_VALUE);
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
   void testUpdateStatus15() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> source2 = new ChannelSendOperator<>(source, mock(Function.class));
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source2, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus16() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> source2 = new ChannelSendOperator<>(source, mock(Function.class));
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source2, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            mock(Publisher.class),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus17() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> source2 = new ChannelSendOperator<>(source, mock(Function.class));
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source2, mock(Function.class));
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -2221,58 +1456,8 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater2,
             publisher,
-            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus18() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> source2 = new ChannelSendOperator<>(source, mock(Function.class));
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source2, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L),
             Duration.ofSeconds(1L));
     statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
@@ -2285,346 +1470,6 @@ class StatusUpdateTriggerDiffblueTest {
     verify(channelSendOperator).doFinally(isA(Consumer.class));
     verify(channelSendOperator3).onErrorResume(isA(Function.class));
     assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus19() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(mock(HazelcastEventStore.class), mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            mock(InMemoryEventStore.class),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus20() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus21() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(mock(ChannelSendOperator.class));
-
-    ChannelSendOperator<Object> channelSendOperator2 = mock(ChannelSendOperator.class);
-    when(channelSendOperator2.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator2);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator2).onErrorResume(isA(Function.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus22() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Mono<?> source = Mono.just("Data");
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus23() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> source2 = new ChannelSendOperator<>(source, mock(Function.class));
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source2, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <ul>
-   *   <li>Given {@link ChannelSendOperator} {@link ChannelSendOperator#doFinally(Consumer)} return
-   *       {@link ChannelSendOperator}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName(
-      "Test updateStatus(InstanceId); given ChannelSendOperator doFinally(Consumer) return ChannelSendOperator")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus_givenChannelSendOperatorDoFinallyReturnChannelSendOperator() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(mock(ChannelSendOperator.class));
-
-    ChannelSendOperator<Object> channelSendOperator2 = mock(ChannelSendOperator.class);
-    when(channelSendOperator2.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator2);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator2).onErrorResume(isA(Function.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
-   *
-   * <ul>
-   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
-   *       three.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName(
-      "Test updateStatus(InstanceId); given InMemoryEventStore(int) with maxLogSizePerAggregate is three")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(mock(ChannelSendOperator.class));
-
-    ChannelSendOperator<Object> channelSendOperator2 = mock(ChannelSendOperator.class);
-    when(channelSendOperator2.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator2);
-
-    StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
-    when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater2,
-            new InMemoryEventStore(3),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator2).onErrorResume(isA(Function.class));
   }
 
   /**
@@ -2676,52 +1521,49 @@ class StatusUpdateTriggerDiffblueTest {
    * Test {@link StatusUpdateTrigger#updateStatus(InstanceId)}.
    *
    * <ul>
-   *   <li>When {@link InstanceId} with {@code Value}.
+   *   <li>Then calls {@link HazelcastEventStore#find(InstanceId)}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdateTrigger#updateStatus(InstanceId)}
    */
   @Test
-  @DisplayName("Test updateStatus(InstanceId); when InstanceId with 'Value'")
+  @DisplayName("Test updateStatus(InstanceId); then calls find(InstanceId)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono StatusUpdateTrigger.updateStatus(InstanceId)"})
-  void testUpdateStatus_whenInstanceIdWithValue() {
+  void testUpdateStatus_thenCallsFind2() throws AssertionError {
     // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
-    ChannelSendOperator<Object> source2 = new ChannelSendOperator<>(source, mock(Function.class));
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source2, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
+    HazelcastEventStore eventStore = mock(HazelcastEventStore.class);
+    Flux<InstanceEvent> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(eventStore.find(Mockito.<InstanceId>any())).thenReturn(fromIterableResult);
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
 
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
 
-    StatusUpdater statusUpdater = mock(StatusUpdater.class);
-    when(statusUpdater.updateStatus(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
 
     StatusUpdater statusUpdater2 = mock(StatusUpdater.class);
     when(statusUpdater2.timeout(Mockito.<Duration>any())).thenReturn(statusUpdater);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater2,
-            mock(Publisher.class),
+            publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
 
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdateTrigger.updateStatus(InstanceId.of("Value"));
-
-    // Assert
+    // Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(statusUpdateTrigger.updateStatus(InstanceId.of("42")));
+    createResult.expectComplete().verify();
+    verify(eventStore).find(isA(InstanceId.class));
     verify(statusUpdater2).timeout(isA(Duration.class));
-    verify(statusUpdater).updateStatus(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateStatusResult);
+    verify(builder).build();
   }
 
   /**
@@ -2821,8 +1663,11 @@ class StatusUpdateTriggerDiffblueTest {
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
@@ -2851,19 +1696,16 @@ class StatusUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
   void testStart4() {
     // Arrange
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(new ArrayList<>());
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+    Mono<InstanceEvent> publisher =
+        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
@@ -2877,7 +1719,6 @@ class StatusUpdateTriggerDiffblueTest {
     statusUpdateTrigger.start();
 
     // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
     verify(builder).build();
   }
 
@@ -2893,14 +1734,11 @@ class StatusUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
   void testStart5() {
     // Arrange
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(new ArrayList<>());
-    eventStore.append(new ArrayList<>());
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -2939,7 +1777,50 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore());
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart7() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -2973,58 +1854,14 @@ class StatusUpdateTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart7() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
   void testStart8() {
     // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -3062,9 +1899,92 @@ class StatusUpdateTriggerDiffblueTest {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart10() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart11() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -3099,53 +2019,14 @@ class StatusUpdateTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart10() {
+  void testStart12() {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(0L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart11() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -3179,54 +2060,14 @@ class StatusUpdateTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart12() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
   void testStart13() {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -3263,11 +2104,11 @@ class StatusUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
   void testStart14() {
     // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -3280,16 +2121,16 @@ class StatusUpdateTriggerDiffblueTest {
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.start();
 
     // Assert
+    verify(builder).webClient(isA(Builder.class));
     verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
   }
 
   /**
@@ -3303,1285 +2144,6 @@ class StatusUpdateTriggerDiffblueTest {
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
   void testStart15() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore(3);
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart16() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    InstanceId instance = InstanceId.of("42");
-    events.add(new InstanceEndpointsDetectedEvent(instance, -1L, Endpoints.empty()));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart17() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    InstanceId instance = InstanceId.of("42");
-    Registration registration =
-        Registration.builder()
-            .healthUrl("https://example.org/example")
-            .managementUrl("https://example.org/example")
-            .name("Name")
-            .serviceUrl("https://example.org/example")
-            .source("Source")
-            .build();
-    events.add(new InstanceRegistrationUpdatedEvent(instance, -1L, registration));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart18() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    InstanceId instance = InstanceId.of("42");
-    events.add(new InstanceEndpointsDetectedEvent(instance, -1L, Endpoints.empty()));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart19() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(null);
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart20() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(null);
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart21() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart22() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart23() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart24() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart25() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart26() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart27() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart28() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart29() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart30() {
-    // Arrange
-    InMemoryEventStore eventStore = new InMemoryEventStore(3);
-    eventStore.append(new ArrayList<>());
-    eventStore.append(new ArrayList<>());
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart31() {
-    // Arrange
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(new ArrayList<>());
-    eventStore.append(new ArrayList<>());
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart32() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    statusUpdater.timeout(Duration.ofSeconds(1L));
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart33() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    statusUpdater.timeout(Duration.ofSeconds(1L));
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart34() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart35() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart36() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart37() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart38() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart39() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart40() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart41() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart42() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart43() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(0L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart44() {
     // Arrange
     InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
     when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
@@ -4599,11 +2161,10 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
     statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.start();
@@ -4623,7 +2184,46 @@ class StatusUpdateTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart45() {
+  void testStart16() {
+    // Arrange
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart17() {
     // Arrange
     InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
     when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
@@ -4640,10 +2240,9 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
 
     // Act
     statusUpdateTrigger.start();
@@ -4663,248 +2262,15 @@ class StatusUpdateTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart46() {
+  void testStart18() {
     // Arrange
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
 
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            mock(StatusUpdater.class),
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <ul>
-   *   <li>Given {@link ArrayList#ArrayList()} add {@link InstanceDeregisteredEvent}.
-   *   <li>Then calls {@link Builder#build()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start(); given ArrayList() add InstanceDeregisteredEvent; then calls build()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenArrayListAddInstanceDeregisteredEvent_thenCallsBuild() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(mock(InstanceDeregisteredEvent.class));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <ul>
-   *   <li>Given {@link ArrayList#ArrayList()} add {@code null}.
-   *   <li>Then calls {@link Builder#build()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName("Test start(); given ArrayList() add 'null'; then calls build()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenArrayListAddNull_thenCallsBuild() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.add(null);
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <ul>
-   *   <li>Given {@link InstanceWebClient.Builder} {@link
-   *       InstanceWebClient.Builder#webClient(Builder)} return {@link
-   *       InstanceWebClient.Builder#Builder()}.
-   *   <li>Then calls {@link InstanceWebClient.Builder#webClient(Builder)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName(
-      "Test start(); given Builder webClient(Builder) return Builder(); then calls webClient(Builder)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenBuilderWebClientReturnBuilder_thenCallsWebClient() {
-    // Arrange
     InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(new InstanceWebClient.Builder());
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
     InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <ul>
-   *   <li>Given {@link InstanceWebClient.Builder} {@link
-   *       InstanceWebClient.Builder#webClient(Builder)} return {@link
-   *       InstanceWebClient.Builder#Builder()}.
-   *   <li>Then calls {@link InstanceWebClient.Builder#webClient(Builder)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName(
-      "Test start(); given Builder webClient(Builder) return Builder(); then calls webClient(Builder)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenBuilderWebClientReturnBuilder_thenCallsWebClient2() {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(new InstanceWebClient.Builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Publisher<InstanceEvent> publisher = mock(Publisher.class);
-    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.start();
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(publisher).subscribe(isA(Subscriber.class));
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#start()}.
-   *
-   * <ul>
-   *   <li>Given {@link
-   *       EventsourcingInstanceRepository#EventsourcingInstanceRepository(InstanceEventStore)} with
-   *       eventStore is {@link InMemoryEventStore}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#start()}
-   */
-  @Test
-  @DisplayName(
-      "Test start(); given EventsourcingInstanceRepository(InstanceEventStore) with eventStore is InMemoryEventStore")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenEventsourcingInstanceRepositoryWithEventStoreIsInMemoryEventStore() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
         new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
@@ -4918,37 +2284,614 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart19() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart20() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart21() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart22() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
             Duration.ofSeconds(Long.MAX_VALUE),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart23() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart24() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(0L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart25() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    InstanceRepository repository = mock(InstanceRepository.class);
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart26() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
     statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.start();
 
     // Assert
+    verify(builder).webClient(isA(Builder.class));
     verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
+    verify(webClient).build();
   }
 
   /**
    * Test {@link StatusUpdateTrigger#start()}.
    *
-   * <ul>
-   *   <li>Given {@link
-   *       EventsourcingInstanceRepository#EventsourcingInstanceRepository(InstanceEventStore)} with
-   *       eventStore is {@link InMemoryEventStore}.
-   * </ul>
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart27() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
    *
    * <p>Method under test: {@link StatusUpdateTrigger#start()}
    */
   @Test
-  @DisplayName(
-      "Test start(); given EventsourcingInstanceRepository(InstanceEventStore) with eventStore is InMemoryEventStore")
+  @DisplayName("Test start()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenEventsourcingInstanceRepositoryWithEventStoreIsInMemoryEventStore2() {
+  void testStart28() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart29() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart30() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart31() {
+    // Arrange
+    Builder webClient = mock(Builder.class);
+    when(webClient.build()).thenReturn(mock(WebClient.class));
+
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any()))
+        .thenReturn(InstanceWebClient.builder(webClient));
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(builder).webClient(isA(Builder.class));
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(webClient).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart32() {
     // Arrange
     InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
     when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
@@ -4966,10 +2909,9 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
 
     // Act
     statusUpdateTrigger.start();
@@ -4982,71 +2924,118 @@ class StatusUpdateTriggerDiffblueTest {
   /**
    * Test {@link StatusUpdateTrigger#start()}.
    *
-   * <ul>
-   *   <li>Given ofSeconds zero addTo ofEpochDay minus one.
-   *   <li>Then calls {@link Builder#build()}.
-   * </ul>
-   *
    * <p>Method under test: {@link StatusUpdateTrigger#start()}
    */
   @Test
-  @DisplayName("Test start(); given ofSeconds zero addTo ofEpochDay minus one; then calls build()")
+  @DisplayName("Test start()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenOfSecondsZeroAddToOfEpochDayMinusOne_thenCallsBuild() {
+  void testStart33() {
     // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
     Publisher<InstanceEvent> publisher = mock(Publisher.class);
     doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
-
-    Duration maxBackoff = Duration.ofSeconds(0L);
-    maxBackoff.addTo(LocalDate.ofEpochDay(-1L));
-
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
-            statusUpdater, publisher, Duration.ofSeconds(1L), Duration.ofSeconds(1L), maxBackoff);
+            mock(StatusUpdater.class),
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(Long.MAX_VALUE));
 
     // Act
     statusUpdateTrigger.start();
 
     // Assert
     verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart34() {
+    // Arrange
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            mock(StatusUpdater.class),
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(Long.MAX_VALUE));
+    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
+  void testStart35() {
+    // Arrange
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            mock(StatusUpdater.class),
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(1L));
+    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+
+    // Act
+    statusUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
   }
 
   /**
    * Test {@link StatusUpdateTrigger#start()}.
    *
    * <ul>
-   *   <li>Given {@link
-   *       SnapshottingInstanceRepository#SnapshottingInstanceRepository(InstanceEventStore)} with
-   *       eventStore is {@link InMemoryEventStore#InMemoryEventStore()}.
+   *   <li>Given {@link InstanceWebClient.Builder} {@link
+   *       InstanceWebClient.Builder#webClient(Builder)} return builder.
+   *   <li>Then calls {@link InstanceWebClient.Builder#webClient(Builder)}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdateTrigger#start()}
    */
   @Test
   @DisplayName(
-      "Test start(); given SnapshottingInstanceRepository(InstanceEventStore) with eventStore is InMemoryEventStore()")
+      "Test start(); given Builder webClient(Builder) return builder; then calls webClient(Builder)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.start()"})
-  void testStart_givenSnapshottingInstanceRepositoryWithEventStoreIsInMemoryEventStore() {
+  void testStart_givenBuilderWebClientReturnBuilder_thenCallsWebClient() {
     // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository =
-        new SnapshottingInstanceRepository(new InMemoryEventStore());
+    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
+    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
+    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -5058,17 +3047,16 @@ class StatusUpdateTriggerDiffblueTest {
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
-            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
 
     // Act
     statusUpdateTrigger.start();
 
     // Assert
+    verify(builder).webClient(isA(Builder.class));
     verify(publisher).subscribe(isA(Subscriber.class));
-    verify(builder).build();
   }
 
   /**
@@ -5086,8 +3074,7 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+    InstanceRepository repository = mock(InstanceRepository.class);
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -5124,7 +3111,7 @@ class StatusUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -5137,7 +3124,7 @@ class StatusUpdateTriggerDiffblueTest {
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5161,11 +3148,12 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    InstanceRepository repository = mock(InstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
@@ -5174,6 +3162,7 @@ class StatusUpdateTriggerDiffblueTest {
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5197,20 +3186,21 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5235,19 +3225,20 @@ class StatusUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
-            new InMemoryEventStore(3),
+            publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(Long.MIN_VALUE));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5272,20 +3263,20 @@ class StatusUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
-            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MAX_VALUE),
+            Duration.ofSeconds(0L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5309,7 +3300,8 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    InstanceRepository repository = mock(InstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -5320,8 +3312,9 @@ class StatusUpdateTriggerDiffblueTest {
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
+            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(Long.MIN_VALUE));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5344,9 +3337,9 @@ class StatusUpdateTriggerDiffblueTest {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -5357,9 +3350,9 @@ class StatusUpdateTriggerDiffblueTest {
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(0L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(Long.MIN_VALUE));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5383,7 +3376,8 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -5394,9 +3388,9 @@ class StatusUpdateTriggerDiffblueTest {
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(Long.MAX_VALUE));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(Long.MIN_VALUE));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5420,20 +3414,21 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+    EmitterProcessor<InstanceEvent> publisher = EmitterProcessor.create(3, true);
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(0L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(Long.MIN_VALUE));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5457,56 +3452,21 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
-            new InMemoryEventStore(3),
+            publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.stop();
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#stop()}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#stop()}
-   */
-  @Test
-  @DisplayName("Test stop()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.stop()"})
-  void testStop12() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            new InMemoryEventStore(3),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(0L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(Long.MIN_VALUE));
 
     // Act
     statusUpdateTrigger.stop();
@@ -5519,44 +3479,89 @@ class StatusUpdateTriggerDiffblueTest {
    * Test {@link StatusUpdateTrigger#stop()}.
    *
    * <ul>
-   *   <li>Given {@link InstanceWebClient.Builder} {@link
-   *       InstanceWebClient.Builder#webClient(Builder)} return builder.
-   *   <li>Then calls {@link InstanceWebClient.Builder#webClient(Builder)}.
+   *   <li>Given {@link
+   *       EventsourcingInstanceRepository#EventsourcingInstanceRepository(InstanceEventStore)} with
+   *       eventStore is {@link InMemoryEventStore#InMemoryEventStore()}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdateTrigger#stop()}
    */
   @Test
   @DisplayName(
-      "Test stop(); given Builder webClient(Builder) return builder; then calls webClient(Builder)")
+      "Test stop(); given EventsourcingInstanceRepository(InstanceEventStore) with eventStore is InMemoryEventStore()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.stop()"})
-  void testStop_givenBuilderWebClientReturnBuilder_thenCallsWebClient() {
+  void testStop_givenEventsourcingInstanceRepositoryWithEventStoreIsInMemoryEventStore() {
     // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
         new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
-            new InMemoryEventStore(3),
+            publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.stop();
 
     // Assert
-    verify(builder).webClient(isA(Builder.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdateTrigger#stop()}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceId} with value is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdateTrigger#stop()}
+   */
+  @Test
+  @DisplayName("Test stop(); given InstanceId with value is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdateTrigger.stop()"})
+  void testStop_givenInstanceIdWithValueIs42() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    StatusUpdater statusUpdater =
+        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
+
+    StatusUpdateTrigger statusUpdateTrigger =
+        new StatusUpdateTrigger(
+            statusUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(Long.MIN_VALUE));
+
+    // Act
+    statusUpdateTrigger.stop();
+
+    // Assert
+    verify(builder).build();
   }
 
   /**
@@ -5624,8 +3629,7 @@ class StatusUpdateTriggerDiffblueTest {
             publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MAX_VALUE));
 
     // Act
     statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
@@ -5649,12 +3653,11 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
@@ -5662,7 +3665,7 @@ class StatusUpdateTriggerDiffblueTest {
             publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MAX_VALUE));
     statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Act
@@ -5686,60 +3689,20 @@ class StatusUpdateTriggerDiffblueTest {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        new InstanceWebClient.Builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#setInterval(Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#setInterval(Duration)}
-   */
-  @Test
-  @DisplayName("Test setInterval(Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.setInterval(Duration)"})
-  void testSetInterval5() {
-    // Arrange
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        new InstanceWebClient.Builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            mock(Publisher.class),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MAX_VALUE));
     statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Act
@@ -5753,140 +3716,37 @@ class StatusUpdateTriggerDiffblueTest {
    * Test {@link StatusUpdateTrigger#setInterval(Duration)}.
    *
    * <ul>
-   *   <li>Given {@link ArrayList#ArrayList()} add {@link InstanceDeregisteredEvent}.
-   *   <li>Then calls {@link Builder#build()}.
+   *   <li>Given {@link ArrayList#ArrayList()} addAll {@link ArrayList#ArrayList()}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdateTrigger#setInterval(Duration)}
    */
   @Test
-  @DisplayName(
-      "Test setInterval(Duration); given ArrayList() add InstanceDeregisteredEvent; then calls build()")
+  @DisplayName("Test setInterval(Duration); given ArrayList() addAll ArrayList()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdateTrigger.setInterval(Duration)"})
-  void testSetInterval_givenArrayListAddInstanceDeregisteredEvent_thenCallsBuild() {
+  void testSetInterval_givenArrayListAddAllArrayList() {
     // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.addAll(new ArrayList<>());
-    events.add(mock(InstanceDeregisteredEvent.class));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        new InstanceWebClient.Builder().webClient(builder).build();
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
 
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            mock(Publisher.class),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#setInterval(Duration)}.
-   *
-   * <ul>
-   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore()} append {@link
-   *       ArrayList#ArrayList()}.
-   *   <li>Then calls {@link Builder#build()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#setInterval(Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test setInterval(Duration); given InMemoryEventStore() append ArrayList(); then calls build()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.setInterval(Duration)"})
-  void testSetInterval_givenInMemoryEventStoreAppendArrayList_thenCallsBuild() {
-    // Arrange
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(new ArrayList<>());
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        new InstanceWebClient.Builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.addAll(new ArrayList<>());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
-            mock(Publisher.class),
+            publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#setInterval(Duration)}.
-   *
-   * <ul>
-   *   <li>Given {@link InstanceId} with value is {@code 42}.
-   *   <li>Then calls {@link Builder#build()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#setInterval(Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test setInterval(Duration); given InstanceId with value is '42'; then calls build()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.setInterval(Duration)"})
-  void testSetInterval_givenInstanceIdWithValueIs42_thenCallsBuild() {
-    // Arrange
-    ArrayList<InstanceEvent> events = new ArrayList<>();
-    events.addAll(new ArrayList<>());
-    events.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(events);
-    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        new InstanceWebClient.Builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            mock(Publisher.class),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(Long.MAX_VALUE));
     statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Act
@@ -5948,7 +3808,8 @@ class StatusUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InstanceEventStore.class));
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -5961,7 +3822,6 @@ class StatusUpdateTriggerDiffblueTest {
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
@@ -5982,40 +3842,30 @@ class StatusUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void StatusUpdateTrigger.setLifetime(Duration)"})
   void testSetLifetime3() {
     // Arrange
-    Builder webClient = mock(Builder.class);
-    when(webClient.build()).thenReturn(mock(WebClient.class));
-
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any()))
-        .thenReturn(InstanceWebClient.builder(webClient));
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Duration updateInterval = Duration.ofSeconds(1L);
-    OffsetDateTime ofResult =
-        OffsetDateTime.of(LocalDate.of(1970, 1, 1), LocalTime.MIDNIGHT, ZoneOffset.UTC);
-    updateInterval.addTo(ofResult);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MIN_VALUE),
             Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(updateInterval);
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(webClient).build();
+    verify(builder).build();
   }
 
   /**
@@ -6030,187 +3880,28 @@ class StatusUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void StatusUpdateTrigger.setLifetime(Duration)"})
   void testSetLifetime4() {
     // Arrange
-    Builder webClient = mock(Builder.class);
-    when(webClient.build()).thenReturn(mock(WebClient.class));
-
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any()))
-        .thenReturn(InstanceWebClient.builder(webClient));
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     StatusUpdater statusUpdater =
         new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Duration updateInterval = Duration.ofSeconds(1L);
-    OffsetDateTime ofResult =
-        OffsetDateTime.of(LocalDate.of(1970, 1, 1), LocalTime.MIDNIGHT, ZoneOffset.UTC);
-    updateInterval.addTo(ofResult);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), -1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     StatusUpdateTrigger statusUpdateTrigger =
         new StatusUpdateTrigger(
             statusUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MIN_VALUE),
             Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(updateInterval);
+    statusUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(webClient).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#setLifetime(Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#setLifetime(Duration)}
-   */
-  @Test
-  @DisplayName("Test setLifetime(Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.setLifetime(Duration)"})
-  void testSetLifetime5() {
-    // Arrange
-    Builder webClient = mock(Builder.class);
-    when(webClient.build()).thenReturn(mock(WebClient.class));
-
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any()))
-        .thenReturn(InstanceWebClient.builder(webClient));
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Duration updateInterval = Duration.ofSeconds(1L);
-    OffsetDateTime ofResult =
-        OffsetDateTime.of(LocalDate.of(1970, 1, 1), LocalTime.MIDNIGHT, ZoneOffset.UTC);
-    updateInterval.addTo(ofResult);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MAX_VALUE),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(updateInterval);
-
-    // Act
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(webClient).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#setLifetime(Duration)}.
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#setLifetime(Duration)}
-   */
-  @Test
-  @DisplayName("Test setLifetime(Duration)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.setLifetime(Duration)"})
-  void testSetLifetime6() {
-    // Arrange
-    Builder webClient = mock(Builder.class);
-    when(webClient.build()).thenReturn(mock(WebClient.class));
-
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any()))
-        .thenReturn(InstanceWebClient.builder(webClient));
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Duration updateInterval = Duration.ofSeconds(1L);
-    OffsetDateTime ofResult =
-        OffsetDateTime.of(LocalDate.of(1970, 1, 1), LocalTime.MIDNIGHT, ZoneOffset.UTC);
-    updateInterval.addTo(ofResult);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L));
-    statusUpdateTrigger.setInterval(updateInterval);
-
-    // Act
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(webClient).build();
-  }
-
-  /**
-   * Test {@link StatusUpdateTrigger#setLifetime(Duration)}.
-   *
-   * <ul>
-   *   <li>Given ofSeconds one addTo {@link LocalTime#MIDNIGHT}.
-   *   <li>Then calls {@link InstanceWebClient.Builder#webClient(Builder)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdateTrigger#setLifetime(Duration)}
-   */
-  @Test
-  @DisplayName(
-      "Test setLifetime(Duration); given ofSeconds one addTo MIDNIGHT; then calls webClient(Builder)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void StatusUpdateTrigger.setLifetime(Duration)"})
-  void testSetLifetime_givenOfSecondsOneAddToMidnight_thenCallsWebClient() {
-    // Arrange
-    Builder webClient = mock(Builder.class);
-    when(webClient.build()).thenReturn(mock(WebClient.class));
-
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any()))
-        .thenReturn(InstanceWebClient.builder(webClient));
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Duration updateInterval = Duration.ofSeconds(1L);
-    updateInterval.addTo(LocalTime.MIDNIGHT);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-
-    StatusUpdateTrigger statusUpdateTrigger =
-        new StatusUpdateTrigger(
-            statusUpdater,
-            publisher,
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    statusUpdateTrigger.setInterval(updateInterval);
-
-    // Act
-    statusUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Assert
-    verify(builder).webClient(isA(Builder.class));
-    verify(webClient).build();
+    verify(builder).build();
   }
 }
