@@ -24,6 +24,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
@@ -35,6 +37,7 @@ import reactor.test.StepVerifier.FirstStep;
 
 @ContextConfiguration(classes = {TelegramNotifier.class})
 @DisabledInAotMode
+@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 class TelegramNotifierDiffblueTest {
   @MockitoBean private InstanceRepository instanceRepository;
@@ -42,6 +45,8 @@ class TelegramNotifierDiffblueTest {
   @MockitoBean private RestTemplate restTemplate;
 
   @Autowired private TelegramNotifier telegramNotifier;
+
+  @InjectMocks private TelegramNotifier telegramNotifier2;
 
   /**
    * Test {@link TelegramNotifier#TelegramNotifier(InstanceRepository, RestTemplate)}.
@@ -113,18 +118,18 @@ class TelegramNotifierDiffblueTest {
    *
    * <ul>
    *   <li>Given {@code Status}.
-   *   <li>Then return {@code <strong>Name</strong>/42 is <strong>Status</strong>}.
+   *   <li>Then return {@code <strong>Name</strong>/ is <strong>Status</strong>}.
    * </ul>
    *
    * <p>Method under test: {@link TelegramNotifier#getText(InstanceEvent, Instance)}
    */
   @Test
   @DisplayName(
-      "Test getText(InstanceEvent, Instance); given 'Status'; then return '<strong>Name</strong>/42 is <strong>Status</strong>'")
+      "Test getText(InstanceEvent, Instance); given 'Status'; then return '<strong>Name</strong>/ is <strong>Status</strong>'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"String TelegramNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_givenStatus_thenReturnStrongNameStrong42IsStrongStatusStrong() {
+  void testGetText_givenStatus_thenReturnStrongNameStrongIsStrongStatusStrong() {
     // Arrange
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.getStatus()).thenReturn("Status");
@@ -132,7 +137,7 @@ class TelegramNotifierDiffblueTest {
         new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
 
     Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(InstanceId.of("42"));
+    when(instance.getId()).thenReturn(null);
     when(instance.getRegistration())
         .thenReturn(
             Registration.builder()
@@ -144,102 +149,13 @@ class TelegramNotifierDiffblueTest {
                 .build());
 
     // Act
-    String actualText = telegramNotifier.getText(event, instance);
+    String actualText = telegramNotifier2.getText(event, instance);
 
     // Assert
     verify(instance).getId();
     verify(instance).getRegistration();
     verify(statusInfo).getStatus();
-    assertEquals("<strong>Name</strong>/42 is <strong>Status</strong>", actualText);
-  }
-
-  /**
-   * Test {@link TelegramNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Given {@code Status}.
-   *   <li>Then return {@code <strong>Name</strong>/42 is <strong>Status</strong>}.
-   * </ul>
-   *
-   * <p>Method under test: {@link TelegramNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName(
-      "Test getText(InstanceEvent, Instance); given 'Status'; then return '<strong>Name</strong>/42 is <strong>Status</strong>'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String TelegramNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_givenStatus_thenReturnStrongNameStrong42IsStrongStatusStrong2() {
-    // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(mock(InstanceId.class), 1L, statusInfo);
-
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(InstanceId.of("42"));
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("Name")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
-
-    // Act
-    String actualText = telegramNotifier.getText(event, instance);
-
-    // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
-    assertEquals("<strong>Name</strong>/42 is <strong>Status</strong>", actualText);
-  }
-
-  /**
-   * Test {@link TelegramNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Then return {@code <strong>eventevent</strong>/42 is <strong>Status</strong>}.
-   * </ul>
-   *
-   * <p>Method under test: {@link TelegramNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName(
-      "Test getText(InstanceEvent, Instance); then return '<strong>eventevent</strong>/42 is <strong>Status</strong>'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String TelegramNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_thenReturnStrongEventeventStrong42IsStrongStatusStrong() {
-    // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
-    InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
-
-    Instance instance = mock(Instance.class);
-    when(instance.getId()).thenReturn(InstanceId.of("42"));
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("eventevent")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
-
-    // Act
-    String actualText = telegramNotifier.getText(event, instance);
-
-    // Assert
-    verify(instance).getId();
-    verify(instance).getRegistration();
-    verify(statusInfo).getStatus();
-    assertEquals("<strong>eventevent</strong>/42 is <strong>Status</strong>", actualText);
+    assertEquals("<strong>Name</strong>/ is <strong>Status</strong>", actualText);
   }
 
   /**

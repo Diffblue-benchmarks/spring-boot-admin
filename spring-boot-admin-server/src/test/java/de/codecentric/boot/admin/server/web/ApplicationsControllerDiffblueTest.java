@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,13 +39,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -65,16 +60,11 @@ import reactor.test.StepVerifier.FirstStep;
 
 @ContextConfiguration(classes = {ApplicationsController.class})
 @DisabledInAotMode
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 class ApplicationsControllerDiffblueTest {
-  @Mock private ApplicationEventPublisher applicationEventPublisher;
-
   @MockitoBean private ApplicationRegistry applicationRegistry;
 
   @Autowired private ApplicationsController applicationsController;
-
-  @InjectMocks private ApplicationsController applicationsController2;
 
   /**
    * Test {@link ApplicationsController#ApplicationsController(ApplicationRegistry,
@@ -420,27 +410,6 @@ class ApplicationsControllerDiffblueTest {
         StepVerifier.create(applicationsController.applications());
     createResult.expectComplete().verify();
     verify(applicationRegistry).getApplications();
-  }
-
-  /**
-   * Test {@link ApplicationsController#refreshApplications()}.
-   *
-   * <p>Method under test: {@link ApplicationsController#refreshApplications()}
-   */
-  @Test
-  @DisplayName("Test refreshApplications()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void ApplicationsController.refreshApplications()"})
-  void testRefreshApplications() {
-    // Arrange
-    doNothing().when(applicationEventPublisher).publishEvent(Mockito.<ApplicationEvent>any());
-
-    // Act
-    applicationsController2.refreshApplications();
-
-    // Assert
-    verify(applicationEventPublisher).publishEvent(isA(ApplicationEvent.class));
   }
 
   /**

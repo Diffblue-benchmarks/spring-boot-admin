@@ -4,18 +4,18 @@
   },
   "run" : {
     "version" : "2025.09.01-44e352d-licensed",
-    "creationTimestamp" : "2025-10-15T16:00:20.277407012Z",
+    "creationTimestamp" : "2025-10-16T13:09:46.368862896Z",
     "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
-    "totalTime" : 1369.548,
-    "environmentDetectionTime" : 0.18,
-    "indexingTime" : 0.401,
-    "entryPointsTime" : 0.169,
-    "generationTime" : 4938.774,
-    "timeToFirstTest" : 2101.869,
-    "timeToLastTest" : 5418.88,
-    "indexQueryTime" : 10.383000000000001,
-    "verificationTime" : 206.61,
-    "validationTime" : 8.509
+    "totalTime" : 2549.778,
+    "environmentDetectionTime" : 0.204,
+    "indexingTime" : 0.348,
+    "entryPointsTime" : 0.188,
+    "generationTime" : 6457.907,
+    "timeToFirstTest" : 4038.326,
+    "timeToLastTest" : 7135.808,
+    "indexQueryTime" : 13.19,
+    "verificationTime" : 245.971,
+    "validationTime" : 40.536
   },
   "codes" : {
     "F009" : "Internal error",
@@ -37,14 +37,15 @@
     "T012" : "Synthetic method",
     "T023" : "Testability unknown",
     "V000" : "Validated successfully",
+    "V003" : "Tests discarded during validation",
     "W001" : "Test did not compile",
     "W002" : "Test compiled, but did not pass"
   },
   "summary" : {
     "classesCount" : 36,
     "methodsCount" : 203,
-    "cumulativeDiffblueTestCount" : 0,
-    "cumulativeManualTestCount" : 0,
+    "cumulativeDiffblueTestCount" : 44,
+    "cumulativeManualTestCount" : 86,
     "completeTestCount" : 44,
     "incompleteTestCount" : 0,
     "skeletonTestCount" : 0,
@@ -68,7 +69,7 @@
       "R013" : 3,
       "R026" : 35,
       "R027" : 2,
-      "R081" : 4,
+      "R081" : 5,
       "R083" : 3,
       "T003" : 4,
       "T004" : 3,
@@ -84,7 +85,8 @@
       "R000" : 44
     },
     "perTestValidation" : {
-      "V000" : 44
+      "V000" : 44,
+      "V003" : 1
     },
     "warnings" : {
       "W001" : 2,
@@ -375,7 +377,7 @@
       }
     },
     "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory" : {
-      "methodsCount" : 2,
+      "methodsCount" : 3,
       "completeTestCount" : 0,
       "incompleteTestCount" : 0,
       "perMethodTestability" : {
@@ -384,7 +386,7 @@
       },
       "perMethodOutcome" : {
         "R026" : 1,
-        "R081" : 1
+        "R081" : 2
       }
     },
     "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory" : {

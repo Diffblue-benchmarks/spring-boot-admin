@@ -50,7 +50,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.Builder;
 import org.springframework.web.reactive.function.client.support.ClientResponseWrapper;
 import org.springframework.web.reactive.function.client.support.ClientResponseWrapper.HeadersWrapper;
-import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -186,46 +185,6 @@ class StatusUpdaterDiffblueTest {
   /**
    * Test {@link StatusUpdater#updateStatus(InstanceId)}.
    *
-   * <p>Method under test: {@link StatusUpdater#updateStatus(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateStatus(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdater.updateStatus(InstanceId)"})
-  void testUpdateStatus4() {
-    // Arrange
-    Mono<Instance> mono = mock(Mono.class);
-    ChannelSendOperator<Object> channelSendOperator =
-        new ChannelSendOperator<>(mock(EmitterProcessor.class), mock(Function.class));
-    when(mono.then()).thenReturn(channelSendOperator);
-
-    EventsourcingInstanceRepository repository = mock(EventsourcingInstanceRepository.class);
-    when(repository.computeIfPresent(
-            Mockito.<InstanceId>any(),
-            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
-        .thenReturn(mono);
-
-    Builder builder = mock(Builder.class);
-    when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    // Act
-    Mono<Void> actualUpdateStatusResult = statusUpdater.updateStatus(InstanceId.of("42"));
-
-    // Assert
-    verify(repository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
-    verify(builder).build();
-    verify(mono).then();
-    assertSame(channelSendOperator, actualUpdateStatusResult);
-  }
-
-  /**
-   * Test {@link StatusUpdater#updateStatus(InstanceId)}.
-   *
    * <ul>
    *   <li>Given {@link InstanceRepository} {@link InstanceRepository#computeIfPresent(InstanceId,
    *       BiFunction)} return just {@link Instance}.
@@ -253,6 +212,37 @@ class StatusUpdaterDiffblueTest {
         StepVerifier.create(statusUpdater.updateStatus(InstanceId.of("42")));
     createResult.expectComplete().verify();
     verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+  }
+
+  /**
+   * Test {@link StatusUpdater#updateStatus(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link Mono} {@link Mono#then()} return {@link ChannelSendOperator}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdater#updateStatus(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateStatus(InstanceId); given Mono then() return ChannelSendOperator")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono StatusUpdater.updateStatus(InstanceId)"})
+  void testUpdateStatus_givenMonoThenReturnChannelSendOperator() {
+    // Arrange
+    Mono<Instance> mono = mock(Mono.class);
+    when(mono.then()).thenReturn(mock(ChannelSendOperator.class));
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    statusUpdater.updateStatus(InstanceId.of("4242"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
   }
 
   /**
@@ -289,6 +279,41 @@ class StatusUpdaterDiffblueTest {
     createResult.expectComplete().verify();
     verify(eventStore).find(isA(InstanceId.class));
     verify(builder).build();
+  }
+
+  /**
+   * Test {@link StatusUpdater#updateStatus(InstanceId)}.
+   *
+   * <ul>
+   *   <li>When {@link InstanceId} with value is {@code 4242Value}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdater#updateStatus(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateStatus(InstanceId); when InstanceId with value is '4242Value'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono StatusUpdater.updateStatus(InstanceId)"})
+  void testUpdateStatus_whenInstanceIdWithValueIs4242Value() {
+    // Arrange
+    Mono<Instance> mono = mock(Mono.class);
+    Flux<?> source = Flux.fromIterable(new ArrayList<>());
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualUpdateStatusResult = statusUpdater.updateStatus(InstanceId.of("4242Value"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualUpdateStatusResult);
   }
 
   /**
@@ -446,23 +471,22 @@ class StatusUpdaterDiffblueTest {
    * Test {@link StatusUpdater#handleError(Throwable)}.
    *
    * <ul>
-   *   <li>Given {@link Throwable#Throwable()}.
-   *   <li>When {@link IOException#IOException()} addSuppressed {@link Throwable#Throwable()}.
+   *   <li>When {@link IOException#IOException(String, Throwable)} with {@code foo} and {@link
+   *       Throwable#Throwable()}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdater#handleError(Throwable)}
    */
   @Test
   @DisplayName(
-      "Test handleError(Throwable); given Throwable(); when IOException() addSuppressed Throwable()")
+      "Test handleError(Throwable); when IOException(String, Throwable) with 'foo' and Throwable()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono StatusUpdater.handleError(Throwable)"})
-  void testHandleError_givenThrowable_whenIOExceptionAddSuppressedThrowable()
-      throws AssertionError {
+  void testHandleError_whenIOExceptionWithFooAndThrowable() throws AssertionError {
     // Arrange
-    IOException ex = new IOException();
-    ex.addSuppressed(new Throwable());
+    IOException ioException = new IOException("foo", new Throwable());
+    Throwable ex = new Throwable("message", ioException);
 
     // Act and Assert
     FirstStep<StatusInfo> createResult = StepVerifier.create(statusUpdater.handleError(ex));
@@ -473,159 +497,7 @@ class StatusUpdaterDiffblueTest {
               Map<String, Object> details = statusInfo.getDetails();
               assertEquals(2, details.size());
               Object getResult = details.get("exception");
-              assertEquals("java.io.IOException", getResult);
-              assertNull(details.get("message"));
-              assertEquals("OFFLINE", statusInfo.getStatus());
-              assertFalse(statusInfo.isDown());
-              assertTrue(statusInfo.isOffline());
-              assertFalse(statusInfo.isUnknown());
-              assertFalse(statusInfo.isUp());
-              return;
-            })
-        .expectComplete()
-        .verify();
-  }
-
-  /**
-   * Test {@link StatusUpdater#handleError(Throwable)}.
-   *
-   * <ul>
-   *   <li>When {@link AbstractMethodError#AbstractMethodError()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdater#handleError(Throwable)}
-   */
-  @Test
-  @DisplayName("Test handleError(Throwable); when AbstractMethodError()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdater.handleError(Throwable)"})
-  void testHandleError_whenAbstractMethodError() throws AssertionError {
-    // Arrange, Act and Assert
-    FirstStep<StatusInfo> createResult =
-        StepVerifier.create(statusUpdater.handleError(new AbstractMethodError()));
-    createResult
-        .assertNext(
-            s -> {
-              StatusInfo statusInfo = s;
-              Map<String, Object> details = statusInfo.getDetails();
-              assertEquals(2, details.size());
-              Object getResult = details.get("exception");
-              assertEquals("java.lang.AbstractMethodError", getResult);
-              assertNull(details.get("message"));
-              assertEquals("OFFLINE", statusInfo.getStatus());
-              assertFalse(statusInfo.isDown());
-              assertTrue(statusInfo.isOffline());
-              assertFalse(statusInfo.isUnknown());
-              assertFalse(statusInfo.isUp());
-              return;
-            })
-        .expectComplete()
-        .verify();
-  }
-
-  /**
-   * Test {@link StatusUpdater#handleError(Throwable)}.
-   *
-   * <ul>
-   *   <li>When {@link ArrayIndexOutOfBoundsException#ArrayIndexOutOfBoundsException(int)} with one.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdater#handleError(Throwable)}
-   */
-  @Test
-  @DisplayName("Test handleError(Throwable); when ArrayIndexOutOfBoundsException(int) with one")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdater.handleError(Throwable)"})
-  void testHandleError_whenArrayIndexOutOfBoundsExceptionWithOne() throws AssertionError {
-    // Arrange, Act and Assert
-    FirstStep<StatusInfo> createResult =
-        StepVerifier.create(statusUpdater.handleError(new ArrayIndexOutOfBoundsException(1)));
-    createResult
-        .assertNext(
-            s -> {
-              StatusInfo statusInfo = s;
-              Map<String, Object> details = statusInfo.getDetails();
-              assertEquals(2, details.size());
-              Object getResult = details.get("exception");
-              assertEquals("java.lang.ArrayIndexOutOfBoundsException", getResult);
-              assertEquals("Array index out of range: 1", details.get("message"));
-              assertEquals("OFFLINE", statusInfo.getStatus());
-              assertFalse(statusInfo.isDown());
-              assertTrue(statusInfo.isOffline());
-              assertFalse(statusInfo.isUnknown());
-              assertFalse(statusInfo.isUp());
-              return;
-            })
-        .expectComplete()
-        .verify();
-  }
-
-  /**
-   * Test {@link StatusUpdater#handleError(Throwable)}.
-   *
-   * <ul>
-   *   <li>When {@link IOException#IOException()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdater#handleError(Throwable)}
-   */
-  @Test
-  @DisplayName("Test handleError(Throwable); when IOException()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdater.handleError(Throwable)"})
-  void testHandleError_whenIOException() throws AssertionError {
-    // Arrange, Act and Assert
-    FirstStep<StatusInfo> createResult =
-        StepVerifier.create(statusUpdater.handleError(new IOException()));
-    createResult
-        .assertNext(
-            s -> {
-              StatusInfo statusInfo = s;
-              Map<String, Object> details = statusInfo.getDetails();
-              assertEquals(2, details.size());
-              Object getResult = details.get("exception");
-              assertEquals("java.io.IOException", getResult);
-              assertNull(details.get("message"));
-              assertEquals("OFFLINE", statusInfo.getStatus());
-              assertFalse(statusInfo.isDown());
-              assertTrue(statusInfo.isOffline());
-              assertFalse(statusInfo.isUnknown());
-              assertFalse(statusInfo.isUp());
-              return;
-            })
-        .expectComplete()
-        .verify();
-  }
-
-  /**
-   * Test {@link StatusUpdater#handleError(Throwable)}.
-   *
-   * <ul>
-   *   <li>When {@link OutOfMemoryError#OutOfMemoryError(String)} with {@code message}.
-   * </ul>
-   *
-   * <p>Method under test: {@link StatusUpdater#handleError(Throwable)}
-   */
-  @Test
-  @DisplayName("Test handleError(Throwable); when OutOfMemoryError(String) with 'message'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdater.handleError(Throwable)"})
-  void testHandleError_whenOutOfMemoryErrorWithMessage() throws AssertionError {
-    // Arrange, Act and Assert
-    FirstStep<StatusInfo> createResult =
-        StepVerifier.create(statusUpdater.handleError(new OutOfMemoryError("message")));
-    createResult
-        .assertNext(
-            s -> {
-              StatusInfo statusInfo = s;
-              Map<String, Object> details = statusInfo.getDetails();
-              assertEquals(2, details.size());
-              Object getResult = details.get("exception");
-              assertEquals("java.lang.OutOfMemoryError", getResult);
+              assertEquals("java.lang.Throwable", getResult);
               assertEquals("message", details.get("message"));
               assertEquals("OFFLINE", statusInfo.getStatus());
               assertFalse(statusInfo.isDown());
@@ -681,18 +553,18 @@ class StatusUpdaterDiffblueTest {
    *
    * <ul>
    *   <li>Given {@link StatusInfo} {@link StatusInfo#isOffline()} return {@code false}.
-   *   <li>Then calls {@link Instance#getStatusInfo()}.
+   *   <li>When {@link Throwable#Throwable()}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdater#logError(Instance, Throwable)}
    */
   @Test
   @DisplayName(
-      "Test logError(Instance, Throwable); given StatusInfo isOffline() return 'false'; then calls getStatusInfo()")
+      "Test logError(Instance, Throwable); given StatusInfo isOffline() return 'false'; when Throwable()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdater.logError(Instance, Throwable)"})
-  void testLogError_givenStatusInfoIsOfflineReturnFalse_thenCallsGetStatusInfo() {
+  void testLogError_givenStatusInfoIsOfflineReturnFalse_whenThrowable() {
     // Arrange
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.isOffline()).thenReturn(false);
@@ -713,18 +585,50 @@ class StatusUpdaterDiffblueTest {
    *
    * <ul>
    *   <li>Given {@link StatusInfo} {@link StatusInfo#isOffline()} return {@code true}.
-   *   <li>Then calls {@link Instance#getStatusInfo()}.
+   *   <li>When {@link AbstractMethodError#AbstractMethodError()}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdater#logError(Instance, Throwable)}
    */
   @Test
   @DisplayName(
-      "Test logError(Instance, Throwable); given StatusInfo isOffline() return 'true'; then calls getStatusInfo()")
+      "Test logError(Instance, Throwable); given StatusInfo isOffline() return 'true'; when AbstractMethodError()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void StatusUpdater.logError(Instance, Throwable)"})
-  void testLogError_givenStatusInfoIsOfflineReturnTrue_thenCallsGetStatusInfo() {
+  void testLogError_givenStatusInfoIsOfflineReturnTrue_whenAbstractMethodError() {
+    // Arrange
+    StatusInfo statusInfo = mock(StatusInfo.class);
+    when(statusInfo.isOffline()).thenReturn(true);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getStatusInfo()).thenReturn(statusInfo);
+
+    // Act
+    statusUpdater.logError(instance, new AbstractMethodError());
+
+    // Assert
+    verify(instance).getStatusInfo();
+    verify(statusInfo).isOffline();
+  }
+
+  /**
+   * Test {@link StatusUpdater#logError(Instance, Throwable)}.
+   *
+   * <ul>
+   *   <li>Given {@link StatusInfo} {@link StatusInfo#isOffline()} return {@code true}.
+   *   <li>When {@link Throwable#Throwable()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdater#logError(Instance, Throwable)}
+   */
+  @Test
+  @DisplayName(
+      "Test logError(Instance, Throwable); given StatusInfo isOffline() return 'true'; when Throwable()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdater.logError(Instance, Throwable)"})
+  void testLogError_givenStatusInfoIsOfflineReturnTrue_whenThrowable() {
     // Arrange
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.isOffline()).thenReturn(true);
@@ -734,6 +638,74 @@ class StatusUpdaterDiffblueTest {
 
     // Act
     statusUpdater.logError(instance, new Throwable());
+
+    // Assert
+    verify(instance).getStatusInfo();
+    verify(statusInfo).isOffline();
+  }
+
+  /**
+   * Test {@link StatusUpdater#logError(Instance, Throwable)}.
+   *
+   * <ul>
+   *   <li>Given {@link Throwable#Throwable()}.
+   *   <li>When {@link AbstractMethodError#AbstractMethodError()} addSuppressed {@link
+   *       Throwable#Throwable()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdater#logError(Instance, Throwable)}
+   */
+  @Test
+  @DisplayName(
+      "Test logError(Instance, Throwable); given Throwable(); when AbstractMethodError() addSuppressed Throwable()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdater.logError(Instance, Throwable)"})
+  void testLogError_givenThrowable_whenAbstractMethodErrorAddSuppressedThrowable() {
+    // Arrange
+    StatusInfo statusInfo = mock(StatusInfo.class);
+    when(statusInfo.isOffline()).thenReturn(false);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getStatusInfo()).thenReturn(statusInfo);
+
+    AbstractMethodError ex = new AbstractMethodError();
+    ex.addSuppressed(new Throwable());
+
+    // Act
+    statusUpdater.logError(instance, ex);
+
+    // Assert
+    verify(instance).getStatusInfo();
+    verify(statusInfo).isOffline();
+  }
+
+  /**
+   * Test {@link StatusUpdater#logError(Instance, Throwable)}.
+   *
+   * <ul>
+   *   <li>When {@link ArrayStoreException#ArrayStoreException(String)} with {@code Couldn't
+   *       retrieve status for {}}.
+   * </ul>
+   *
+   * <p>Method under test: {@link StatusUpdater#logError(Instance, Throwable)}
+   */
+  @Test
+  @DisplayName(
+      "Test logError(Instance, Throwable); when ArrayStoreException(String) with 'Couldn't retrieve status for {}'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void StatusUpdater.logError(Instance, Throwable)"})
+  void testLogError_whenArrayStoreExceptionWithCouldnTRetrieveStatusFor() {
+    // Arrange
+    StatusInfo statusInfo = mock(StatusInfo.class);
+    when(statusInfo.isOffline()).thenReturn(false);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getStatusInfo()).thenReturn(statusInfo);
+
+    // Act
+    statusUpdater.logError(instance, new ArrayStoreException("Couldn't retrieve status for {}"));
 
     // Assert
     verify(instance).getStatusInfo();

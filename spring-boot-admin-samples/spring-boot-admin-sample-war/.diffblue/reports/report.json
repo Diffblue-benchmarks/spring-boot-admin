@@ -4,18 +4,18 @@
   },
   "run" : {
     "version" : "2025.09.01-44e352d-licensed",
-    "creationTimestamp" : "2025-10-15T16:00:20.277407012Z",
+    "creationTimestamp" : "2025-10-16T13:09:46.368862896Z",
     "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
-    "totalTime" : 100.422,
-    "environmentDetectionTime" : 0.032,
-    "indexingTime" : 0.413,
-    "entryPointsTime" : 0.021,
-    "generationTime" : 5154.346,
-    "timeToFirstTest" : 2466.182,
-    "timeToLastTest" : 5721.167,
-    "indexQueryTime" : 5.553,
-    "verificationTime" : 217.573,
-    "validationTime" : 12.036
+    "totalTime" : 190.626,
+    "environmentDetectionTime" : 0.037,
+    "indexingTime" : 0.362,
+    "entryPointsTime" : 0.025,
+    "generationTime" : 6748.433,
+    "timeToFirstTest" : 4774.311,
+    "timeToLastTest" : 7731.182,
+    "indexQueryTime" : 7.127,
+    "verificationTime" : 259.927,
+    "validationTime" : 8.761
   },
   "codes" : {
     "R000" : "Success",
@@ -24,12 +24,13 @@
     "T005" : "Trivial constructor",
     "T006" : "Main method",
     "T012" : "Synthetic method",
-    "V000" : "Validated successfully"
+    "V000" : "Validated successfully",
+    "V003" : "Tests discarded during validation"
   },
   "summary" : {
     "classesCount" : 3,
     "methodsCount" : 13,
-    "cumulativeDiffblueTestCount" : 0,
+    "cumulativeDiffblueTestCount" : 1,
     "cumulativeManualTestCount" : 0,
     "completeTestCount" : 1,
     "incompleteTestCount" : 0,
@@ -52,7 +53,8 @@
       "R000" : 1
     },
     "perTestValidation" : {
-      "V000" : 1
+      "V000" : 1,
+      "V003" : 1
     }
   },
   "classes" : {

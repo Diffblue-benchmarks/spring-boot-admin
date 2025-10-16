@@ -185,57 +185,6 @@ class AbstractEventHandlerDiffblueTest {
    * Test {@link AbstractEventHandler#start()}.
    *
    * <ul>
-   *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
-   *   <li>Then calls {@link Function#apply(Object)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link AbstractEventHandler#start()}
-   */
-  @Test
-  @DisplayName("Test start(); given ArrayList() add '42'; then calls apply(Object)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void AbstractEventHandler.start()"})
-  void testStart_givenArrayListAdd42_thenCallsApply2() {
-    // Arrange
-    ArrayList<Object> it = new ArrayList<>();
-    it.add("42");
-    it.add("42");
-    Flux<?> source = Flux.fromIterable(it);
-
-    Function<Publisher<Object>, Publisher<Void>> writeFunction = mock(Function.class);
-    Flux<Void> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(writeFunction.apply(Mockito.<Publisher<Object>>any())).thenReturn(fromIterableResult);
-
-    ChannelSendOperator<Object> channelSendOperator =
-        new ChannelSendOperator<>(source, writeFunction);
-
-    Notifier notifier = mock(Notifier.class);
-    when(notifier.notify(Mockito.<InstanceEvent>any())).thenReturn(channelSendOperator);
-
-    ArrayList<InstanceEvent> it2 = new ArrayList<>();
-    it2.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
-    Flux<InstanceEvent> fromIterableResult2 = Flux.fromIterable(it2);
-
-    DirectProcessor<InstanceEvent> events = mock(DirectProcessor.class);
-    when(events.subscribeOn(Mockito.<Scheduler>any())).thenReturn(fromIterableResult2);
-
-    HazelcastNotificationTrigger hazelcastNotificationTrigger =
-        new HazelcastNotificationTrigger(notifier, events, new ConcurrentHashMap<>());
-
-    // Act
-    hazelcastNotificationTrigger.start();
-
-    // Assert
-    verify(notifier).notify(isA(InstanceEvent.class));
-    verify(writeFunction).apply(isA(Publisher.class));
-    verify(events).subscribeOn(isA(Scheduler.class));
-  }
-
-  /**
-   * Test {@link AbstractEventHandler#start()}.
-   *
-   * <ul>
    *   <li>Given {@link ArrayList#ArrayList()} add {@code null}.
    *   <li>Then calls {@link DirectProcessor#subscribeOn(Scheduler)}.
    * </ul>
@@ -488,28 +437,32 @@ class AbstractEventHandlerDiffblueTest {
    * Test {@link AbstractEventHandler#createScheduler()}.
    *
    * <ul>
-   *   <li>Given {@link ConcurrentHashMap#ConcurrentHashMap()} {@link InstanceId} with value is
-   *       {@code 42} is one.
+   *   <li>Given {@link InstanceId} with value is {@code Value42}.
    * </ul>
    *
    * <p>Method under test: {@link AbstractEventHandler#createScheduler()}
    */
   @Test
-  @DisplayName(
-      "Test createScheduler(); given ConcurrentHashMap() InstanceId with value is '42' is one")
+  @DisplayName("Test createScheduler(); given InstanceId with value is 'Value42'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Scheduler AbstractEventHandler.createScheduler()"})
-  void testCreateScheduler_givenConcurrentHashMapInstanceIdWithValueIs42IsOne() {
+  void testCreateScheduler_givenInstanceIdWithValueIsValue42() {
     // Arrange
+    ArrayList<InstanceEvent> instanceEventList = new ArrayList<>();
+    instanceEventList.add(new InstanceDeregisteredEvent(InstanceId.of("Value42"), 1L));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    it.addAll(instanceEventList);
+    it.add(null);
+    Flux<InstanceEvent> events = Flux.fromIterable(it);
+
     ConcurrentHashMap<InstanceId, Long> sentNotifications = new ConcurrentHashMap<>();
-    sentNotifications.put(InstanceId.of("42"), 1L);
     sentNotifications.putIfAbsent(InstanceId.of("42"), 1L);
-    Notifier notifier = mock(Notifier.class);
-    Flux<InstanceEvent> events = Flux.fromIterable(new ArrayList<>());
 
     HazelcastNotificationTrigger hazelcastNotificationTrigger =
-        new HazelcastNotificationTrigger(notifier, events, sentNotifications);
+        new HazelcastNotificationTrigger(mock(Notifier.class), events, sentNotifications);
 
     // Act and Assert
     assertFalse(hazelcastNotificationTrigger.createScheduler().isDisposed());

@@ -104,7 +104,37 @@ class InfoUpdaterDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono InfoUpdater.updateInfo(InstanceId)"})
-  void testUpdateInfo2() throws AssertionError {
+  void testUpdateInfo2() {
+    // Arrange
+    Mono<Instance> mono = mock(Mono.class);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(new InMemoryEventStore(), mock(Function.class));
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualUpdateInfoResult = infoUpdater.updateInfo(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualUpdateInfoResult);
+  }
+
+  /**
+   * Test {@link InfoUpdater#updateInfo(InstanceId)}.
+   *
+   * <p>Method under test: {@link InfoUpdater#updateInfo(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateInfo(InstanceId)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdater.updateInfo(InstanceId)"})
+  void testUpdateInfo3() throws AssertionError {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
@@ -131,7 +161,7 @@ class InfoUpdaterDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono InfoUpdater.updateInfo(InstanceId)"})
-  void testUpdateInfo3() throws AssertionError {
+  void testUpdateInfo4() throws AssertionError {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
@@ -146,6 +176,83 @@ class InfoUpdaterDiffblueTest {
     FirstStep<Void> createResult = StepVerifier.create(infoUpdater.updateInfo(InstanceId.of("42")));
     createResult.expectComplete().verify();
     verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdater#updateInfo(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} addAll {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdater#updateInfo(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateInfo(InstanceId); given ArrayList() addAll ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdater.updateInfo(InstanceId)"})
+  void testUpdateInfo_givenArrayListAddAllArrayList() {
+    // Arrange
+    ArrayList<Object> it = new ArrayList<>();
+    it.addAll(new ArrayList<>());
+    Flux<?> source = Flux.fromIterable(it);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+
+    Mono<Instance> mono = mock(Mono.class);
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualUpdateInfoResult = infoUpdater.updateInfo(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualUpdateInfoResult);
+  }
+
+  /**
+   * Test {@link InfoUpdater#updateInfo(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} addAll {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdater#updateInfo(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateInfo(InstanceId); given ArrayList() addAll ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdater.updateInfo(InstanceId)"})
+  void testUpdateInfo_givenArrayListAddAllArrayList2() {
+    // Arrange
+    ArrayList<Object> it = new ArrayList<>();
+    it.addAll(new ArrayList<>());
+    it.addAll(new ArrayList<>());
+    Flux<?> source = Flux.fromIterable(it);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+
+    Mono<Instance> mono = mock(Mono.class);
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualUpdateInfoResult = infoUpdater.updateInfo(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualUpdateInfoResult);
   }
 
   /**
@@ -358,14 +465,43 @@ class InfoUpdaterDiffblueTest {
   /**
    * Test {@link InfoUpdater#convertInfo(Instance, Throwable)} with {@code instance}, {@code ex}.
    *
+   * <ul>
+   *   <li>Given {@link Throwable#Throwable()}.
+   * </ul>
+   *
    * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, Throwable)}
    */
   @Test
-  @DisplayName("Test convertInfo(Instance, Throwable) with 'instance', 'ex'")
+  @DisplayName("Test convertInfo(Instance, Throwable) with 'instance', 'ex'; given Throwable()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Info InfoUpdater.convertInfo(Instance, Throwable)"})
-  void testConvertInfoWithInstanceEx() {
+  void testConvertInfoWithInstanceEx_givenThrowable() {
+    // Arrange
+    Instance instance = mock(Instance.class);
+
+    ArrayStoreException ex = new ArrayStoreException();
+    ex.addSuppressed(new Throwable());
+
+    // Act and Assert
+    assertTrue(infoUpdater.convertInfo(instance, ex).getValues().isEmpty());
+  }
+
+  /**
+   * Test {@link InfoUpdater#convertInfo(Instance, Throwable)} with {@code instance}, {@code ex}.
+   *
+   * <ul>
+   *   <li>When {@link Throwable#Throwable()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, Throwable)}
+   */
+  @Test
+  @DisplayName("Test convertInfo(Instance, Throwable) with 'instance', 'ex'; when Throwable()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Info InfoUpdater.convertInfo(Instance, Throwable)"})
+  void testConvertInfoWithInstanceEx_whenThrowable() {
     // Arrange
     Instance instance = mock(Instance.class);
 
@@ -377,19 +513,14 @@ class InfoUpdaterDiffblueTest {
    * Test {@link InfoUpdater#convertInfo(Instance, ClientResponse)} with {@code instance}, {@code
    * response}.
    *
-   * <ul>
-   *   <li>Then calls {@link ApiMediaTypeHandler#isApiMediaType(MediaType)}.
-   * </ul>
-   *
    * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, ClientResponse)}
    */
   @Test
-  @DisplayName(
-      "Test convertInfo(Instance, ClientResponse) with 'instance', 'response'; then calls isApiMediaType(MediaType)")
+  @DisplayName("Test convertInfo(Instance, ClientResponse) with 'instance', 'response'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono InfoUpdater.convertInfo(Instance, ClientResponse)"})
-  void testConvertInfoWithInstanceResponse_thenCallsIsApiMediaType() throws AssertionError {
+  void testConvertInfoWithInstanceResponse() throws AssertionError {
     // Arrange
     when(apiMediaTypeHandler.isApiMediaType(Mockito.<MediaType>any())).thenReturn(true);
     Instance instance = mock(Instance.class);
@@ -426,6 +557,58 @@ class InfoUpdaterDiffblueTest {
     verify(delegate).headers();
     verify(delegate).statusCode();
     verify(headers).contentType();
+  }
+
+  /**
+   * Test {@link InfoUpdater#convertInfo(Instance, ClientResponse)} with {@code instance}, {@code
+   * response}.
+   *
+   * <p>Method under test: {@link InfoUpdater#convertInfo(Instance, ClientResponse)}
+   */
+  @Test
+  @DisplayName("Test convertInfo(Instance, ClientResponse) with 'instance', 'response'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdater.convertInfo(Instance, ClientResponse)"})
+  void testConvertInfoWithInstanceResponse2() throws AssertionError {
+    // Arrange
+    when(apiMediaTypeHandler.isApiMediaType(Mockito.<MediaType>any())).thenReturn(true);
+    Instance instance = mock(Instance.class);
+
+    HeadersWrapper headersWrapper = mock(HeadersWrapper.class);
+    Optional<MediaType> ofResult =
+        Optional.of(MediaType.parseMediaType(MediaType.IMAGE_JPEG_VALUE));
+    when(headersWrapper.contentType()).thenReturn(ofResult);
+
+    ClientResponseWrapper delegate = mock(ClientResponseWrapper.class);
+    Mono<Object> justResult = Mono.just("Data");
+    when(delegate.bodyToMono(Mockito.<ParameterizedTypeReference<Object>>any()))
+        .thenReturn(justResult);
+    Mono<Map<String, Object>> justResult2 = Mono.just(new HashMap<>());
+    when(delegate.bodyToMono(Mockito.<ParameterizedTypeReference<Map<String, Object>>>any()))
+        .thenReturn(justResult2);
+    when(delegate.headers()).thenReturn(headersWrapper);
+    when(delegate.statusCode()).thenReturn(HttpStatus.OK);
+
+    // Act
+    Mono<Info> actualPublisher =
+        infoUpdater.convertInfo(instance, new ClientResponseWrapper(delegate));
+
+    // Assert
+    FirstStep<Info> createResult = StepVerifier.create(actualPublisher);
+    createResult
+        .assertNext(
+            i -> {
+              assertTrue(i.getValues().isEmpty());
+              return;
+            })
+        .expectComplete()
+        .verify();
+    verify(apiMediaTypeHandler).isApiMediaType(isA(MediaType.class));
+    verify(delegate, atLeast(1)).bodyToMono(isA(ParameterizedTypeReference.class));
+    verify(delegate).headers();
+    verify(delegate).statusCode();
+    verify(headersWrapper).contentType();
   }
 
   /**

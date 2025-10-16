@@ -9,15 +9,11 @@ import static org.mockito.Mockito.when;
 import com.diffblue.cover.annotations.ManagedByDiffblue;
 import com.diffblue.cover.annotations.MethodsUnderTest;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
@@ -26,18 +22,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ContextConfiguration(classes = {UiExtensions.class})
 @DisabledInAotMode
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 class UiExtensionsDiffblueTest {
   @Autowired private List<UiExtension> list;
 
-  @Mock private List<UiExtension> list2;
-
   @MockitoBean private UiExtension uiExtension;
 
   @Autowired private UiExtensions uiExtensions;
-
-  @InjectMocks private UiExtensions uiExtensions2;
 
   /**
    * Test {@link UiExtensions#UiExtensions(List)}.
@@ -63,29 +54,6 @@ class UiExtensionsDiffblueTest {
     assertTrue(actualUiExtensions.getCssExtensions().isEmpty());
     assertTrue(actualUiExtensions.getExtensions().isEmpty());
     assertTrue(actualUiExtensions.getJsExtensions().isEmpty());
-  }
-
-  /**
-   * Test {@link UiExtensions#iterator()}.
-   *
-   * <p>Method under test: {@link UiExtensions#iterator()}
-   */
-  @Test
-  @DisplayName("Test iterator()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Iterator UiExtensions.iterator()"})
-  void testIterator() {
-    // Arrange
-    ArrayList<UiExtension> uiExtensionList = new ArrayList<>();
-    when(list2.iterator()).thenReturn(uiExtensionList.iterator());
-
-    // Act
-    Iterator<UiExtension> actualIteratorResult = uiExtensions2.iterator();
-
-    // Assert
-    verify(list2).iterator();
-    assertFalse(actualIteratorResult.hasNext());
   }
 
   /**

@@ -21,7 +21,6 @@ import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import de.codecentric.boot.admin.server.domain.values.Registration;
 import de.codecentric.boot.admin.server.domain.values.StatusInfo;
-import de.codecentric.boot.admin.server.eventstore.HazelcastEventStore;
 import de.codecentric.boot.admin.server.eventstore.InMemoryEventStore;
 import java.net.URI;
 import java.util.Map;
@@ -86,6 +85,33 @@ class WebexNotifierDiffblueTest {
     Class<String> expectedValueType = String.class;
     assertEquals(expectedValueType, message.getValueType());
     assertArrayEquals(new String[] {"UNKNOWN:UP"}, actualWebexNotifier.getIgnoreChanges());
+  }
+
+  /**
+   * Test {@link WebexNotifier#doNotify(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>Given {@link WebexNotifier} AuthToken is {@code 42}.
+   *   <li>When {@code null}.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName(
+      "Test doNotify(InstanceEvent, Instance); given WebexNotifier AuthToken is '42'; when 'null'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"reactor.core.publisher.Mono WebexNotifier.doNotify(InstanceEvent, Instance)"})
+  void testDoNotify_givenWebexNotifierAuthTokenIs42_whenNull() throws AssertionError {
+    // Arrange
+    webexNotifier.setAuthToken("42");
+
+    // Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(
+            webexNotifier.doNotify(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), null));
+    createResult.expectError().verify();
   }
 
   /**
@@ -165,6 +191,38 @@ class WebexNotifierDiffblueTest {
   }
 
   /**
+   * Test {@link WebexNotifier#doNotify(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>Then throw {@link IllegalStateException}.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName("Test doNotify(InstanceEvent, Instance); then throw IllegalStateException")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"reactor.core.publisher.Mono WebexNotifier.doNotify(InstanceEvent, Instance)"})
+  void testDoNotify_thenThrowIllegalStateException() {
+    // Arrange
+    WebexNotifier webexNotifier =
+        new WebexNotifier(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(RestTemplate.class));
+    webexNotifier.setAuthToken("ABC123");
+    webexNotifier.setRoomId("42");
+
+    InstanceDeregisteredEvent event = mock(InstanceDeregisteredEvent.class);
+    when(event.getInstance()).thenThrow(new IllegalStateException());
+
+    // Act and Assert
+    assertThrows(
+        IllegalStateException.class, () -> webexNotifier.doNotify(event, mock(Instance.class)));
+    verify(event).getInstance();
+  }
+
+  /**
    * Test {@link WebexNotifier#createMessage(InstanceEvent, Instance)}.
    *
    * <ul>
@@ -182,7 +240,7 @@ class WebexNotifierDiffblueTest {
   @MethodsUnderTest({"Object WebexNotifier.createMessage(InstanceEvent, Instance)"})
   void testCreateMessage_givenIllegalStateException_thenThrowIllegalStateException() {
     // Arrange
-    InstanceEvent event = mock(InstanceEvent.class);
+    InstanceDeregisteredEvent event = mock(InstanceDeregisteredEvent.class);
     when(event.getInstance()).thenThrow(new IllegalStateException());
 
     // Act and Assert
@@ -196,20 +254,94 @@ class WebexNotifierDiffblueTest {
    * Test {@link WebexNotifier#createMessage(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Given {@code Status}.
-   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Status}.
    *   <li>Then return {@link Map}.
    * </ul>
    *
    * <p>Method under test: {@link WebexNotifier#createMessage(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName(
-      "Test createMessage(InstanceEvent, Instance); given 'Status'; when StatusInfo getStatus() return 'Status'; then return Map")
+  @DisplayName("Test createMessage(InstanceEvent, Instance); then return Map")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Object WebexNotifier.createMessage(InstanceEvent, Instance)"})
-  void testCreateMessage_givenStatus_whenStatusInfoGetStatusReturnStatus_thenReturnMap() {
+  void testCreateMessage_thenReturnMap() {
+    // Arrange
+    WebexNotifier webexNotifier =
+        new WebexNotifier(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(RestTemplate.class));
+    webexNotifier.setMessage("Not all who wander are lost");
+
+    // Act
+    Object actualCreateMessageResult =
+        webexNotifier.createMessage(
+            new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), mock(Instance.class));
+
+    // Assert
+    assertTrue(actualCreateMessageResult instanceof Map);
+    assertEquals(2, ((Map<String, String>) actualCreateMessageResult).size());
+    assertEquals(
+        "Not all who wander are lost",
+        ((Map<String, String>) actualCreateMessageResult).get("markdown"));
+    assertNull(((Map<String, String>) actualCreateMessageResult).get("roomId"));
+  }
+
+  /**
+   * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
+   *
+   * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName("Test getText(InstanceEvent, Instance)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
+  void testGetText() {
+    // Arrange
+    StatusInfo statusInfo = mock(StatusInfo.class);
+    when(statusInfo.getStatus()).thenReturn("Status");
+    InstanceStatusChangedEvent event =
+        new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("lastStatus")
+                .build());
+
+    // Act
+    String actualText = webexNotifier.getText(event, instance);
+
+    // Assert
+    verify(instance).getId();
+    verify(instance).getRegistration();
+    verify(statusInfo).getStatus();
+    assertEquals("<strong>Name</strong>/42 is <strong>Status</strong>", actualText);
+  }
+
+  /**
+   * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>Given {@code Status}.
+   *   <li>Then return {@code <strong>Name</strong>/42 is <strong>Status</strong>}.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName(
+      "Test getText(InstanceEvent, Instance); given 'Status'; then return '<strong>Name</strong>/42 is <strong>Status</strong>'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
+  void testGetText_givenStatus_thenReturnStrongNameStrong42IsStrongStatusStrong() {
     // Arrange
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.getStatus()).thenReturn("Status");
@@ -229,80 +361,13 @@ class WebexNotifierDiffblueTest {
                 .build());
 
     // Act
-    Object actualCreateMessageResult = webexNotifier.createMessage(event, instance);
+    String actualText = webexNotifier.getText(event, instance);
 
     // Assert
     verify(instance).getId();
     verify(instance).getRegistration();
     verify(statusInfo).getStatus();
-    assertTrue(actualCreateMessageResult instanceof Map);
-    assertEquals(2, ((Map<String, String>) actualCreateMessageResult).size());
-    assertEquals(
-        "<strong>Name</strong>/42 is <strong>Status</strong>",
-        ((Map<String, String>) actualCreateMessageResult).get("markdown"));
-    assertNull(((Map<String, String>) actualCreateMessageResult).get("roomId"));
-  }
-
-  /**
-   * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Then return {@code Not all who wander are lost}.
-   * </ul>
-   *
-   * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance); then return 'Not all who wander are lost'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_thenReturnNotAllWhoWanderAreLost() {
-    // Arrange
-    WebexNotifier webexNotifier =
-        new WebexNotifier(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(RestTemplate.class));
-    webexNotifier.setMessage("Not all who wander are lost");
-
-    // Act and Assert
-    assertEquals(
-        "Not all who wander are lost",
-        webexNotifier.getText(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), null));
-  }
-
-  /**
-   * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>When {@link Instance}.
-   *   <li>Then calls {@link InstanceDeregisteredEvent#getInstance()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance); when Instance; then calls getInstance()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_whenInstance_thenCallsGetInstance() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
-
-    WebexNotifier webexNotifier = new WebexNotifier(repository, mock(RestTemplate.class));
-    webexNotifier.setMessage("Not all who wander are lost");
-
-    InstanceDeregisteredEvent event = mock(InstanceDeregisteredEvent.class);
-    when(event.getInstance()).thenReturn(InstanceId.of("42"));
-
-    // Act
-    String actualText = webexNotifier.getText(event, mock(Instance.class));
-
-    // Assert
-    verify(event).getInstance();
-    assertEquals("Not all who wander are lost", actualText);
+    assertEquals("<strong>Name</strong>/42 is <strong>Status</strong>", actualText);
   }
 
   /**

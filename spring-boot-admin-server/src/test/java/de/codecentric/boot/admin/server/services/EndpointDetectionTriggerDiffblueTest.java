@@ -16,6 +16,7 @@ import de.codecentric.boot.admin.server.domain.entities.EventsourcingInstanceRep
 import de.codecentric.boot.admin.server.domain.entities.SnapshottingInstanceRepository;
 import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
+import de.codecentric.boot.admin.server.domain.events.InstanceInfoChangedEvent;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import de.codecentric.boot.admin.server.eventstore.HazelcastEventStore;
 import de.codecentric.boot.admin.server.eventstore.InMemoryEventStore;
@@ -31,7 +32,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.net.ssl.SSLContext;
@@ -80,43 +80,32 @@ class EndpointDetectionTriggerDiffblueTest {
   /**
    * Test {@link EndpointDetectionTrigger#EndpointDetectionTrigger(EndpointDetector, Publisher)}.
    *
-   * <ul>
-   *   <li>Given {@link InstanceId} with value is {@code 42Value}.
-   * </ul>
-   *
    * <p>Method under test: {@link
    * EndpointDetectionTrigger#EndpointDetectionTrigger(EndpointDetector, Publisher)}
    */
   @Test
-  @DisplayName(
-      "Test new EndpointDetectionTrigger(EndpointDetector, Publisher); given InstanceId with value is '42Value'")
+  @DisplayName("Test new EndpointDetectionTrigger(EndpointDetector, Publisher)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void EndpointDetectionTrigger.<init>(EndpointDetector, Publisher)"})
-  void testNewEndpointDetectionTrigger_givenInstanceIdWithValueIs42Value() throws AssertionError {
+  void testNewEndpointDetectionTrigger() {
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
     // Arrange
     EndpointDetector endpointDetector =
         new EndpointDetector(
             new EventsourcingInstanceRepository(new InMemoryEventStore()),
             mock(EndpointDetectionStrategy.class));
-
-    ArrayList<InstanceEvent> it = new ArrayList<>();
-    it.add(new InstanceDeregisteredEvent(InstanceId.of("42Value"), -1L));
-    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     // Act
-    new EndpointDetectionTrigger(endpointDetector, publisher);
+    EndpointDetectionTrigger actualEndpointDetectionTrigger =
+        new EndpointDetectionTrigger(endpointDetector, publisher);
 
     // Assert
-    FirstStep<InstanceEvent> createResult = StepVerifier.create(publisher);
-    createResult
-        .assertNext(
-            i -> {
-              assertTrue(i instanceof InstanceDeregisteredEvent);
-              return;
-            })
-        .expectComplete()
-        .verify();
+    assertFalse(actualEndpointDetectionTrigger.createScheduler().isDisposed());
   }
 
   /**
@@ -198,7 +187,6 @@ class EndpointDetectionTriggerDiffblueTest {
    * Test {@link EndpointDetectionTrigger#handle(Flux)}.
    *
    * <ul>
-   *   <li>Given {@link EndpointDetector}.
    *   <li>When create.
    *   <li>Then create Empty.
    * </ul>
@@ -206,11 +194,11 @@ class EndpointDetectionTriggerDiffblueTest {
    * <p>Method under test: {@link EndpointDetectionTrigger#handle(Flux)}
    */
   @Test
-  @DisplayName("Test handle(Flux); given EndpointDetector; when create; then create Empty")
+  @DisplayName("Test handle(Flux); when create; then create Empty")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Publisher EndpointDetectionTrigger.handle(Flux)"})
-  void testHandle_givenEndpointDetector_whenCreate_thenCreateEmpty() {
+  void testHandle_whenCreate_thenCreateEmpty() {
     // Arrange
     DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
@@ -241,7 +229,6 @@ class EndpointDetectionTriggerDiffblueTest {
    * Test {@link EndpointDetectionTrigger#handle(Flux)}.
    *
    * <ul>
-   *   <li>Given {@link EndpointDetector}.
    *   <li>When create.
    *   <li>Then create three and {@code true} Error is {@code null}.
    * </ul>
@@ -249,12 +236,11 @@ class EndpointDetectionTriggerDiffblueTest {
    * <p>Method under test: {@link EndpointDetectionTrigger#handle(Flux)}
    */
   @Test
-  @DisplayName(
-      "Test handle(Flux); given EndpointDetector; when create; then create three and 'true' Error is 'null'")
+  @DisplayName("Test handle(Flux); when create; then create three and 'true' Error is 'null'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Publisher EndpointDetectionTrigger.handle(Flux)"})
-  void testHandle_givenEndpointDetector_whenCreate_thenCreateThreeAndTrueErrorIsNull() {
+  void testHandle_whenCreate_thenCreateThreeAndTrueErrorIsNull() {
     // Arrange
     DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
@@ -298,7 +284,6 @@ class EndpointDetectionTriggerDiffblueTest {
    * Test {@link EndpointDetectionTrigger#handle(Flux)}.
    *
    * <ul>
-   *   <li>Given {@link EndpointDetector}.
    *   <li>When create.
    *   <li>Then not create hasDownstreams.
    * </ul>
@@ -306,12 +291,11 @@ class EndpointDetectionTriggerDiffblueTest {
    * <p>Method under test: {@link EndpointDetectionTrigger#handle(Flux)}
    */
   @Test
-  @DisplayName(
-      "Test handle(Flux); given EndpointDetector; when create; then not create hasDownstreams")
+  @DisplayName("Test handle(Flux); when create; then not create hasDownstreams")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Publisher EndpointDetectionTrigger.handle(Flux)"})
-  void testHandle_givenEndpointDetector_whenCreate_thenNotCreateHasDownstreams() {
+  void testHandle_whenCreate_thenNotCreateHasDownstreams() {
     // Arrange
     DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
@@ -355,18 +339,17 @@ class EndpointDetectionTriggerDiffblueTest {
    * Test {@link EndpointDetectionTrigger#handle(Flux)}.
    *
    * <ul>
-   *   <li>Given {@link EndpointDetector}.
    *   <li>When fromIterable {@link ArrayList#ArrayList()}.
    * </ul>
    *
    * <p>Method under test: {@link EndpointDetectionTrigger#handle(Flux)}
    */
   @Test
-  @DisplayName("Test handle(Flux); given EndpointDetector; when fromIterable ArrayList()")
+  @DisplayName("Test handle(Flux); when fromIterable ArrayList()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Publisher EndpointDetectionTrigger.handle(Flux)"})
-  void testHandle_givenEndpointDetector_whenFromIterableArrayList() throws AssertionError {
+  void testHandle_whenFromIterableArrayList() throws AssertionError {
     // Arrange
     Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
@@ -376,126 +359,6 @@ class EndpointDetectionTriggerDiffblueTest {
     // Assert that nothing has changed
     FirstStep<InstanceEvent> createResult = StepVerifier.create(publisher);
     createResult.expectComplete().verify();
-  }
-
-  /**
-   * Test {@link EndpointDetectionTrigger#handle(Flux)}.
-   *
-   * <ul>
-   *   <li>Given fromIterable {@link ArrayList#ArrayList()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link EndpointDetectionTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux); given fromIterable ArrayList()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher EndpointDetectionTrigger.handle(Flux)"})
-  void testHandle_givenFromIterableArrayList() {
-    // Arrange
-    EndpointDetector endpointDetector =
-        new EndpointDetector(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(EndpointDetectionStrategy.class));
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    EndpointDetectionTrigger endpointDetectionTrigger =
-        new EndpointDetectionTrigger(endpointDetector, publisher);
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    Flux<InstanceEvent> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(fromIterableResult);
-
-    // Act
-    endpointDetectionTrigger.handle(publisher2);
-
-    // Assert
-    verify(publisher2).filter(isA(Predicate.class));
-  }
-
-  /**
-   * Test {@link EndpointDetectionTrigger#handle(Flux)}.
-   *
-   * <ul>
-   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore()} append {@link
-   *       ArrayList#ArrayList()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link EndpointDetectionTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux); given InMemoryEventStore() append ArrayList()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher EndpointDetectionTrigger.handle(Flux)"})
-  void testHandle_givenInMemoryEventStoreAppendArrayList() {
-    // Arrange
-    InMemoryEventStore eventStore = new InMemoryEventStore();
-    eventStore.append(new ArrayList<>());
-    EndpointDetector endpointDetector =
-        new EndpointDetector(
-            new EventsourcingInstanceRepository(eventStore), mock(EndpointDetectionStrategy.class));
-    EndpointDetectionTrigger endpointDetectionTrigger =
-        new EndpointDetectionTrigger(endpointDetector, mock(HazelcastEventStore.class));
-
-    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
-    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
-        .thenReturn(fromIterableResult);
-
-    DirectProcessor<InstanceEvent> publisher = mock(DirectProcessor.class);
-    when(publisher.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
-
-    // Act
-    Publisher<Void> actualHandleResult = endpointDetectionTrigger.handle(publisher);
-
-    // Assert
-    verify(publisher).filter(isA(Predicate.class));
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertSame(fromIterableResult, actualHandleResult);
-  }
-
-  /**
-   * Test {@link EndpointDetectionTrigger#handle(Flux)}.
-   *
-   * <ul>
-   *   <li>Then return fromIterable {@link ArrayList#ArrayList()}.
-   * </ul>
-   *
-   * <p>Method under test: {@link EndpointDetectionTrigger#handle(Flux)}
-   */
-  @Test
-  @DisplayName("Test handle(Flux); then return fromIterable ArrayList()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Publisher EndpointDetectionTrigger.handle(Flux)"})
-  void testHandle_thenReturnFromIterableArrayList() {
-    // Arrange
-    EndpointDetector endpointDetector =
-        new EndpointDetector(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(EndpointDetectionStrategy.class));
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
-
-    EndpointDetectionTrigger endpointDetectionTrigger =
-        new EndpointDetectionTrigger(endpointDetector, publisher);
-
-    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
-    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
-        .thenReturn(fromIterableResult);
-
-    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
-    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
-
-    // Act
-    Publisher<Void> actualHandleResult = endpointDetectionTrigger.handle(publisher2);
-
-    // Assert
-    verify(publisher2).filter(isA(Predicate.class));
-    verify(directProcessor).flatMap(isA(Function.class));
-    assertSame(fromIterableResult, actualHandleResult);
   }
 
   /**
@@ -577,12 +440,14 @@ class EndpointDetectionTriggerDiffblueTest {
     when(endpointDetector.detectEndpoints(Mockito.<InstanceId>any()))
         .thenReturn(channelSendOperator);
 
+    InstanceInfoChangedEvent event = mock(InstanceInfoChangedEvent.class);
+    when(event.getInstance()).thenReturn(InstanceId.of("42"));
+
     // Act
-    Mono<Void> actualDetectEndpointsResult =
-        endpointDetectionTrigger.detectEndpoints(
-            new InstanceDeregisteredEvent(InstanceId.of("42"), Long.MAX_VALUE));
+    Mono<Void> actualDetectEndpointsResult = endpointDetectionTrigger.detectEndpoints(event);
 
     // Assert
+    verify(event).getInstance();
     verify(endpointDetector).detectEndpoints(isA(InstanceId.class));
     verify(channelSendOperator).onErrorResume(isA(Function.class));
     assertSame(channelSendOperator2, actualDetectEndpointsResult);
@@ -601,20 +466,21 @@ class EndpointDetectionTriggerDiffblueTest {
   void testDetectEndpoints4() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    DirectProcessor<?> source = DirectProcessor.create();
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(new InMemoryEventStore(), mock(Function.class));
     when(channelSendOperator.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
         .thenReturn(channelSendOperator2);
     when(endpointDetector.detectEndpoints(Mockito.<InstanceId>any()))
         .thenReturn(channelSendOperator);
 
+    InstanceInfoChangedEvent event = mock(InstanceInfoChangedEvent.class);
+    when(event.getInstance()).thenReturn(InstanceId.of("42"));
+
     // Act
-    Mono<Void> actualDetectEndpointsResult =
-        endpointDetectionTrigger.detectEndpoints(
-            new InstanceDeregisteredEvent(InstanceId.of("42"), Long.MAX_VALUE));
+    Mono<Void> actualDetectEndpointsResult = endpointDetectionTrigger.detectEndpoints(event);
 
     // Assert
+    verify(event).getInstance();
     verify(endpointDetector).detectEndpoints(isA(InstanceId.class));
     verify(channelSendOperator).onErrorResume(isA(Function.class));
     assertSame(channelSendOperator2, actualDetectEndpointsResult);
@@ -630,38 +496,7 @@ class EndpointDetectionTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono EndpointDetectionTrigger.detectEndpoints(InstanceEvent)"})
-  void testDetectEndpoints5() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(mock(EmitterProcessor.class), mock(Function.class));
-    when(channelSendOperator.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator2);
-    when(endpointDetector.detectEndpoints(Mockito.<InstanceId>any()))
-        .thenReturn(channelSendOperator);
-
-    // Act
-    Mono<Void> actualDetectEndpointsResult =
-        endpointDetectionTrigger.detectEndpoints(
-            new InstanceDeregisteredEvent(InstanceId.of("42"), Long.MAX_VALUE));
-
-    // Assert
-    verify(endpointDetector).detectEndpoints(isA(InstanceId.class));
-    verify(channelSendOperator).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualDetectEndpointsResult);
-  }
-
-  /**
-   * Test {@link EndpointDetectionTrigger#detectEndpoints(InstanceEvent)}.
-   *
-   * <p>Method under test: {@link EndpointDetectionTrigger#detectEndpoints(InstanceEvent)}
-   */
-  @Test
-  @DisplayName("Test detectEndpoints(InstanceEvent)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono EndpointDetectionTrigger.detectEndpoints(InstanceEvent)"})
-  void testDetectEndpoints6() throws AssertionError {
+  void testDetectEndpoints5() throws AssertionError {
     // Arrange
     EndpointDetector endpointDetector =
         new EndpointDetector(
@@ -692,7 +527,7 @@ class EndpointDetectionTriggerDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono EndpointDetectionTrigger.detectEndpoints(InstanceEvent)"})
-  void testDetectEndpoints7() throws AssertionError {
+  void testDetectEndpoints6() throws AssertionError {
     // Arrange
     EndpointDetector endpointDetector =
         new EndpointDetector(

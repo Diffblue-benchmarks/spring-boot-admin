@@ -4,18 +4,18 @@
   },
   "run" : {
     "version" : "2025.09.01-44e352d-licensed",
-    "creationTimestamp" : "2025-10-15T16:00:20.277407012Z",
+    "creationTimestamp" : "2025-10-16T13:09:46.368862896Z",
     "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
-    "totalTime" : 88.492,
-    "environmentDetectionTime" : 0.029,
-    "indexingTime" : 0.424,
-    "entryPointsTime" : 0.021,
-    "generationTime" : 5320.781,
-    "timeToFirstTest" : 2762.943,
-    "timeToLastTest" : 5956.982,
-    "indexQueryTime" : 5.984,
-    "verificationTime" : 220.339,
-    "validationTime" : 12.205
+    "totalTime" : 184.784,
+    "environmentDetectionTime" : 0.039,
+    "indexingTime" : 0.374,
+    "entryPointsTime" : 0.03,
+    "generationTime" : 6990.62,
+    "timeToFirstTest" : 5412.708,
+    "timeToLastTest" : 8257.453,
+    "indexQueryTime" : 7.888,
+    "verificationTime" : 263.616,
+    "validationTime" : 17.151
   },
   "codes" : {
     "R027" : "Missing beans when creating Spring context",
@@ -23,7 +23,8 @@
     "T005" : "Trivial constructor",
     "T006" : "Main method",
     "T012" : "Synthetic method",
-    "V000" : "Validated successfully"
+    "V000" : "Validated successfully",
+    "V003" : "Tests discarded during validation"
   },
   "summary" : {
     "classesCount" : 3,
@@ -47,7 +48,8 @@
       "T012" : 6
     },
     "perTestValidation" : {
-      "V000" : 1
+      "V000" : 1,
+      "V003" : 1
     }
   },
   "classes" : {
