@@ -1,0 +1,2 @@
+--exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui
+
