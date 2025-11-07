@@ -1,0 +1,233 @@
+{
+  "meta" : {
+    "reportVersion" : "2.6"
+  },
+  "run" : {
+    "version" : "2024.10.01-2ee2e3d-licensed",
+    "creationTimestamp" : "2025-11-07T14:33:10.253535951Z",
+    "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
+    "totalTime" : 4588.575,
+    "environmentDetectionTime" : 0.422,
+    "indexingTime" : 0.267,
+    "entryPointsTime" : 0.416,
+    "generationTime" : 2574.383,
+    "timeToFirstTest" : 202.496,
+    "timeToLastTest" : 2252.829,
+    "indexQueryTime" : 8.044,
+    "verificationTime" : 207.989,
+    "validationTime" : 61.809
+  },
+  "codes" : {
+    "R000" : "Success",
+    "R002" : "Missing observers",
+    "R013" : "No inputs found that don't throw a trivial exception",
+    "T000" : "Method eligible for test creation",
+    "T003" : "Private method",
+    "T005" : "Trivial constructor",
+    "T006" : "Main method",
+    "T012" : "Synthetic method",
+    "V000" : "Validated successfully"
+  },
+  "summary" : {
+    "classesCount" : 1,
+    "methodsCount" : 12,
+    "cumulativeDiffblueTestCount" : 4,
+    "cumulativeManualTestCount" : 1,
+    "completeTestCount" : 4,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 70,
+    "perMethodTestability" : {
+      "T000" : 3,
+      "T003" : 2,
+      "T005" : 1,
+      "T006" : 1,
+      "T012" : 5
+    },
+    "perMethodOutcome" : {
+      "R000" : 2,
+      "R002" : 1,
+      "R013" : 1,
+      "T003" : 2,
+      "T006" : 1,
+      "T012" : 5
+    },
+    "perTestOutcome" : {
+      "R000" : 4
+    },
+    "perTestValidation" : {
+      "V000" : 4
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication" : {
+      "methodsCount" : 12,
+      "completeTestCount" : 4,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T003" : 2,
+        "T005" : 1,
+        "T006" : 1,
+        "T012" : 5
+      },
+      "perMethodOutcome" : {
+        "R000" : 2,
+        "R002" : 1,
+        "R013" : 1,
+        "T003" : 2,
+        "T006" : 1,
+        "T012" : 5
+      },
+      "perTestOutcome" : {
+        "R000" : 4
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        44,
+        45,
+        46
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.lambda$notifier$4:(Lde/codecentric/boot/admin/server/domain/events/InstanceEvent;)Lreactor/core/publisher/Mono;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        98
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.lambda$securityWebFilterChainPermitAll$0:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$AuthorizeExchangeSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        55
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.lambda$securityWebFilterChainSecure$1:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$AuthorizeExchangeSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        69,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        69
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.lambda$securityWebFilterChainSecure$2:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$FormLoginSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        73,
+        74,
+        73
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.lambda$securityWebFilterChainSecure$3:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$LogoutSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        75,
+        76,
+        75
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.loginSuccessHandler:(Ljava/lang/String;)Lorg/springframework/security/web/server/authentication/ServerAuthenticationSuccessHandler;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        91,
+        92,
+        93
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.logoutSuccessHandler:(Ljava/lang/String;)Lorg/springframework/security/web/server/authentication/logout/ServerLogoutSuccessHandler;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        85,
+        86,
+        87
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.main:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T006",
+      "perMethodOutcome" : "T006",
+      "lineNumbers" : [
+        49,
+        50
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.notifier:()Lde/codecentric/boot/admin/server/notify/Notifier;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        98
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.securityWebFilterChainPermitAll:(Lorg/springframework/security/config/web/server/ServerHttpSecurity;)Lorg/springframework/security/web/server/SecurityWebFilterChain;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        55,
+        56,
+        57,
+        55
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminReactiveApplication.securityWebFilterChainSecure:(Lorg/springframework/security/config/web/server/ServerHttpSecurity;)Lorg/springframework/security/web/server/SecurityWebFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R013",
+      "lineNumbers" : [
+        63,
+        64,
+        73,
+        75,
+        77,
+        78,
+        79,
+        63
+      ]
+    }
+  }
+}

@@ -1,0 +1,3872 @@
+{
+  "meta" : {
+    "reportVersion" : "2.6"
+  },
+  "run" : {
+    "version" : "2024.10.01-2ee2e3d-licensed",
+    "creationTimestamp" : "2025-11-07T14:33:10.253535951Z",
+    "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
+    "totalTime" : 3700.049,
+    "environmentDetectionTime" : 0.863,
+    "indexingTime" : 0.257,
+    "entryPointsTime" : 0.858,
+    "generationTime" : 2178.888,
+    "timeToFirstTest" : 202.496,
+    "timeToLastTest" : 2252.829,
+    "indexQueryTime" : 13.34,
+    "verificationTime" : 171.247,
+    "validationTime" : 147.356
+  },
+  "codes" : {
+    "R000" : "Success",
+    "R002" : "Missing observers",
+    "R004" : "No meaningful assertions found",
+    "R013" : "No inputs found that don't throw a trivial exception",
+    "R026" : "Failed to create Spring context",
+    "R027" : "Missing beans when creating Spring context",
+    "T000" : "Method eligible for test creation",
+    "T001" : "Trivial getter",
+    "T002" : "Trivial setter",
+    "T003" : "Private method",
+    "T005" : "Trivial constructor",
+    "T007" : "Framework configuration callback",
+    "T012" : "Synthetic method",
+    "T020" : "Other trivial method",
+    "T021" : "Empty method body",
+    "V000" : "Validated successfully"
+  },
+  "summary" : {
+    "classesCount" : 26,
+    "methodsCount" : 265,
+    "cumulativeDiffblueTestCount" : 178,
+    "cumulativeManualTestCount" : 89,
+    "completeTestCount" : 183,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 922,
+    "perMethodTestability" : {
+      "T000" : 63,
+      "T001" : 72,
+      "T002" : 59,
+      "T003" : 9,
+      "T005" : 18,
+      "T007" : 9,
+      "T012" : 22,
+      "T020" : 11,
+      "T021" : 2
+    },
+    "perMethodOutcome" : {
+      "R000" : 204,
+      "R002" : 5,
+      "R004" : 2,
+      "R013" : 2,
+      "R026" : 3,
+      "R027" : 1,
+      "T003" : 9,
+      "T005" : 8,
+      "T007" : 9,
+      "T012" : 22
+    },
+    "perTestOutcome" : {
+      "R000" : 183
+    },
+    "perTestValidation" : {
+      "V000" : 183
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration" : {
+      "methodsCount" : 8,
+      "completeTestCount" : 18,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 5,
+        "T005" : 1,
+        "T012" : 2
+      },
+      "perMethodOutcome" : {
+        "R000" : 4,
+        "R027" : 1,
+        "T005" : 1,
+        "T012" : 2
+      },
+      "perTestOutcome" : {
+        "R000" : 18
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration$AdminUiWebfluxConfig" : {
+      "methodsCount" : 6,
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T005" : 1,
+        "T012" : 2
+      },
+      "perMethodOutcome" : {
+        "R000" : 2,
+        "R013" : 1,
+        "T005" : 1,
+        "T012" : 2
+      },
+      "perTestOutcome" : {
+        "R000" : 2
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration$AdminUiWebMvcConfig" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 4,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 4,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 3,
+        "R013" : 1,
+        "T005" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 4
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties" : {
+      "methodsCount" : 46,
+      "completeTestCount" : 17,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T001" : 20,
+        "T002" : 20,
+        "T007" : 1,
+        "T012" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 44,
+        "T007" : 1,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 17
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache" : {
+      "methodsCount" : 12,
+      "completeTestCount" : 18,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 4,
+        "T001" : 3,
+        "T002" : 3,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 11,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 18
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette" : {
+      "methodsCount" : 21,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T001" : 10,
+        "T002" : 10,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 21
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer" : {
+      "methodsCount" : 19,
+      "completeTestCount" : 12,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T001" : 7,
+        "T002" : 7,
+        "T005" : 1,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 18,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 12
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme" : {
+      "methodsCount" : 11,
+      "completeTestCount" : 9,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T001" : 3,
+        "T002" : 3,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 10,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 9
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.CssColorUtils" : {
+      "methodsCount" : 3,
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R002" : 1,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 2
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.ServerRuntimeHints" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T003" : 3,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "T003" : 3,
+        "T005" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 2
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.config.SpringNativeServerAutoConfiguration" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension" : {
+      "methodsCount" : 7,
+      "completeTestCount" : 11,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T001" : 2,
+        "T005" : 1,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 6,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 11
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions" : {
+      "methodsCount" : 12,
+      "completeTestCount" : 19,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 6,
+        "T001" : 1,
+        "T007" : 1,
+        "T012" : 3,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 8,
+        "T007" : 1,
+        "T012" : 3
+      },
+      "perTestOutcome" : {
+        "R000" : 19
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensionsScanner" : {
+      "methodsCount" : 6,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T003" : 3,
+        "T005" : 1,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R002" : 1,
+        "T003" : 3,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiRoutesScanner" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T003" : 2,
+        "T005" : 1,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R002" : 1,
+        "T003" : 2,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig" : {
+      "methodsCount" : 7,
+      "completeTestCount" : 10,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T001" : 3,
+        "T005" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 7
+      },
+      "perTestOutcome" : {
+        "R000" : 10
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher" : {
+      "methodsCount" : 7,
+      "completeTestCount" : 6,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T003" : 1,
+        "T012" : 4
+      },
+      "perMethodOutcome" : {
+        "R000" : 2,
+        "T003" : 1,
+        "T012" : 4
+      },
+      "perTestOutcome" : {
+        "R000" : 6
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController" : {
+      "methodsCount" : 10,
+      "completeTestCount" : 19,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 8,
+        "T001" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 10
+      },
+      "perTestOutcome" : {
+        "R000" : 19
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView" : {
+      "methodsCount" : 10,
+      "completeTestCount" : 10,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T001" : 5,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 9,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 10
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings" : {
+      "methodsCount" : 21,
+      "completeTestCount" : 10,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T001" : 15,
+        "T005" : 2,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 19,
+        "T005" : 1,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 10
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder" : {
+      "methodsCount" : 18,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T002" : 15,
+        "T005" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 18
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings" : {
+      "methodsCount" : 8,
+      "completeTestCount" : 8,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T001" : 2,
+        "T002" : 1,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 7,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 8
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter" : {
+      "methodsCount" : 8,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T012" : 5
+      },
+      "perMethodOutcome" : {
+        "R004" : 1,
+        "R026" : 2,
+        "T012" : 5
+      }
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter" : {
+      "methodsCount" : 7,
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T012" : 2,
+        "T021" : 2
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R002" : 2,
+        "R004" : 1,
+        "R026" : 1,
+        "T012" : 2
+      },
+      "perTestOutcome" : {
+        "R000" : 2
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration$AdminUiWebfluxConfig.<init>:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties;Lde/codecentric/boot/admin/server/config/AdminServerProperties;Lorg/springframework/boot/autoconfigure/web/reactive/WebFluxProperties;Lorg/springframework/context/ApplicationContext;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        176,
+        177,
+        178,
+        179,
+        180,
+        181
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration$AdminUiWebfluxConfig.addResourceHandlers:(Lorg/springframework/web/reactive/config/ResourceHandlerRegistry;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        207,
+        208,
+        209,
+        210,
+        212,
+        213,
+        214,
+        215,
+        216
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration$AdminUiWebfluxConfig.homepageForwardFilter:(Lde/codecentric/boot/admin/server/ui/web/HomepageForwardingFilterConfig;)Lde/codecentric/boot/admin/server/ui/web/reactive/HomepageForwardingFilter;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R013",
+      "lineNumbers" : [
+        222
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration$AdminUiWebfluxConfig.homepageForwardingFilterConfig:()Lde/codecentric/boot/admin/server/ui/web/HomepageForwardingFilterConfig;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        185,
+        186,
+        188,
+        187,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        197,
+        198,
+        199,
+        200,
+        202
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration$AdminUiWebfluxConfig.lambda$homepageForwardingFilterConfig$0:(ZLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        193
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration$AdminUiWebfluxConfig.lambda$homepageForwardingFilterConfig$1:(ZLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        199
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ReactiveUiConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        162
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration$AdminUiWebMvcConfig.<init>:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties;Lde/codecentric/boot/admin/server/config/AdminServerProperties;Lorg/springframework/context/ApplicationContext;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        244,
+        245,
+        246,
+        247,
+        248
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration$AdminUiWebMvcConfig.addResourceHandlers:(Lorg/springframework/web/servlet/config/annotation/ResourceHandlerRegistry;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        277,
+        278,
+        279,
+        280,
+        281,
+        282,
+        283
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration$AdminUiWebMvcConfig.configurePathMatch:(Lorg/springframework/web/servlet/config/annotation/PathMatchConfigurer;)V" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        252,
+        253
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration$AdminUiWebMvcConfig.homepageForwardFilter:(Lde/codecentric/boot/admin/server/ui/web/HomepageForwardingFilterConfig;)Lde/codecentric/boot/admin/server/ui/web/servlet/HomepageForwardingFilter;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R013",
+      "lineNumbers" : [
+        289
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration$AdminUiWebMvcConfig.homepageForwardingFilterConfig:()Lde/codecentric/boot/admin/server/ui/web/HomepageForwardingFilterConfig;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        257,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        266,
+        267,
+        268,
+        269,
+        271
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration$ServletUiConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        232
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        67,
+        72,
+        79
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.<init>:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties;Lde/codecentric/boot/admin/server/config/AdminServerProperties;Lorg/springframework/context/ApplicationContext;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        88,
+        89,
+        90,
+        91,
+        92
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.adminTemplateResolver:()Lorg/thymeleaf/spring6/templateresolver/SpringResourceTemplateResolver;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.cssColorUtils:()Lde/codecentric/boot/admin/server/ui/config/CssColorUtils;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        96
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.homeUiController:(Lde/codecentric/boot/admin/server/ui/extensions/UiExtensions;)Lde/codecentric/boot/admin/server/ui/web/UiController;" : {
+      "completeTestCount" : 4,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 4
+      },
+      "lineNumbers" : [
+        102,
+        103,
+        104,
+        105,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        116,
+        115,
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        126,
+        127,
+        128
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.lambda$uiExtensions$0:(Lde/codecentric/boot/admin/server/ui/extensions/UiExtension;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        135
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.normalizeHomepageUrl:(Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 5,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 5
+      },
+      "lineNumbers" : [
+        154,
+        155,
+        157
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration.uiExtensions:()Lde/codecentric/boot/admin/server/ui/extensions/UiExtensions;" : {
+      "completeTestCount" : 7,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 7
+      },
+      "lineNumbers" : [
+        133,
+        134,
+        135,
+        136
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        182,
+        188,
+        190,
+        195,
+        200
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        182
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 12,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 12
+      },
+      "lineNumbers" : [
+        182
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.getMaxAge:()Ljava/time/Duration;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        190
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.getNoCache:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        195
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.getNoStore:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        200
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.hashCode:()I" : {
+      "completeTestCount" : 12,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 12
+      },
+      "lineNumbers" : [
+        182
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.setMaxAge:(Ljava/time/Duration;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        182
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.setNoCache:(Ljava/lang/Boolean;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        182
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.setNoStore:(Ljava/lang/Boolean;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        182
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.toCacheControl:()Lorg/springframework/http/CacheControl;" : {
+      "completeTestCount" : 4,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 4
+      },
+      "lineNumbers" : [
+        203,
+        204,
+        206,
+        207,
+        209,
+        210,
+        212
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Cache.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        182
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        236,
+        238,
+        240,
+        242,
+        244,
+        246,
+        248,
+        250,
+        252,
+        254,
+        256
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade100:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        240
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade200:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        242
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade300:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        244
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade400:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        246
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade500:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        248
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade50:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        238
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade600:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        250
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade700:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        252
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade800:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        254
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.getShade900:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        256
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set100:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        263,
+        264
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set200:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        267,
+        268
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set300:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        271,
+        272
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set400:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        275,
+        276
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set500:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        279,
+        280
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set50:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        259,
+        260
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set600:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        283,
+        284
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set700:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        287,
+        288
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set800:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        291,
+        292
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$Palette.set900:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        295,
+        296
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142,
+        148,
+        153,
+        158,
+        163,
+        168,
+        173,
+        178
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 11,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 11
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.getCache:()I" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        148
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.getDatasource:()I" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        153
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.getGc:()I" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        158
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.getLogfile:()I" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        178
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.getMemory:()I" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        168
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.getProcess:()I" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        163
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.getThreads:()I" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        173
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.hashCode:()I" : {
+      "completeTestCount" : 11,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 11
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.setCache:(I)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.setDatasource:(I)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.setGc:(I)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.setLogfile:(I)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.setMemory:(I)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.setProcess:(I)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.setThreads:(I)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$PollTimer.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        142
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        217,
+        220,
+        222,
+        224
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 7,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 7
+      },
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.getBackgroundEnabled:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        220
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.getColor:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        224
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.getPalette:()Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$Palette;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        222
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.hashCode:()I" : {
+      "completeTestCount" : 7,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 7
+      },
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.setBackgroundEnabled:(Ljava/lang/Boolean;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.setColor:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.setPalette:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$Palette;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties$UiTheme.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        217
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        38,
+        40
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34,
+        46,
+        51,
+        56,
+        61,
+        66,
+        71,
+        76,
+        81,
+        88,
+        94,
+        99,
+        104,
+        109,
+        114,
+        120,
+        122,
+        128,
+        133,
+        138,
+        140
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 15,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 15
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getAdditionalRouteExcludes:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        128
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getAvailableLanguages:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        120
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getBrand:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        81
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getCache:()Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$Cache;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        99
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getEnableToasts:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        133
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getExtensionResourceLocations:()[Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        51
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getExternalViews:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        104
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getFavicon:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        66
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getFaviconDanger:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        71
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getHideInstanceUrl:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        138
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getLoginIcon:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        61
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getPollTimer:()Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$PollTimer;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getPublicUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        89
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getResourceLocations:()[Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        46
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getTemplateLocation:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        56
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getTheme:()Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$UiTheme;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        140
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getTitle:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        76
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.getViewSettings:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        109
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.hashCode:()I" : {
+      "completeTestCount" : 15,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 15
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.isCacheTemplates:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        94
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.isRememberMeEnabled:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        114
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setAdditionalRouteExcludes:(Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setAvailableLanguages:(Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setBrand:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setCache:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$Cache;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setCacheTemplates:(Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setEnableToasts:(Ljava/lang/Boolean;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setExtensionResourceLocations:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setExternalViews:(Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setFavicon:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setFaviconDanger:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setHideInstanceUrl:(Ljava/lang/Boolean;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setLoginIcon:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setPollTimer:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$PollTimer;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setPublicUrl:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setRememberMeEnabled:(Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setResourceLocations:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setTemplateLocation:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setTheme:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$UiTheme;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setTitle:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.setViewSettings:(Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.AdminServerUiProperties.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.CssColorUtils.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        23
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.CssColorUtils.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        21
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.CssColorUtils.hexToRgb:(Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        26,
+        27,
+        29,
+        30,
+        29
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.ServerRuntimeHints.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        70
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.ServerRuntimeHints.registerHints:(Lorg/springframework/aot/hint/RuntimeHints;Ljava/lang/ClassLoader;)V" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        74,
+        76,
+        78,
+        79
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.ServerRuntimeHints.registerReflectionHints:(Lorg/springframework/aot/hint/RuntimeHints;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        105,
+        106,
+        107,
+        110,
+        111,
+        113,
+        115,
+        117,
+        119,
+        121,
+        123,
+        125,
+        127,
+        129,
+        131,
+        133,
+        135,
+        137,
+        139,
+        141,
+        143,
+        145,
+        147,
+        149,
+        151,
+        153,
+        155,
+        158,
+        160,
+        162,
+        164,
+        166,
+        168,
+        170,
+        172,
+        174,
+        176,
+        178,
+        180,
+        182,
+        184,
+        187,
+        189,
+        188,
+        192,
+        194,
+        195,
+        196,
+        197,
+        200,
+        197,
+        103,
+        201
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.ServerRuntimeHints.registerResourcesHints:(Lorg/springframework/aot/hint/RuntimeHints;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        97,
+        98,
+        99,
+        100,
+        101
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.ServerRuntimeHints.registerSerializationHints:(Lorg/springframework/aot/hint/RuntimeHints;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.config.SpringNativeServerAutoConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension.<init>:(Ljava/lang/String;Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 10,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 10
+      },
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension.getResourceLocation:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        24
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension.getResourcePath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        22
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension.hashCode:()I" : {
+      "completeTestCount" : 10,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 10
+      },
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtension.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        27
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.<init>:(Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        31,
+        32,
+        33
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        24
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 8,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 8
+      },
+      "lineNumbers" : [
+        24
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.getCssExtensions:()Ljava/util/List;" : {
+      "completeTestCount" : 4,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 4
+      },
+      "lineNumbers" : [
+        41,
+        42,
+        43,
+        41
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.getExtensions:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        29
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.getJsExtensions:()Ljava/util/List;" : {
+      "completeTestCount" : 4,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 4
+      },
+      "lineNumbers" : [
+        47
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.hashCode:()I" : {
+      "completeTestCount" : 8,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 8
+      },
+      "lineNumbers" : [
+        24
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.iterator:()Ljava/util/Iterator;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        37
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.lambda$getCssExtensions$0:(Lde/codecentric/boot/admin/server/ui/extensions/UiExtension;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        42
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.lambda$getJsExtensions$1:(Lde/codecentric/boot/admin/server/ui/extensions/UiExtension;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        47
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensions.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        24
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensionsScanner.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        36
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensionsScanner.<init>:(Lorg/springframework/core/io/support/ResourcePatternResolver;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        40,
+        41,
+        42
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensionsScanner.getResourcePath:(Ljava/lang/String;Lorg/springframework/core/io/Resource;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        74,
+        75,
+        76,
+        77,
+        78,
+        81
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensionsScanner.resolveAssets:(Ljava/lang/String;)Ljava/util/List;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        60,
+        61,
+        62,
+        63,
+        62,
+        64,
+        61
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensionsScanner.scan:([Ljava/lang/String;)Lde/codecentric/boot/admin/server/ui/extensions/UiExtensions;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        54,
+        46,
+        56
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiExtensionsScanner.toPattern:(Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        69
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiRoutesScanner.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        37
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiRoutesScanner.<init>:(Lorg/springframework/core/io/support/ResourcePatternResolver;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        41,
+        42,
+        43
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiRoutesScanner.readLines:(Ljava/io/InputStream;)Ljava/util/List;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        58,
+        59,
+        60,
+        59,
+        58,
+        61,
+        62,
+        63
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiRoutesScanner.scan:([Ljava/lang/String;)Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        46,
+        47,
+        48,
+        49,
+        50,
+        48,
+        47,
+        54
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.extensions.UiRoutesScanner.toPattern:(Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        69
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig.<init>:(Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        23
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 9,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 9
+      },
+      "lineNumbers" : [
+        23
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig.getHomepage:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig.getRoutesExcludes:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        33
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig.getRoutesIncludes:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig.hashCode:()I" : {
+      "completeTestCount" : 9,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 9
+      },
+      "lineNumbers" : [
+        23
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingFilterConfig.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        23
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher.<init>:(Ljava/util/List;Ljava/util/List;Ljava/util/function/Function;Ljava/util/function/Function;Ljava/util/function/Function;)V" : {
+      "completeTestCount" : 5,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 5
+      },
+      "lineNumbers" : [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher.lambda$test$0:(Ljava/lang/String;Ljava/util/regex/Pattern;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        56
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher.lambda$test$1:(Ljava/lang/String;Ljava/util/regex/Pattern;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher.lambda$test$2:(Lorg/springframework/http/MediaType;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        62
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher.lambda$toPatterns$3:(Ljava/lang/String;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        67
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher.test:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        51,
+        52,
+        55,
+        56,
+        57,
+        58,
+        59,
+        62
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.HomepageForwardingMatcher.toPatterns:(Ljava/util/List;)Ljava/util/List;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        66,
+        67,
+        68,
+        69,
+        66
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.<init>:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;ZLjava/util/List;)V" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        186,
+        187,
+        188,
+        189,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        157
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 6,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 6
+      },
+      "lineNumbers" : [
+        157
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.getChildren:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        184
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.getLabel:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        164
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.getOrder:()Ljava/lang/Integer;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        174
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.getUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        169
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.hashCode:()I" : {
+      "completeTestCount" : 6,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 6
+      },
+      "lineNumbers" : [
+        157
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.isIframe:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        179
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ExternalView.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        157
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.availableLanguages:(Ljava/util/List;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.brand:(Ljava/lang/String;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.build:()Lde/codecentric/boot/admin/server/ui/web/UiController$Settings;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.enableToasts:(Ljava/lang/Boolean;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.externalViews:(Ljava/util/List;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.favicon:(Ljava/lang/String;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.faviconDanger:(Ljava/lang/String;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.hideInstanceUrl:(Ljava/lang/Boolean;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.loginIcon:(Ljava/lang/String;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.notificationFilterEnabled:(Z)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.pollTimer:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$PollTimer;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.rememberMeEnabled:(Z)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.routes:(Ljava/util/List;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.theme:(Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$UiTheme;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.title:(Ljava/lang/String;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings$SettingsBuilder.viewSettings:(Ljava/util/List;)Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.<init>:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$PollTimer;Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$UiTheme;ZZLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.builder:()Lde/codecentric/boot/admin/server/ui/web/UiController$Settings$SettingsBuilder;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        122
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        121
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 9,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 9
+      },
+      "lineNumbers" : [
+        121
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getAvailableLanguages:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        143
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getBrand:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        127
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getEnableToasts:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        151
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getExternalViews:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        147
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getFavicon:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        131
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getFaviconDanger:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        133
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getHideInstanceUrl:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        153
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getLoginIcon:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        129
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getPollTimer:()Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$PollTimer;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        135
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getRoutes:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        145
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getTheme:()Lde/codecentric/boot/admin/server/ui/config/AdminServerUiProperties$UiTheme;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        137
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getTitle:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        125
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.getViewSettings:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        149
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.hashCode:()I" : {
+      "completeTestCount" : 9,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 9
+      },
+      "lineNumbers" : [
+        121
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.isNotificationFilterEnabled:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        139
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.isRememberMeEnabled:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        141
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$Settings.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        121
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.<init>:(Ljava/lang/String;Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        214,
+        215,
+        216,
+        217,
+        218
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        200
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 6,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 6
+      },
+      "lineNumbers" : [
+        200
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.getName:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        207
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.hashCode:()I" : {
+      "completeTestCount" : 6,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 6
+      },
+      "lineNumbers" : [
+        200
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.isEnabled:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        212
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.setEnabled:(Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        200
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController$ViewSettings.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        200
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.<init>:(Ljava/lang/String;Lde/codecentric/boot/admin/server/ui/extensions/UiExtensions;Lde/codecentric/boot/admin/server/ui/web/UiController$Settings;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        53,
+        54,
+        55,
+        56,
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.getBaseUrl:(Lorg/springframework/web/util/UriComponentsBuilder;)Ljava/lang/String;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        61,
+        62,
+        63,
+        65,
+        66,
+        68,
+        69,
+        71,
+        72,
+        74
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.getCssExtensions:()Ljava/util/List;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        84
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.getJsExtensions:()Ljava/util/List;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        89
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.getUiSettings:()Lde/codecentric/boot/admin/server/ui/web/UiController$Settings;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        79
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.getUser:(Ljava/security/Principal;)Ljava/util/Map;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        94,
+        95,
+        97
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.index:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        103
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.login:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        118
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.sbaSettings:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        108
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.UiController.variablesCss:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        113
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.<init>:(Lde/codecentric/boot/admin/server/ui/web/HomepageForwardingFilterConfig;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R004",
+      "lineNumbers" : [
+        49,
+        50
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.<init>:(Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        40,
+        41,
+        42,
+        46
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.filter:(Lorg/springframework/web/server/ServerWebExchange;Lorg/springframework/web/server/WebFilterChain;)Lreactor/core/publisher/Mono;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        54,
+        55,
+        56,
+        58
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.lambda$filter$3:(Lorg/springframework/http/server/reactive/ServerHttpRequest$Builder;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        56
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.lambda$new$0:(Lorg/springframework/http/server/reactive/ServerHttpRequest;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        43
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.lambda$new$1:(Lorg/springframework/http/server/reactive/ServerHttpRequest;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.reactive.HomepageForwardingFilter.lambda$new$2:(Lorg/springframework/http/server/reactive/ServerHttpRequest;)Ljava/util/List;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        45
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        47
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter.<init>:(Lde/codecentric/boot/admin/server/ui/web/HomepageForwardingFilterConfig;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R004",
+      "lineNumbers" : [
+        62,
+        63
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter.<init>:(Ljava/lang/String;Ljava/util/List;Ljava/util/List;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        53,
+        54,
+        55,
+        56,
+        57,
+        59
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter.destroy:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T021",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        85
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter.doFilter:(Ljakarta/servlet/ServletRequest;Ljakarta/servlet/ServletResponse;Ljakarta/servlet/FilterChain;)V" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        68,
+        69,
+        70,
+        71,
+        72,
+        76,
+        77
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter.init:(Ljakarta/servlet/FilterConfig;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T021",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        81
+      ]
+    },
+    "de.codecentric.boot.admin.server.ui.web.servlet.HomepageForwardingFilter.lambda$new$0:(Ljakarta/servlet/http/HttpServletRequest;)Ljava/util/List;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        58
+      ]
+    }
+  }
+}

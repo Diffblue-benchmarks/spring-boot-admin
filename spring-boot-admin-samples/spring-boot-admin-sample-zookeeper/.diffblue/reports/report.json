@@ -1,0 +1,244 @@
+{
+  "meta" : {
+    "reportVersion" : "2.6"
+  },
+  "run" : {
+    "version" : "2024.10.01-2ee2e3d-licensed",
+    "creationTimestamp" : "2025-11-07T14:33:10.253535951Z",
+    "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
+    "totalTime" : 5355.828,
+    "environmentDetectionTime" : 0.258,
+    "indexingTime" : 0.283,
+    "entryPointsTime" : 0.255,
+    "generationTime" : 2775.617,
+    "timeToFirstTest" : 202.496,
+    "timeToLastTest" : 2252.829,
+    "indexQueryTime" : 8.461,
+    "verificationTime" : 211.514,
+    "validationTime" : 55.311
+  },
+  "codes" : {
+    "R027" : "Missing beans when creating Spring context",
+    "T000" : "Method eligible for test creation",
+    "T005" : "Trivial constructor",
+    "T006" : "Main method",
+    "T012" : "Synthetic method",
+    "V000" : "Validated successfully"
+  },
+  "summary" : {
+    "classesCount" : 3,
+    "methodsCount" : 12,
+    "cumulativeDiffblueTestCount" : 4,
+    "cumulativeManualTestCount" : 1,
+    "completeTestCount" : 0,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 75,
+    "perMethodTestability" : {
+      "T000" : 2,
+      "T005" : 3,
+      "T006" : 1,
+      "T012" : 6
+    },
+    "perMethodOutcome" : {
+      "R027" : 2,
+      "T005" : 3,
+      "T006" : 1,
+      "T012" : 6
+    },
+    "perTestValidation" : {
+      "V000" : 2
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T005" : 1,
+        "T006" : 1
+      },
+      "perMethodOutcome" : {
+        "T005" : 1,
+        "T006" : 1
+      }
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecurityPermitAllConfig" : {
+      "methodsCount" : 4,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1,
+        "T012" : 2
+      },
+      "perMethodOutcome" : {
+        "R027" : 1,
+        "T005" : 1,
+        "T012" : 2
+      }
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecuritySecureConfig" : {
+      "methodsCount" : 6,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1,
+        "T012" : 4
+      },
+      "perMethodOutcome" : {
+        "R027" : 1,
+        "T005" : 1,
+        "T012" : 4
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecurityPermitAllConfig.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        51,
+        52,
+        53
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecurityPermitAllConfig.filterChain:(Lorg/springframework/security/config/annotation/web/builders/HttpSecurity;)Lorg/springframework/security/web/SecurityFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        57,
+        58,
+        65
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecurityPermitAllConfig.lambda$filterChain$0:(Lorg/springframework/security/config/annotation/web/configurers/AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecurityPermitAllConfig.lambda$filterChain$1:(Lorg/springframework/security/config/annotation/web/configurers/CsrfConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        58,
+        60,
+        61,
+        62,
+        63,
+        59,
+        58
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecuritySecureConfig.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        76,
+        77,
+        78
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecuritySecureConfig.filterChain:(Lorg/springframework/security/config/annotation/web/builders/HttpSecurity;)Lorg/springframework/security/web/SecurityFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        82,
+        83,
+        84,
+        86,
+        93,
+        95,
+        96,
+        97,
+        104
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecuritySecureConfig.lambda$filterChain$0:(Lorg/springframework/security/config/annotation/web/configurers/AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        91,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        91
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecuritySecureConfig.lambda$filterChain$1:(Lorg/springframework/security/web/authentication/SavedRequestAwareAuthenticationSuccessHandler;Lorg/springframework/security/config/annotation/web/configurers/FormLoginConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        93,
+        94,
+        93
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecuritySecureConfig.lambda$filterChain$2:(Lorg/springframework/security/config/annotation/web/configurers/LogoutConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        95
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication$SecuritySecureConfig.lambda$filterChain$3:(Lorg/springframework/security/config/annotation/web/configurers/CsrfConfigurer;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        97,
+        99,
+        100,
+        101,
+        102,
+        98,
+        97
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        39
+      ]
+    },
+    "de.codecentric.boot.admin.sample.SpringBootAdminZookeeperApplication.main:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T006",
+      "perMethodOutcome" : "T006",
+      "lineNumbers" : [
+        42,
+        43
+      ]
+    }
+  }
+}
