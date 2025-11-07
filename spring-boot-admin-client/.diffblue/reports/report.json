@@ -1,0 +1,3202 @@
+{
+  "meta" : {
+    "reportVersion" : "2.6"
+  },
+  "run" : {
+    "version" : "2025.02.02-08b2a5a-licensed",
+    "creationTimestamp" : "2025-11-07T13:55:34.390243277Z",
+    "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
+    "totalTime" : 515.5,
+    "environmentDetectionTime" : 0.651,
+    "indexingTime" : 0.297,
+    "entryPointsTime" : 0.647,
+    "generationTime" : 2447.062,
+    "timeToFirstTest" : 1450.687,
+    "timeToLastTest" : 2997.405,
+    "indexQueryTime" : 18.532,
+    "verificationTime" : 173.963,
+    "validationTime" : 41.504
+  },
+  "codes" : {
+    "F009" : "Internal error",
+    "R000" : "Success",
+    "R002" : "Missing observers",
+    "R005" : "Unable to load class",
+    "R013" : "No inputs found that don't throw a trivial exception",
+    "R026" : "Failed to create Spring context",
+    "R027" : "Missing beans when creating Spring context",
+    "R081" : "Exception in arrange section",
+    "R083" : "Can't find a suitable constructor",
+    "T000" : "Method eligible for test creation",
+    "T001" : "Trivial getter",
+    "T002" : "Trivial setter",
+    "T003" : "Private method",
+    "T004" : "In anonymous inner class",
+    "T005" : "Trivial constructor",
+    "T007" : "Framework configuration callback",
+    "T010" : "Abstract or interface method",
+    "T012" : "Synthetic method",
+    "T020" : "Other trivial method",
+    "V000" : "Validated successfully",
+    "V003" : "Tests discarded during validation",
+    "W002" : "Test compiled, but did not pass"
+  },
+  "summary" : {
+    "classesCount" : 36,
+    "methodsCount" : 203,
+    "cumulativeDiffblueTestCount" : 196,
+    "cumulativeManualTestCount" : 86,
+    "completeTestCount" : 196,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 1120,
+    "perMethodTestability" : {
+      "T000" : 84,
+      "T001" : 28,
+      "T002" : 31,
+      "T003" : 4,
+      "T004" : 3,
+      "T005" : 23,
+      "T007" : 6,
+      "T010" : 7,
+      "T012" : 12,
+      "T020" : 5
+    },
+    "perMethodOutcome" : {
+      "F009" : 1,
+      "R000" : 131,
+      "R002" : 6,
+      "R005" : 1,
+      "R013" : 2,
+      "R026" : 5,
+      "R027" : 5,
+      "R081" : 4,
+      "R083" : 4,
+      "T003" : 4,
+      "T004" : 3,
+      "T005" : 10,
+      "T007" : 6,
+      "T010" : 7,
+      "T012" : 12,
+      "W002" : 2
+    },
+    "perTestOutcome" : {
+      "R000" : 196
+    },
+    "perTestValidation" : {
+      "V000" : 196,
+      "V003" : 2
+    },
+    "warnings" : {
+      "W002" : 2
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.client.config.ClientProperties" : {
+      "methodsCount" : 29,
+      "completeTestCount" : 20,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 5,
+        "T001" : 11,
+        "T002" : 11,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 28,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 20
+      }
+    },
+    "de.codecentric.boot.admin.client.config.ClientRuntimeHints" : {
+      "methodsCount" : 3,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T003" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R013" : 1,
+        "T003" : 1,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties" : {
+      "methodsCount" : 11,
+      "completeTestCount" : 12,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T001" : 3,
+        "T002" : 3,
+        "T005" : 1,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 10,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 12
+      }
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties" : {
+      "methodsCount" : 25,
+      "completeTestCount" : 24,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T001" : 10,
+        "T002" : 10,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 24,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 24
+      }
+    },
+    "de.codecentric.boot.admin.client.config.ServiceHostType" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T003" : 1,
+        "T012" : 4
+      },
+      "perMethodOutcome" : {
+        "T003" : 1,
+        "T012" : 4
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration" : {
+      "methodsCount" : 4,
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 2,
+        "R027" : 1,
+        "T005" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 3
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "T005" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 3
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ReactiveConfiguration" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R027" : 1,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ReactiveRegistrationClientConfig" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "T005" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 3
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$RestClientRegistrationClientConfig" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R005" : 1,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ServletConfiguration" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R027" : 1,
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientCloudFoundryAutoConfiguration" : {
+      "methodsCount" : 3,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R027" : 1,
+        "T005" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientEnabledCondition" : {
+      "methodsCount" : 3,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T003" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R002" : 1,
+        "T003" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.config.SpringNativeClientAutoConfiguration" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "T005" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.Application" : {
+      "methodsCount" : 12,
+      "completeTestCount" : 11,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 4,
+        "T001" : 4,
+        "T005" : 2,
+        "T007" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 10,
+        "T005" : 1,
+        "T007" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 11
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder" : {
+      "methodsCount" : 10,
+      "completeTestCount" : 5,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 4,
+        "T002" : 4,
+        "T005" : 1,
+        "T020" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 10
+      },
+      "perTestOutcome" : {
+        "R000" : 5
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.ApplicationFactory" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T010" : 1
+      },
+      "perMethodOutcome" : {
+        "T010" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.ApplicationRegistrator" : {
+      "methodsCount" : 3,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T010" : 3
+      },
+      "perMethodOutcome" : {
+        "T010" : 3
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T005" : 1,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 2,
+        "R002" : 1,
+        "R013" : 1,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 2
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient$1" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T004" : 1
+      },
+      "perMethodOutcome" : {
+        "T004" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R081" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory" : {
+      "methodsCount" : 21,
+      "completeTestCount" : 74,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 20,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 18,
+        "R026" : 1,
+        "R081" : 1,
+        "W002" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 74
+      },
+      "warnings" : {
+        "W002" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory$1" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "T012" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator" : {
+      "methodsCount" : 7,
+      "completeTestCount" : 10,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 4,
+        "T005" : 1,
+        "T012" : 2
+      },
+      "perMethodOutcome" : {
+        "F009" : 1,
+        "R000" : 4,
+        "T012" : 2
+      },
+      "perTestOutcome" : {
+        "R000" : 10
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveApplicationFactory" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 7,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 4,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 4,
+        "R081" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 7
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T005" : 1,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R083" : 4,
+        "T012" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient$1" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T004" : 1
+      },
+      "perMethodOutcome" : {
+        "T004" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener" : {
+      "methodsCount" : 13,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 6,
+        "T002" : 3,
+        "T003" : 1,
+        "T007" : 2,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R002" : 3,
+        "R026" : 4,
+        "R027" : 1,
+        "T003" : 1,
+        "T007" : 2,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationClient" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T010" : 2
+      },
+      "perMethodOutcome" : {
+        "T010" : 2
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient" : {
+      "methodsCount" : 5,
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 3,
+        "T005" : 1,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 3,
+        "R002" : 1,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 3
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient$1" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T004" : 1
+      },
+      "perMethodOutcome" : {
+        "T004" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.ServletApplicationFactory" : {
+      "methodsCount" : 6,
+      "completeTestCount" : 8,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 5,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 5,
+        "R081" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 8
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.CloudFoundryMetadataContributor" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 2
+      },
+      "perTestOutcome" : {
+        "R000" : 2
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.CompositeMetadataContributor" : {
+      "methodsCount" : 3,
+      "completeTestCount" : 4,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 1,
+        "T005" : 1,
+        "T012" : 1
+      },
+      "perMethodOutcome" : {
+        "R000" : 2,
+        "T012" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 4
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.MetadataContributor" : {
+      "methodsCount" : 1,
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T010" : 1
+      },
+      "perMethodOutcome" : {
+        "T010" : 1
+      }
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.StartupDateMetadataContributor" : {
+      "methodsCount" : 2,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "W002" : 1
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "warnings" : {
+        "W002" : 1
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.client.config.ClientProperties.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28,
+        35,
+        40,
+        45,
+        46,
+        51,
+        52,
+        57,
+        58,
+        76,
+        82,
+        87,
+        92
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 14,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 14
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getAdminUrl:()[Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        95,
+        96,
+        97,
+        96,
+        99
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getApiPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        40
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getAutoDeregistration:()Ljava/lang/Boolean;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        77
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getConnectTimeout:()Ljava/time/Duration;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        52
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getPassword:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        70
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getPeriod:()Ljava/time/Duration;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        46
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getReadTimeout:()Ljava/time/Duration;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        58
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getUrl:()[Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        35
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.getUsername:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        64
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.hashCode:()I" : {
+      "completeTestCount" : 14,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 14
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.isAutoDeregistration:(Lorg/springframework/core/env/Environment;)Z" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        103,
+        104,
+        103
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.isAutoRegistration:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        82
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.isEnabled:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        92
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.isRegisterOnce:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        87
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setApiPath:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setAutoDeregistration:(Ljava/lang/Boolean;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setAutoRegistration:(Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setConnectTimeout:(Ljava/time/Duration;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setEnabled:(Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setPassword:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setPeriod:(Ljava/time/Duration;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setReadTimeout:(Ljava/time/Duration;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setRegisterOnce:(Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setUrl:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.setUsername:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientProperties.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientRuntimeHints.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        31
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientRuntimeHints.registerHints:(Lorg/springframework/aot/hint/RuntimeHints;Ljava/lang/ClassLoader;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R013",
+      "lineNumbers" : [
+        35,
+        36
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ClientRuntimeHints.registerReflectionHints:(Lorg/springframework/aot/hint/RuntimeHints;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        40,
+        41,
+        43,
+        45,
+        46,
+        47,
+        48,
+        38,
+        50
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        25,
+        35
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        25
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 11,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 11
+      },
+      "lineNumbers" : [
+        25
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.getApplicationId:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        30
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.getInstanceIndex:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        33
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.getUris:()Ljava/util/List;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        35
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.hashCode:()I" : {
+      "completeTestCount" : 11,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 11
+      },
+      "lineNumbers" : [
+        25
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.setApplicationId:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        25
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.setInstanceIndex:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        25
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.setUris:(Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        25
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.CloudFoundryApplicationProperties.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        25
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26,
+        75,
+        82,
+        88,
+        93
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 22,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 22
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getHealthUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        70
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getManagementBaseUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        42
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getManagementUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        35
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        93
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getName:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        76
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getServiceBaseUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        56
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getServiceHostType:()Lde/codecentric/boot/admin/client/config/ServiceHostType;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        88
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getServicePath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        63
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.getServiceUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        49
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.hashCode:()I" : {
+      "completeTestCount" : 22,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 22
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.isPreferIp:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        83
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setHealthUrl:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setManagementBaseUrl:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setManagementUrl:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setMetadata:(Ljava/util/Map;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setName:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setPreferIp:(Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setServiceBaseUrl:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setServiceHostType:(Lde/codecentric/boot/admin/client/config/ServiceHostType;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setServicePath:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.setServiceUrl:(Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.InstanceProperties.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        26
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ServiceHostType.$values:()[Lde/codecentric/boot/admin/client/config/ServiceHostType;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ServiceHostType.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        21,
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ServiceHostType.<init>:(Ljava/lang/String;I)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ServiceHostType.valueOf:(Ljava/lang/String;)Lde/codecentric/boot/admin/client/config/ServiceHostType;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.ServiceHostType.values:()[Lde/codecentric/boot/admin/client/config/ServiceHostType;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        19
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        143
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig.registrationClient:(Lde/codecentric/boot/admin/client/config/ClientProperties;)Lde/codecentric/boot/admin/client/registration/RegistrationClient;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        148,
+        149,
+        151,
+        152,
+        155,
+        156
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ReactiveConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        126
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ReactiveConfiguration.applicationFactory:(Lde/codecentric/boot/admin/client/config/InstanceProperties;Lorg/springframework/boot/actuate/autoconfigure/web/server/ManagementServerProperties;Lorg/springframework/boot/autoconfigure/web/ServerProperties;Lorg/springframework/boot/actuate/endpoint/web/PathMappedEndpoints;Lorg/springframework/boot/actuate/autoconfigure/endpoint/web/WebEndpointProperties;Lorg/springframework/beans/factory/ObjectProvider;Lorg/springframework/boot/autoconfigure/web/reactive/WebFluxProperties;)Lde/codecentric/boot/admin/client/registration/ApplicationFactory;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        134,
+        135,
+        134
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ReactiveRegistrationClientConfig.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        187
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ReactiveRegistrationClientConfig.registrationClient:(Lde/codecentric/boot/admin/client/config/ClientProperties;Lorg/springframework/web/reactive/function/client/WebClient$Builder;)Lde/codecentric/boot/admin/client/registration/RegistrationClient;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        192,
+        193,
+        195
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$RestClientRegistrationClientConfig.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        163
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$RestClientRegistrationClientConfig.registrationClient:(Lde/codecentric/boot/admin/client/config/ClientProperties;Lorg/springframework/web/client/RestClient$Builder;Lorg/springframework/boot/http/client/ClientHttpRequestFactoryBuilder;)Lde/codecentric/boot/admin/client/registration/RegistrationClient;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R005",
+      "lineNumbers" : [
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        178,
+        179
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ServletConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        107
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$ServletConfiguration.applicationFactory:(Lde/codecentric/boot/admin/client/config/InstanceProperties;Lorg/springframework/boot/actuate/autoconfigure/web/server/ManagementServerProperties;Lorg/springframework/boot/autoconfigure/web/ServerProperties;Ljakarta/servlet/ServletContext;Lorg/springframework/boot/actuate/endpoint/web/PathMappedEndpoints;Lorg/springframework/boot/actuate/autoconfigure/endpoint/web/WebEndpointProperties;Lorg/springframework/beans/factory/ObjectProvider;Lorg/springframework/boot/autoconfigure/web/servlet/DispatcherServletPath;)Lde/codecentric/boot/admin/client/registration/ApplicationFactory;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        116,
+        118,
+        116
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        77
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration.registrationListener:(Lde/codecentric/boot/admin/client/config/ClientProperties;Lde/codecentric/boot/admin/client/registration/ApplicationRegistrator;Lorg/springframework/core/env/Environment;)Lde/codecentric/boot/admin/client/registration/RegistrationApplicationListener;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        91,
+        92,
+        93,
+        94,
+        95
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration.registrator:(Lde/codecentric/boot/admin/client/registration/RegistrationClient;Lde/codecentric/boot/admin/client/config/ClientProperties;Lde/codecentric/boot/admin/client/registration/ApplicationFactory;)Lde/codecentric/boot/admin/client/registration/ApplicationRegistrator;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        83,
+        84,
+        83
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration.startupDateMetadataContributor:()Lde/codecentric/boot/admin/client/registration/metadata/StartupDateMetadataContributor;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        101
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientCloudFoundryAutoConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        49
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientCloudFoundryAutoConfiguration.applicationFactory:(Lde/codecentric/boot/admin/client/config/InstanceProperties;Lorg/springframework/boot/actuate/autoconfigure/web/server/ManagementServerProperties;Lorg/springframework/boot/autoconfigure/web/ServerProperties;Lorg/springframework/boot/actuate/endpoint/web/PathMappedEndpoints;Lorg/springframework/boot/actuate/autoconfigure/endpoint/web/WebEndpointProperties;Lorg/springframework/beans/factory/ObjectProvider;Lde/codecentric/boot/admin/client/config/CloudFoundryApplicationProperties;)Lde/codecentric/boot/admin/client/registration/CloudFoundryApplicationFactory;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        65,
+        66,
+        65
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientCloudFoundryAutoConfiguration.cloudFoundryMetadataContributor:(Lde/codecentric/boot/admin/client/config/CloudFoundryApplicationProperties;)Lde/codecentric/boot/admin/client/registration/metadata/CloudFoundryMetadataContributor;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        55
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientEnabledCondition.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        38
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientEnabledCondition.getClientProperties:(Lorg/springframework/context/annotation/ConditionContext;)Lde/codecentric/boot/admin/client/config/ClientProperties;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        58,
+        59,
+        60
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringBootAdminClientEnabledCondition.getMatchOutcome:(Lorg/springframework/context/annotation/ConditionContext;Lorg/springframework/core/type/AnnotatedTypeMetadata;)Lorg/springframework/boot/autoconfigure/condition/ConditionOutcome;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        42,
+        44,
+        45,
+        46,
+        45,
+        49,
+        50,
+        51,
+        50,
+        54
+      ]
+    },
+    "de.codecentric.boot.admin.client.config.SpringNativeClientAutoConfiguration.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.build:()Lde/codecentric/boot/admin/client/registration/Application;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.clearMetadata:()Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.healthUrl:(Ljava/lang/String;)Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.managementUrl:(Ljava/lang/String;)Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.metadata:(Ljava/lang/String;Ljava/lang/String;)Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.metadata:(Ljava/util/Map;)Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.name:(Ljava/lang/String;)Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.serviceUrl:(Ljava/lang/String;)Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application$Builder.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.<init>:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.builder:()Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.canEqual:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        30
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.create:(Ljava/lang/String;)Lde/codecentric/boot/admin/client/registration/Application$Builder;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.equals:(Ljava/lang/Object;)Z" : {
+      "completeTestCount" : 8,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 8
+      },
+      "lineNumbers" : [
+        30
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.getHealthUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        38
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.getManagementUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        36
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.getMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        61
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.getName:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.getServiceUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T001",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        40
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.hashCode:()I" : {
+      "completeTestCount" : 8,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 8
+      },
+      "lineNumbers" : [
+        30
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.Application.toString:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T020",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        31
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ApplicationFactory.createApplication:()Lde/codecentric/boot/admin/client/registration/Application;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    },
+    "de.codecentric.boot.admin.client.registration.ApplicationRegistrator.deregister:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    },
+    "de.codecentric.boot.admin.client.registration.ApplicationRegistrator.getRegisteredId:()Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    },
+    "de.codecentric.boot.admin.client.registration.ApplicationRegistrator.register:()Z" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient$1.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T004",
+      "perMethodOutcome" : "T004",
+      "lineNumbers" : [
+        32
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        32
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient.<init>:(Lorg/springframework/web/client/RestTemplate;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        37,
+        38,
+        39
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient.createRequestHeaders:()Lorg/springframework/http/HttpHeaders;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        54,
+        55,
+        56,
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient.deregister:(Ljava/lang/String;Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        50,
+        51
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.BlockingRegistrationClient.register:(Ljava/lang/String;Lde/codecentric/boot/admin/client/registration/Application;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R013",
+      "lineNumbers" : [
+        43,
+        44,
+        43,
+        45
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory.<init>:(Lde/codecentric/boot/admin/client/config/InstanceProperties;Lorg/springframework/boot/actuate/autoconfigure/web/server/ManagementServerProperties;Lorg/springframework/boot/autoconfigure/web/ServerProperties;Lorg/springframework/boot/actuate/endpoint/web/PathMappedEndpoints;Lorg/springframework/boot/actuate/autoconfigure/endpoint/web/WebEndpointProperties;Lde/codecentric/boot/admin/client/registration/metadata/MetadataContributor;Lde/codecentric/boot/admin/client/config/CloudFoundryApplicationProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R081",
+      "lineNumbers" : [
+        38,
+        39,
+        40,
+        41
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.CloudFoundryApplicationFactory.getServiceBaseUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        45,
+        46,
+        47,
+        50,
+        51,
+        54
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory$1.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        239
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.<init>:(Lde/codecentric/boot/admin/client/config/InstanceProperties;Lorg/springframework/boot/actuate/autoconfigure/web/server/ManagementServerProperties;Lorg/springframework/boot/autoconfigure/web/ServerProperties;Lorg/springframework/boot/actuate/endpoint/web/PathMappedEndpoints;Lorg/springframework/boot/actuate/autoconfigure/endpoint/web/WebEndpointProperties;Lde/codecentric/boot/admin/client/registration/metadata/MetadataContributor;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R081",
+      "lineNumbers" : [
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.createApplication:()Lde/codecentric/boot/admin/client/registration/Application;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        79
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getEndpointsWebPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        158
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthEndpointPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        219,
+        220,
+        221,
+        223,
+        224,
+        225,
+        227
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 12,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 12
+      },
+      "lineNumbers" : [
+        162,
+        163,
+        165,
+        166,
+        167,
+        168,
+        165
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHost:(Ljava/net/InetAddress;)Ljava/lang/String;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        235,
+        236,
+        239,
+        241,
+        243,
+        246
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalHost:()Ljava/net/InetAddress;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "W002",
+      "warnings" : {
+        "W002" : 1
+      },
+      "lineNumbers" : [
+        196,
+        198,
+        199
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalManagementPort:()Ljava/lang/Integer;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        212,
+        213,
+        215
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalServerPort:()Ljava/lang/Integer;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        204,
+        205,
+        208
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementBaseUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 11,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 11
+      },
+      "lineNumbers" : [
+        135,
+        137,
+        138,
+        141,
+        142,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        146
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementHost:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        187,
+        188,
+        189,
+        191
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getManagementUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 12,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 12
+      },
+      "lineNumbers" : [
+        124,
+        125,
+        128,
+        129,
+        130,
+        131,
+        128
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        172,
+        173,
+        174,
+        175
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getName:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        88
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getScheme:(Lorg/springframework/boot/web/server/Ssl;)Ljava/lang/String;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        231
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceBaseUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 8,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 8
+      },
+      "lineNumbers" : [
+        100,
+        102,
+        103,
+        106,
+        107,
+        108,
+        109,
+        110,
+        106
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceHost:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        179,
+        180,
+        181,
+        183
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServicePath:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        114,
+        116,
+        117,
+        120
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 10,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 10
+      },
+      "lineNumbers" : [
+        92,
+        93,
+        96
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.isManagementPortEqual:()Z" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        154
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.onWebServerInitialized:(Lorg/springframework/boot/web/context/WebServerInitializedEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        252,
+        253,
+        254,
+        256,
+        257,
+        259
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        28
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.<init>:(Lde/codecentric/boot/admin/client/registration/ApplicationFactory;Lde/codecentric/boot/admin/client/registration/RegistrationClient;[Ljava/lang/String;Z)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        43,
+        30,
+        32,
+        44,
+        45,
+        46,
+        47,
+        48
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.deregister:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "F009",
+      "lineNumbers" : [
+        105,
+        106,
+        107,
+        110,
+        112,
+        113,
+        114,
+        115,
+        121,
+        118,
+        119,
+        120,
+        119,
+        110,
+        123
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.getRegisteredId:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        127
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.lambda$register$0:(Ljava/lang/String;)Ljava/util/concurrent/atomic/LongAdder;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        60
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.register:()Z" : {
+      "completeTestCount" : 5,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 5
+      },
+      "lineNumbers" : [
+        56,
+        57,
+        59,
+        60,
+        61,
+        63,
+        64,
+        67,
+        68,
+        69,
+        70,
+        59,
+        75
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.register:(Lde/codecentric/boot/admin/client/registration/Application;Ljava/lang/String;Z)Z" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        80,
+        81,
+        82,
+        85,
+        87,
+        89,
+        90,
+        91,
+        93,
+        91,
+        96,
+        97,
+        96,
+        99
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveApplicationFactory.<init>:(Lde/codecentric/boot/admin/client/config/InstanceProperties;Lorg/springframework/boot/actuate/autoconfigure/web/server/ManagementServerProperties;Lorg/springframework/boot/autoconfigure/web/ServerProperties;Lorg/springframework/boot/actuate/endpoint/web/PathMappedEndpoints;Lorg/springframework/boot/actuate/autoconfigure/endpoint/web/WebEndpointProperties;Lde/codecentric/boot/admin/client/registration/metadata/MetadataContributor;Lorg/springframework/boot/autoconfigure/web/reactive/WebFluxProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R081",
+      "lineNumbers" : [
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveApplicationFactory.getManagementBaseUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        65,
+        67,
+        68,
+        71,
+        72,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        76
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveApplicationFactory.getManagementContextPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        85
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveApplicationFactory.getServiceUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        53,
+        54,
+        57,
+        58,
+        59,
+        60,
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveApplicationFactory.getWebfluxBasePath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        89
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient$1.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T004",
+      "perMethodOutcome" : "T004",
+      "lineNumbers" : [
+        30
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        30
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient.<init>:(Lorg/springframework/web/reactive/function/client/WebClient;Ljava/time/Duration;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R083",
+      "lineNumbers" : [
+        37,
+        38,
+        39,
+        40
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient.deregister:(Ljava/lang/String;Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R083",
+      "lineNumbers" : [
+        57,
+        58
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient.register:(Ljava/lang/String;Lde/codecentric/boot/admin/client/registration/Application;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R083",
+      "lineNumbers" : [
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient.setRequestHeaders:(Lorg/springframework/http/HttpHeaders;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R083",
+      "lineNumbers" : [
+        61,
+        62,
+        63
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        42
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.<init>:(Lde/codecentric/boot/admin/client/registration/ApplicationRegistrator;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R027",
+      "lineNumbers" : [
+        58,
+        59
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.<init>:(Lde/codecentric/boot/admin/client/registration/ApplicationRegistrator;Lorg/springframework/scheduling/concurrent/ThreadPoolTaskScheduler;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        69,
+        48,
+        50,
+        52,
+        70,
+        71,
+        72
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.afterPropertiesSet:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        125,
+        126
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.destroy:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T007",
+      "perMethodOutcome" : "T007",
+      "lineNumbers" : [
+        130,
+        131
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.onApplicationReady:(Lorg/springframework/boot/context/event/ApplicationReadyEvent;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        77,
+        78,
+        80
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.onClosedContext:(Lorg/springframework/context/event/ContextClosedEvent;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        85,
+        86,
+        87,
+        89,
+        90,
+        93
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.registrationTaskScheduler:()Lorg/springframework/scheduling/concurrent/ThreadPoolTaskScheduler;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        62,
+        63,
+        64,
+        65,
+        66
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.setAutoDeregister:(Z)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        112,
+        113
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.setAutoRegister:(Z)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        116,
+        117
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.setRegisterPeriod:(Ljava/time/Duration;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T002",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        120,
+        121
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.startRegisterTask:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        96,
+        97,
+        100,
+        101,
+        102
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationApplicationListener.stopRegisterTask:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        105,
+        106,
+        107,
+        109
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationClient.deregister:(Ljava/lang/String;Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    },
+    "de.codecentric.boot.admin.client.registration.RegistrationClient.register:(Ljava/lang/String;Lde/codecentric/boot/admin/client/registration/Application;)Ljava/lang/String;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient$1.<init>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T004",
+      "perMethodOutcome" : "T004",
+      "lineNumbers" : [
+        29
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient.<clinit>:()V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        29
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient.<init>:(Lorg/springframework/web/client/RestClient;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R002",
+      "lineNumbers" : [
+        34,
+        35,
+        36
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient.deregister:(Ljava/lang/String;Ljava/lang/String;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        51,
+        52
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient.register:(Ljava/lang/String;Lde/codecentric/boot/admin/client/registration/Application;)Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.RestClientRegistrationClient.setRequestHeaders:(Lorg/springframework/http/HttpHeaders;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        55,
+        56,
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.<init>:(Lde/codecentric/boot/admin/client/config/InstanceProperties;Lorg/springframework/boot/actuate/autoconfigure/web/server/ManagementServerProperties;Lorg/springframework/boot/autoconfigure/web/ServerProperties;Ljakarta/servlet/ServletContext;Lorg/springframework/boot/actuate/endpoint/web/PathMappedEndpoints;Lorg/springframework/boot/actuate/autoconfigure/endpoint/web/WebEndpointProperties;Lde/codecentric/boot/admin/client/registration/metadata/MetadataContributor;Lorg/springframework/boot/autoconfigure/web/servlet/DispatcherServletPath;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R081",
+      "lineNumbers" : [
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getDispatcherServletPrefix:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        102
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementBaseUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        70,
+        72,
+        73,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        77,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        85
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementContextPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        94
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServerContextPath:()Ljava/lang/String;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        98
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServiceUrl:()Ljava/lang/String;" : {
+      "completeTestCount" : 2,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 2
+      },
+      "lineNumbers" : [
+        58,
+        59,
+        62,
+        63,
+        64,
+        65,
+        62
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.CloudFoundryMetadataContributor.<init>:(Lde/codecentric/boot/admin/client/config/CloudFoundryApplicationProperties;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        31,
+        32,
+        33
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.CloudFoundryMetadataContributor.getMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        44
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.CompositeMetadataContributor.<init>:(Ljava/util/List;)V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        27,
+        28,
+        29
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.CompositeMetadataContributor.getMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 3,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 3
+      },
+      "lineNumbers" : [
+        33,
+        34,
+        35
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.CompositeMetadataContributor.lambda$getMetadata$0:(Ljava/util/Map;Lde/codecentric/boot/admin/client/registration/metadata/MetadataContributor;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        34
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.MetadataContributor.getMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T010",
+      "perMethodOutcome" : "T010"
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.StartupDateMetadataContributor.<init>:()V" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        25,
+        27
+      ]
+    },
+    "de.codecentric.boot.admin.client.registration.metadata.StartupDateMetadataContributor.getMetadata:()Ljava/util/Map;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "W002",
+      "warnings" : {
+        "W002" : 1
+      },
+      "lineNumbers" : [
+        31
+      ]
+    }
+  }
+}

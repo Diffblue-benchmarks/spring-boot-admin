@@ -1,0 +1,213 @@
+{
+  "meta" : {
+    "reportVersion" : "2.6"
+  },
+  "run" : {
+    "version" : "2025.02.02-08b2a5a-licensed",
+    "creationTimestamp" : "2025-11-07T13:55:34.390243277Z",
+    "command" : "dcover create --exclude-modules=de.codecentric:spring-boot-admin-dependencies,de.codecentric:spring-boot-admin-build,de.codecentric:spring-boot-admin-starter-server,de.codecentric:spring-boot-admin-starter-client,de.codecentric:spring-boot-admin-sample-custom-ui --coverage-reports --upload http://localhost:8080 --project-name spring-boot-admin --name with-diffblue-tests",
+    "totalTime" : 191.717,
+    "environmentDetectionTime" : 0.316,
+    "indexingTime" : 0.313,
+    "entryPointsTime" : 0.304,
+    "generationTime" : 2748.792,
+    "timeToFirstTest" : 2511.988,
+    "timeToLastTest" : 3652.092,
+    "indexQueryTime" : 7.328,
+    "verificationTime" : 185.271,
+    "validationTime" : 58.236
+  },
+  "codes" : {
+    "R000" : "Success",
+    "R026" : "Failed to create Spring context",
+    "T000" : "Method eligible for test creation",
+    "T003" : "Private method",
+    "T005" : "Trivial constructor",
+    "T006" : "Main method",
+    "T012" : "Synthetic method",
+    "V000" : "Validated successfully",
+    "V003" : "Tests discarded during validation"
+  },
+  "summary" : {
+    "classesCount" : 1,
+    "methodsCount" : 10,
+    "cumulativeDiffblueTestCount" : 1,
+    "cumulativeManualTestCount" : 1,
+    "completeTestCount" : 1,
+    "incompleteTestCount" : 0,
+    "skeletonTestCount" : 0,
+    "totalPhysicalLineCount" : 68,
+    "perMethodTestability" : {
+      "T000" : 2,
+      "T003" : 2,
+      "T005" : 1,
+      "T006" : 1,
+      "T012" : 4
+    },
+    "perMethodOutcome" : {
+      "R000" : 1,
+      "R026" : 1,
+      "T003" : 2,
+      "T005" : 1,
+      "T006" : 1,
+      "T012" : 4
+    },
+    "perTestOutcome" : {
+      "R000" : 1
+    },
+    "perTestValidation" : {
+      "V000" : 1,
+      "V003" : 1
+    }
+  },
+  "classes" : {
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication" : {
+      "methodsCount" : 10,
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : {
+        "T000" : 2,
+        "T003" : 2,
+        "T005" : 1,
+        "T006" : 1,
+        "T012" : 4
+      },
+      "perMethodOutcome" : {
+        "R000" : 1,
+        "R026" : 1,
+        "T003" : 2,
+        "T005" : 1,
+        "T006" : 1,
+        "T012" : 4
+      },
+      "perTestOutcome" : {
+        "R000" : 1
+      }
+    }
+  },
+  "methods" : {
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.<init>:(Lde/codecentric/boot/admin/server/config/AdminServerProperties;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T005",
+      "perMethodOutcome" : "T005",
+      "lineNumbers" : [
+        46,
+        47,
+        48
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.lambda$securityWebFilterChainPermitAll$0:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$AuthorizeExchangeSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.lambda$securityWebFilterChainSecure$1:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$AuthorizeExchangeSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        71,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        71
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.lambda$securityWebFilterChainSecure$2:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$FormLoginSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        75,
+        76,
+        75
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.lambda$securityWebFilterChainSecure$3:(Lorg/springframework/security/config/web/server/ServerHttpSecurity$LogoutSpec;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T012",
+      "perMethodOutcome" : "T012",
+      "lineNumbers" : [
+        77,
+        78,
+        77
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.loginSuccessHandler:(Ljava/lang/String;)Lorg/springframework/security/web/server/authentication/ServerAuthenticationSuccessHandler;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        93,
+        94,
+        95
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.logoutSuccessHandler:(Ljava/lang/String;)Lorg/springframework/security/web/server/authentication/logout/ServerLogoutSuccessHandler;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T003",
+      "perMethodOutcome" : "T003",
+      "lineNumbers" : [
+        87,
+        88,
+        89
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.main:([Ljava/lang/String;)V" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T006",
+      "perMethodOutcome" : "T006",
+      "lineNumbers" : [
+        51,
+        52
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.securityWebFilterChainPermitAll:(Lorg/springframework/security/config/web/server/ServerHttpSecurity;)Lorg/springframework/security/web/server/SecurityWebFilterChain;" : {
+      "completeTestCount" : 1,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R000",
+      "perTestOutcome" : {
+        "R000" : 1
+      },
+      "lineNumbers" : [
+        57,
+        58,
+        59,
+        57
+      ]
+    },
+    "de.codecentric.boot.admin.SpringBootAdminEurekaApplication.securityWebFilterChainSecure:(Lorg/springframework/security/config/web/server/ServerHttpSecurity;)Lorg/springframework/security/web/server/SecurityWebFilterChain;" : {
+      "completeTestCount" : 0,
+      "incompleteTestCount" : 0,
+      "perMethodTestability" : "T000",
+      "perMethodOutcome" : "R026",
+      "lineNumbers" : [
+        65,
+        66,
+        75,
+        77,
+        79,
+        80,
+        81,
+        65
+      ]
+    }
+  }
+}
