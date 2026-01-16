@@ -47,4 +47,30 @@ class AdminServerHazelcastAutoConfigurationClaude_constructorTest {
 		assertThat(nameEventStoreMap).isEqualTo("spring-boot-admin-event-store");
 	}
 
+	@Test
+	void notifierTriggerConfiguration_constructor_shouldCreateInstanceSuccessfully() {
+		AdminServerHazelcastAutoConfiguration.NotifierTriggerConfiguration config = new AdminServerHazelcastAutoConfiguration.NotifierTriggerConfiguration();
+
+		assertThat(config).isNotNull();
+	}
+
+	@Test
+	void notifierTriggerConfiguration_constructor_shouldInitializeNameSentNotificationsMapToDefaultValue()
+			throws Exception {
+		// Reflection is necessary here because the nameSentNotificationsMap field is private
+		// with no public getter, and there is no other way to verify that the constructor
+		// properly initializes the field to its default value without setting up a full
+		// Spring context and testing the bean methods that use this field.
+		AdminServerHazelcastAutoConfiguration.NotifierTriggerConfiguration config = new AdminServerHazelcastAutoConfiguration.NotifierTriggerConfiguration();
+
+		Field field = AdminServerHazelcastAutoConfiguration.NotifierTriggerConfiguration.class
+			.getDeclaredField("nameSentNotificationsMap");
+		field.setAccessible(true);
+		String nameSentNotificationsMap = (String) field.get(config);
+
+		assertThat(nameSentNotificationsMap)
+			.isEqualTo(AdminServerHazelcastAutoConfiguration.DEFAULT_NAME_SENT_NOTIFICATIONS_MAP);
+		assertThat(nameSentNotificationsMap).isEqualTo("spring-boot-admin-sent-notifications");
+	}
+
 }
