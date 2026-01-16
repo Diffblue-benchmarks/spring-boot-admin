@@ -17,14 +17,21 @@
 package de.codecentric.boot.admin.server.config;
 
 import java.lang.reflect.Field;
+import java.net.CookiePolicy;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
+import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClient;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClientCustomizer;
+import de.codecentric.boot.admin.server.web.client.cookies.CookieStoreCleanupTrigger;
+import de.codecentric.boot.admin.server.web.client.cookies.JdkPerInstanceCookieStore;
+import de.codecentric.boot.admin.server.web.client.cookies.PerInstanceCookieStore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -235,6 +242,94 @@ class AdminServerInstanceWebClientConfigurationClaudeTest {
 		new AdminServerInstanceWebClientConfiguration(customizers, webClientBuilder);
 
 		verify(customizer, never()).customize(any());
+	}
+
+	// Tests for CookieStoreConfiguration nested class
+
+	@Test
+	void cookieStoreConfiguration_constructor_shouldCreateInstance() {
+		AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration config = new AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration();
+
+		assertThat(config).isNotNull();
+	}
+
+	@Test
+	void cookieStoreConfiguration_cookieStore_shouldReturnJdkPerInstanceCookieStore() {
+		AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration config = new AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration();
+
+		PerInstanceCookieStore cookieStore = config.cookieStore();
+
+		assertThat(cookieStore).isNotNull();
+		assertThat(cookieStore).isInstanceOf(JdkPerInstanceCookieStore.class);
+	}
+
+	@Test
+	void cookieStoreConfiguration_cookieStore_shouldUseAcceptOriginalServerPolicy() throws Exception {
+		AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration config = new AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration();
+
+		PerInstanceCookieStore cookieStore = config.cookieStore();
+
+		// Reflection is needed here to verify the cookie policy used internally
+		// by JdkPerInstanceCookieStore, as there is no public API to access it
+		assertThat(cookieStore).isInstanceOf(JdkPerInstanceCookieStore.class);
+		JdkPerInstanceCookieStore jdkStore = (JdkPerInstanceCookieStore) cookieStore;
+
+		Field cookiePolicyField = JdkPerInstanceCookieStore.class.getDeclaredField("cookiePolicy");
+		cookiePolicyField.setAccessible(true);
+		CookiePolicy policy = (CookiePolicy) cookiePolicyField.get(jdkStore);
+
+		assertThat(policy).isEqualTo(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
+	}
+
+	@Test
+	void cookieStoreConfiguration_cookieStore_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration config = new AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration();
+
+		PerInstanceCookieStore cookieStore1 = config.cookieStore();
+		PerInstanceCookieStore cookieStore2 = config.cookieStore();
+
+		assertThat(cookieStore1).isNotNull();
+		assertThat(cookieStore2).isNotNull();
+		assertThat(cookieStore1).isNotSameAs(cookieStore2);
+	}
+
+	@Test
+	void cookieStoreConfiguration_cookieStoreCleanupTrigger_shouldCreateTrigger() {
+		AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration config = new AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration();
+
+		Publisher<InstanceEvent> publisher = Flux.empty();
+		PerInstanceCookieStore cookieStore = config.cookieStore();
+
+		CookieStoreCleanupTrigger trigger = config.cookieStoreCleanupTrigger(publisher, cookieStore);
+
+		assertThat(trigger).isNotNull();
+	}
+
+	@Test
+	void cookieStoreConfiguration_cookieStoreCleanupTrigger_shouldAcceptPublisher() {
+		AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration config = new AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration();
+
+		Publisher<InstanceEvent> publisher = Flux.empty();
+		PerInstanceCookieStore cookieStore = new JdkPerInstanceCookieStore();
+
+		CookieStoreCleanupTrigger trigger = config.cookieStoreCleanupTrigger(publisher, cookieStore);
+
+		assertThat(trigger).isNotNull();
+	}
+
+	@Test
+	void cookieStoreConfiguration_cookieStoreCleanupTrigger_shouldCreateNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration config = new AdminServerInstanceWebClientConfiguration.CookieStoreConfiguration();
+
+		Publisher<InstanceEvent> publisher = Flux.empty();
+		PerInstanceCookieStore cookieStore = config.cookieStore();
+
+		CookieStoreCleanupTrigger trigger1 = config.cookieStoreCleanupTrigger(publisher, cookieStore);
+		CookieStoreCleanupTrigger trigger2 = config.cookieStoreCleanupTrigger(publisher, cookieStore);
+
+		assertThat(trigger1).isNotNull();
+		assertThat(trigger2).isNotNull();
+		assertThat(trigger1).isNotSameAs(trigger2);
 	}
 
 }
