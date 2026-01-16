@@ -18,6 +18,8 @@ package de.codecentric.boot.admin.server.config;
 
 import java.lang.reflect.Field;
 import java.net.CookiePolicy;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
+import de.codecentric.boot.admin.server.web.client.BasicAuthHttpHeaderProvider;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClient;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClientCustomizer;
 import de.codecentric.boot.admin.server.web.client.cookies.CookieStoreCleanupTrigger;
@@ -330,6 +333,103 @@ class AdminServerInstanceWebClientConfigurationClaudeTest {
 		assertThat(trigger1).isNotNull();
 		assertThat(trigger2).isNotNull();
 		assertThat(trigger1).isNotSameAs(trigger2);
+	}
+
+	// Tests for HttpHeadersProviderConfiguration nested class
+
+	@Test
+	void httpHeadersProviderConfiguration_constructor_shouldCreateInstance() {
+		AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration config = new AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration();
+
+		assertThat(config).isNotNull();
+	}
+
+	@Test
+	void httpHeadersProviderConfiguration_basicAuthHttpHeadersProvider_shouldReturnProviderWhenAuthDisabled() {
+		AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration config = new AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getInstanceAuth().setEnabled(false);
+
+		BasicAuthHttpHeaderProvider provider = config.basicAuthHttpHeadersProvider(properties);
+
+		assertThat(provider).isNotNull();
+	}
+
+	@Test
+	void httpHeadersProviderConfiguration_basicAuthHttpHeadersProvider_shouldReturnProviderWithDefaultCredentialsWhenAuthEnabled() {
+		AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration config = new AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getInstanceAuth().setEnabled(true);
+		properties.getInstanceAuth().setDefaultUserName("admin");
+		properties.getInstanceAuth().setDefaultPassword("secret");
+
+		BasicAuthHttpHeaderProvider provider = config.basicAuthHttpHeadersProvider(properties);
+
+		assertThat(provider).isNotNull();
+	}
+
+	@Test
+	void httpHeadersProviderConfiguration_basicAuthHttpHeadersProvider_shouldReturnProviderWithServiceMapWhenAuthEnabled() {
+		AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration config = new AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getInstanceAuth().setEnabled(true);
+		properties.getInstanceAuth().setDefaultUserName("admin");
+		properties.getInstanceAuth().setDefaultPassword("secret");
+
+		Map<String, BasicAuthHttpHeaderProvider.InstanceCredentials> serviceMap = new HashMap<>();
+		serviceMap.put("service1",
+				new BasicAuthHttpHeaderProvider.InstanceCredentials("user1", "password1"));
+		properties.getInstanceAuth().setServiceMap(serviceMap);
+
+		BasicAuthHttpHeaderProvider provider = config.basicAuthHttpHeadersProvider(properties);
+
+		assertThat(provider).isNotNull();
+	}
+
+	@Test
+	void httpHeadersProviderConfiguration_basicAuthHttpHeadersProvider_shouldReturnProviderWithNullDefaultsWhenAuthEnabled() {
+		AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration config = new AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getInstanceAuth().setEnabled(true);
+		// defaultUserName and defaultPassword remain null
+
+		BasicAuthHttpHeaderProvider provider = config.basicAuthHttpHeadersProvider(properties);
+
+		assertThat(provider).isNotNull();
+	}
+
+	@Test
+	void httpHeadersProviderConfiguration_basicAuthHttpHeadersProvider_shouldReturnProviderWithEmptyServiceMapWhenAuthEnabled() {
+		AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration config = new AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getInstanceAuth().setEnabled(true);
+		properties.getInstanceAuth().setDefaultUserName("admin");
+		properties.getInstanceAuth().setDefaultPassword("secret");
+		// serviceMap is empty by default
+
+		BasicAuthHttpHeaderProvider provider = config.basicAuthHttpHeadersProvider(properties);
+
+		assertThat(provider).isNotNull();
+	}
+
+	@Test
+	void httpHeadersProviderConfiguration_basicAuthHttpHeadersProvider_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration config = new AdminServerInstanceWebClientConfiguration.HttpHeadersProviderConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getInstanceAuth().setEnabled(true);
+
+		BasicAuthHttpHeaderProvider provider1 = config.basicAuthHttpHeadersProvider(properties);
+		BasicAuthHttpHeaderProvider provider2 = config.basicAuthHttpHeadersProvider(properties);
+
+		assertThat(provider1).isNotNull();
+		assertThat(provider2).isNotNull();
+		assertThat(provider1).isNotSameAs(provider2);
 	}
 
 }
