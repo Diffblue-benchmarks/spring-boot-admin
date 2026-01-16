@@ -1,0 +1,74 @@
+INFO  Diffblue Cover 2026.01.01-SNAPSHOT-bf74e39-local
+INFO  
+INFO  Command: create
+INFO  Create tests for the specified package/class/method.
+      
+      Supports Java projects (JUnit tests) and Python projects (pytest tests, experimental). For Python projects, use the --python flag.
+INFO  
+INFO  Discovered modules:
+INFO  - de.codecentric:spring-boot-admin-server
+INFO  - de.codecentric:spring-boot-admin-server-ui
+INFO  - de.codecentric:spring-boot-admin-client
+INFO  - de.codecentric:spring-boot-admin-dependencies
+INFO  - de.codecentric:spring-boot-admin-docs
+INFO  - de.codecentric:spring-boot-admin-build
+INFO  - de.codecentric:spring-boot-admin-starter-server
+INFO  - de.codecentric:spring-boot-admin-starter-client
+INFO  - de.codecentric:spring-boot-admin-sample-servlet
+INFO  - de.codecentric:spring-boot-admin-sample-reactive
+INFO  - de.codecentric:spring-boot-admin-sample-war
+INFO  - de.codecentric:spring-boot-admin-sample-hazelcast
+INFO  - de.codecentric:spring-boot-admin-sample-custom-ui
+INFO  - de.codecentric:spring-boot-admin-sample-eureka
+INFO  - de.codecentric:spring-boot-admin-sample-consul
+INFO  - de.codecentric:spring-boot-admin-sample-zookeeper
+INFO  - de.codecentric:spring-boot-admin-pitest-aggregation
+INFO  - de.codecentric:spring-boot-admin-server-cloud
+INFO  
+WARN  E147: Unknown module
+      An unknown module has been specified:
+      --exclude-modules spring-boot-admin-server-ui,spring-boot-admin-docs
+      Please update the module name.
+INFO  
+INFO   [1/18] Creating tests for module: de.codecentric:spring-boot-admin-server
+INFO  ==========================================================================
+INFO  
+INFO  Detecting environment:
+INFO  ----------------------
+INFO  Detected Java version 17.0.17
+INFO  Selected build system: Maven
+INFO  Selected classpath from build system maven
+INFO  Selected test framework: JUnit Jupiter API
+INFO  Selected Java language compliance level: 17
+INFO  Selected test validation: enabled
+INFO  Prefixes for filtering classes/methods:
+INFO  - de.codecentric.boot.admin.server.config
+INFO  - de.codecentric.boot.admin.server.domain.entities
+INFO  - de.codecentric.boot.admin.server.domain.events
+INFO  - de.codecentric.boot.admin.server.domain.values
+INFO  - de.codecentric.boot.admin.server.eventstore
+INFO  - de.codecentric.boot.admin.server.notify
+INFO  - de.codecentric.boot.admin.server.notify.filter
+INFO  - de.codecentric.boot.admin.server.notify.filter.web
+INFO  - de.codecentric.boot.admin.server.services
+INFO  - de.codecentric.boot.admin.server.services.endpoints
+INFO  - de.codecentric.boot.admin.server.utils.jackson
+INFO  - de.codecentric.boot.admin.server.web
+INFO  - de.codecentric.boot.admin.server.web.client
+INFO  - de.codecentric.boot.admin.server.web.client.cookies
+INFO  - de.codecentric.boot.admin.server.web.client.exception
+INFO  - de.codecentric.boot.admin.server.web.client.reactive
+INFO  - de.codecentric.boot.admin.server.web.reactive
+INFO  - de.codecentric.boot.admin.server.web.servlet
+INFO  Gathering methods to test...
+WARN  E052: Missing dependency
+      Required dependencies were not found.
+      Please add the following dependencies to your project:
+      <dependency>
+        <groupId>com.diffblue.cover</groupId>
+        <artifactId>cover-annotations</artifactId>
+        <version>1.9.0</version>
+        <scope>provided</scope>
+      </dependency>
+INFO  Using CLAUDE agent for test generation
+INFO  Jacoco validation passed. JUnit: false, Jupiter: true
