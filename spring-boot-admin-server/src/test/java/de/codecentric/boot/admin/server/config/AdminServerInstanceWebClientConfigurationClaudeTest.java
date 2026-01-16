@@ -18,7 +18,11 @@ package de.codecentric.boot.admin.server.config;
 
 import java.lang.reflect.Field;
 import java.net.CookiePolicy;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -30,11 +34,15 @@ import reactor.core.publisher.Flux;
 
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
 import de.codecentric.boot.admin.server.web.client.BasicAuthHttpHeaderProvider;
+import de.codecentric.boot.admin.server.web.client.HttpHeadersProvider;
+import de.codecentric.boot.admin.server.web.client.InstanceExchangeFilterFunction;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClient;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClientCustomizer;
+import de.codecentric.boot.admin.server.web.client.LegacyEndpointConverter;
 import de.codecentric.boot.admin.server.web.client.cookies.CookieStoreCleanupTrigger;
 import de.codecentric.boot.admin.server.web.client.cookies.JdkPerInstanceCookieStore;
 import de.codecentric.boot.admin.server.web.client.cookies.PerInstanceCookieStore;
+import de.codecentric.boot.admin.server.web.client.reactive.ReactiveHttpHeadersProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -430,6 +438,402 @@ class AdminServerInstanceWebClientConfigurationClaudeTest {
 		assertThat(provider1).isNotNull();
 		assertThat(provider2).isNotNull();
 		assertThat(provider1).isNotSameAs(provider2);
+	}
+
+	// Tests for DefaultInstanceExchangeFiltersConfiguration nested class
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_constructor_shouldCreateInstance() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		assertThat(config).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addHeadersInstanceExchangeFilter_shouldReturnFilterWithEmptyList() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		List<HttpHeadersProvider> providers = Collections.emptyList();
+
+		InstanceExchangeFilterFunction filter = config.addHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addHeadersInstanceExchangeFilter_shouldReturnFilterWithSingleProvider() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		HttpHeadersProvider provider = mock(HttpHeadersProvider.class);
+		List<HttpHeadersProvider> providers = Collections.singletonList(provider);
+
+		InstanceExchangeFilterFunction filter = config.addHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addHeadersInstanceExchangeFilter_shouldReturnFilterWithMultipleProviders() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		HttpHeadersProvider provider1 = mock(HttpHeadersProvider.class);
+		HttpHeadersProvider provider2 = mock(HttpHeadersProvider.class);
+		List<HttpHeadersProvider> providers = new ArrayList<>();
+		providers.add(provider1);
+		providers.add(provider2);
+
+		InstanceExchangeFilterFunction filter = config.addHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addHeadersInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		List<HttpHeadersProvider> providers = Collections.emptyList();
+
+		InstanceExchangeFilterFunction filter1 = config.addHeadersInstanceExchangeFilter(providers);
+		InstanceExchangeFilterFunction filter2 = config.addHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addReactiveHeadersInstanceExchangeFilter_shouldReturnFilterWithEmptyList() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		List<ReactiveHttpHeadersProvider> providers = Collections.emptyList();
+
+		InstanceExchangeFilterFunction filter = config.addReactiveHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addReactiveHeadersInstanceExchangeFilter_shouldReturnFilterWithSingleProvider() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		ReactiveHttpHeadersProvider provider = mock(ReactiveHttpHeadersProvider.class);
+		List<ReactiveHttpHeadersProvider> providers = Collections.singletonList(provider);
+
+		InstanceExchangeFilterFunction filter = config.addReactiveHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addReactiveHeadersInstanceExchangeFilter_shouldReturnFilterWithMultipleProviders() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		ReactiveHttpHeadersProvider provider1 = mock(ReactiveHttpHeadersProvider.class);
+		ReactiveHttpHeadersProvider provider2 = mock(ReactiveHttpHeadersProvider.class);
+		List<ReactiveHttpHeadersProvider> providers = new ArrayList<>();
+		providers.add(provider1);
+		providers.add(provider2);
+
+		InstanceExchangeFilterFunction filter = config.addReactiveHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_addReactiveHeadersInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		List<ReactiveHttpHeadersProvider> providers = Collections.emptyList();
+
+		InstanceExchangeFilterFunction filter1 = config.addReactiveHeadersInstanceExchangeFilter(providers);
+		InstanceExchangeFilterFunction filter2 = config.addReactiveHeadersInstanceExchangeFilter(providers);
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_rewriteEndpointUrlInstanceExchangeFilter_shouldReturnFilter() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		InstanceExchangeFilterFunction filter = config.rewriteEndpointUrlInstanceExchangeFilter();
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_rewriteEndpointUrlInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		InstanceExchangeFilterFunction filter1 = config.rewriteEndpointUrlInstanceExchangeFilter();
+		InstanceExchangeFilterFunction filter2 = config.rewriteEndpointUrlInstanceExchangeFilter();
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_setDefaultAcceptHeaderInstanceExchangeFilter_shouldReturnFilter() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		InstanceExchangeFilterFunction filter = config.setDefaultAcceptHeaderInstanceExchangeFilter();
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_setDefaultAcceptHeaderInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		InstanceExchangeFilterFunction filter1 = config.setDefaultAcceptHeaderInstanceExchangeFilter();
+		InstanceExchangeFilterFunction filter2 = config.setDefaultAcceptHeaderInstanceExchangeFilter();
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_legacyEndpointConverterInstanceExchangeFilter_shouldReturnFilterWithEmptyList() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		List<LegacyEndpointConverter> converters = Collections.emptyList();
+
+		InstanceExchangeFilterFunction filter = config.legacyEndpointConverterInstanceExchangeFilter(converters);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_legacyEndpointConverterInstanceExchangeFilter_shouldReturnFilterWithSingleConverter() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		LegacyEndpointConverter converter = mock(LegacyEndpointConverter.class);
+		List<LegacyEndpointConverter> converters = Collections.singletonList(converter);
+
+		InstanceExchangeFilterFunction filter = config.legacyEndpointConverterInstanceExchangeFilter(converters);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_legacyEndpointConverterInstanceExchangeFilter_shouldReturnFilterWithMultipleConverters() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		LegacyEndpointConverter converter1 = mock(LegacyEndpointConverter.class);
+		LegacyEndpointConverter converter2 = mock(LegacyEndpointConverter.class);
+		List<LegacyEndpointConverter> converters = new ArrayList<>();
+		converters.add(converter1);
+		converters.add(converter2);
+
+		InstanceExchangeFilterFunction filter = config.legacyEndpointConverterInstanceExchangeFilter(converters);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_legacyEndpointConverterInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		List<LegacyEndpointConverter> converters = Collections.emptyList();
+
+		InstanceExchangeFilterFunction filter1 = config.legacyEndpointConverterInstanceExchangeFilter(converters);
+		InstanceExchangeFilterFunction filter2 = config.legacyEndpointConverterInstanceExchangeFilter(converters);
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_logfileAcceptWorkaround_shouldReturnFilter() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		InstanceExchangeFilterFunction filter = config.logfileAcceptWorkaround();
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_logfileAcceptWorkaround_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		InstanceExchangeFilterFunction filter1 = config.logfileAcceptWorkaround();
+		InstanceExchangeFilterFunction filter2 = config.logfileAcceptWorkaround();
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_cookieHandlingInstanceExchangeFilter_shouldReturnFilter() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		PerInstanceCookieStore store = new JdkPerInstanceCookieStore();
+
+		InstanceExchangeFilterFunction filter = config.cookieHandlingInstanceExchangeFilter(store);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_cookieHandlingInstanceExchangeFilter_shouldReturnFilterWithCustomStore() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		PerInstanceCookieStore store = new JdkPerInstanceCookieStore(CookiePolicy.ACCEPT_ALL);
+
+		InstanceExchangeFilterFunction filter = config.cookieHandlingInstanceExchangeFilter(store);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_cookieHandlingInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		PerInstanceCookieStore store = new JdkPerInstanceCookieStore();
+
+		InstanceExchangeFilterFunction filter1 = config.cookieHandlingInstanceExchangeFilter(store);
+		InstanceExchangeFilterFunction filter2 = config.cookieHandlingInstanceExchangeFilter(store);
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_retryInstanceExchangeFilter_shouldReturnFilterWithDefaultProperties() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+
+		InstanceExchangeFilterFunction filter = config.retryInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_retryInstanceExchangeFilter_shouldReturnFilterWithCustomRetries() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getMonitor().setDefaultRetries(3);
+
+		InstanceExchangeFilterFunction filter = config.retryInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_retryInstanceExchangeFilter_shouldReturnFilterWithEndpointSpecificRetries() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getMonitor().setDefaultRetries(3);
+		Map<String, Integer> retries = new HashMap<>();
+		retries.put("health", 5);
+		retries.put("info", 2);
+		properties.getMonitor().setRetries(retries);
+
+		InstanceExchangeFilterFunction filter = config.retryInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_retryInstanceExchangeFilter_shouldReturnFilterWithEmptyEndpointRetries() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getMonitor().setDefaultRetries(3);
+		properties.getMonitor().setRetries(new HashMap<>());
+
+		InstanceExchangeFilterFunction filter = config.retryInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_retryInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+
+		InstanceExchangeFilterFunction filter1 = config.retryInstanceExchangeFilter(properties);
+		InstanceExchangeFilterFunction filter2 = config.retryInstanceExchangeFilter(properties);
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_timeoutInstanceExchangeFilter_shouldReturnFilterWithDefaultProperties() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+
+		InstanceExchangeFilterFunction filter = config.timeoutInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_timeoutInstanceExchangeFilter_shouldReturnFilterWithCustomTimeout() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getMonitor().setDefaultTimeout(Duration.ofSeconds(30));
+
+		InstanceExchangeFilterFunction filter = config.timeoutInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_timeoutInstanceExchangeFilter_shouldReturnFilterWithEndpointSpecificTimeouts() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getMonitor().setDefaultTimeout(Duration.ofSeconds(30));
+		Map<String, Duration> timeouts = new HashMap<>();
+		timeouts.put("health", Duration.ofSeconds(10));
+		timeouts.put("info", Duration.ofSeconds(20));
+		properties.getMonitor().setTimeout(timeouts);
+
+		InstanceExchangeFilterFunction filter = config.timeoutInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_timeoutInstanceExchangeFilter_shouldReturnFilterWithEmptyEndpointTimeouts() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+		properties.getMonitor().setDefaultTimeout(Duration.ofSeconds(30));
+		properties.getMonitor().setTimeout(new HashMap<>());
+
+		InstanceExchangeFilterFunction filter = config.timeoutInstanceExchangeFilter(properties);
+
+		assertThat(filter).isNotNull();
+	}
+
+	@Test
+	void defaultInstanceExchangeFiltersConfiguration_timeoutInstanceExchangeFilter_shouldReturnNewInstanceEachTime() {
+		AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration config = new AdminServerInstanceWebClientConfiguration.InstanceExchangeFiltersConfiguration.DefaultInstanceExchangeFiltersConfiguration();
+
+		AdminServerProperties properties = new AdminServerProperties();
+
+		InstanceExchangeFilterFunction filter1 = config.timeoutInstanceExchangeFilter(properties);
+		InstanceExchangeFilterFunction filter2 = config.timeoutInstanceExchangeFilter(properties);
+
+		assertThat(filter1).isNotNull();
+		assertThat(filter2).isNotNull();
+		assertThat(filter1).isNotSameAs(filter2);
 	}
 
 }
