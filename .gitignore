@@ -27,3 +27,9 @@ node/
 .flattened-pom.xml
 
 .DS_Store
+
+.diffblue/cache
+**.diffblue/cache
+**/.diffblue/cache
+**/**.diffblue/cache
+**/**/.diffblue/cache
