@@ -86,12 +86,42 @@ class EndpointDetectorDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
-  void testDetectEndpoints2() throws AssertionError {
+  void testDetectEndpoints2() {
     // Arrange
+    Mono<Instance> mono = mock(Mono.class);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualDetectEndpointsResult = endpointDetector.detectEndpoints(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualDetectEndpointsResult);
+  }
+
+  /**
+   * Test {@link EndpointDetector#detectEndpoints(InstanceId)}.
+   *
+   * <p>Method under test: {@link EndpointDetector#detectEndpoints(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test detectEndpoints(InstanceId)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
+  void testDetectEndpoints3() throws AssertionError {
+    // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
     EndpointDetector endpointDetector =
-        new EndpointDetector(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(EndpointDetectionStrategy.class));
+        new EndpointDetector(repository, mock(EndpointDetectionStrategy.class));
 
     // Act and Assert
     FirstStep<Void> createResult =
@@ -109,17 +139,98 @@ class EndpointDetectorDiffblueTest {
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
-  void testDetectEndpoints3() throws AssertionError {
+  void testDetectEndpoints4() throws AssertionError {
     // Arrange
+    SnapshottingInstanceRepository repository =
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
     EndpointDetector endpointDetector =
-        new EndpointDetector(
-            new SnapshottingInstanceRepository(new InMemoryEventStore()),
-            mock(EndpointDetectionStrategy.class));
+        new EndpointDetector(repository, mock(EndpointDetectionStrategy.class));
 
     // Act and Assert
     FirstStep<Void> createResult =
         StepVerifier.create(endpointDetector.detectEndpoints(InstanceId.of("42")));
     createResult.expectComplete().verify();
+  }
+
+  /**
+   * Test {@link EndpointDetector#detectEndpoints(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link EndpointDetector#detectEndpoints(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test detectEndpoints(InstanceId); given ArrayList() add '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
+  void testDetectEndpoints_givenArrayListAdd42() {
+    // Arrange
+    ArrayList<Object> it = new ArrayList<>();
+    it.add("42");
+    it.addAll(new ArrayList<>());
+    Flux<?> source = Flux.fromIterable(it);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+
+    Mono<Instance> mono = mock(Mono.class);
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualDetectEndpointsResult = endpointDetector.detectEndpoints(InstanceId.of("42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualDetectEndpointsResult);
+  }
+
+  /**
+   * Test {@link EndpointDetector#detectEndpoints(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
+   *   <li>When {@link InstanceId} with value is {@code Value42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link EndpointDetector#detectEndpoints(InstanceId)}
+   */
+  @Test
+  @DisplayName(
+      "Test detectEndpoints(InstanceId); given ArrayList() add '42'; when InstanceId with value is 'Value42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono EndpointDetector.detectEndpoints(InstanceId)"})
+  void testDetectEndpoints_givenArrayListAdd42_whenInstanceIdWithValueIsValue42() {
+    // Arrange
+    ArrayList<Object> it = new ArrayList<>();
+    it.add("42");
+    it.addAll(new ArrayList<>());
+    Flux<?> source = Flux.fromIterable(it);
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+
+    Mono<Instance> mono = mock(Mono.class);
+    when(mono.then()).thenReturn(channelSendOperator);
+    when(instanceRepository.computeIfPresent(
+            Mockito.<InstanceId>any(),
+            Mockito.<BiFunction<InstanceId, Instance, Mono<Instance>>>any()))
+        .thenReturn(mono);
+
+    // Act
+    Mono<Void> actualDetectEndpointsResult =
+        endpointDetector.detectEndpoints(InstanceId.of("Value42"));
+
+    // Assert
+    verify(instanceRepository).computeIfPresent(isA(InstanceId.class), isA(BiFunction.class));
+    verify(mono).then();
+    assertSame(channelSendOperator, actualDetectEndpointsResult);
   }
 
   /**

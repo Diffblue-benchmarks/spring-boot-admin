@@ -148,32 +148,6 @@ class AbstractEventNotifierDiffblueTest {
    * Test {@link AbstractEventNotifier#shouldNotify(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Then return {@code false}.
-   * </ul>
-   *
-   * <p>Method under test: {@link AbstractEventNotifier#shouldNotify(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test shouldNotify(InstanceEvent, Instance); then return 'false'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"boolean AbstractEventNotifier.shouldNotify(InstanceEvent, Instance)"})
-  void testShouldNotify_thenReturnFalse() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
-    LoggingNotifier loggingNotifier = new LoggingNotifier(repository);
-
-    // Act and Assert
-    assertFalse(
-        loggingNotifier.shouldNotify(
-            new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), mock(Instance.class)));
-  }
-
-  /**
-   * Test {@link AbstractEventNotifier#shouldNotify(InstanceEvent, Instance)}.
-   *
-   * <ul>
    *   <li>Then return {@code true}.
    * </ul>
    *

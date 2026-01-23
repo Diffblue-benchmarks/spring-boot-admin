@@ -59,9 +59,10 @@ class NotificationFilterControllerDiffblueTest {
   void testNewNotificationFilterController() {
     // Arrange
     Notifier delegate = mock(Notifier.class);
-    FilteringNotifier filteringNotifier =
-        new FilteringNotifier(
-            delegate, new EventsourcingInstanceRepository(new InMemoryEventStore()));
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    FilteringNotifier filteringNotifier = new FilteringNotifier(delegate, repository);
 
     // Act and Assert
     assertTrue(new NotificationFilterController(filteringNotifier).getFilters().isEmpty());
@@ -70,19 +71,26 @@ class NotificationFilterControllerDiffblueTest {
   /**
    * Test {@link NotificationFilterController#getFilters()}.
    *
+   * <ul>
+   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       three.
+   * </ul>
+   *
    * <p>Method under test: {@link NotificationFilterController#getFilters()}
    */
   @Test
-  @DisplayName("Test getFilters()")
+  @DisplayName(
+      "Test getFilters(); given InMemoryEventStore(int) with maxLogSizePerAggregate is three")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Collection NotificationFilterController.getFilters()"})
-  void testGetFilters() {
+  void testGetFilters_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree() {
     // Arrange
     Notifier delegate = mock(Notifier.class);
-    FilteringNotifier filteringNotifier =
-        new FilteringNotifier(
-            delegate, new EventsourcingInstanceRepository(new InMemoryEventStore()));
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    FilteringNotifier filteringNotifier = new FilteringNotifier(delegate, repository);
 
     // Act and Assert
     assertTrue(new NotificationFilterController(filteringNotifier).getFilters().isEmpty());
@@ -117,32 +125,6 @@ class NotificationFilterControllerDiffblueTest {
   /**
    * Test {@link NotificationFilterController#addFilter(String, String, Long)}.
    *
-   * <p>Method under test: {@link NotificationFilterController#addFilter(String, String, Long)}
-   */
-  @Test
-  @DisplayName("Test addFilter(String, String, Long)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"ResponseEntity NotificationFilterController.addFilter(String, String, Long)"})
-  void testAddFilter() {
-    // Arrange
-    Notifier delegate = mock(Notifier.class);
-    FilteringNotifier filteringNotifier =
-        new FilteringNotifier(
-            delegate, new EventsourcingInstanceRepository(new InMemoryEventStore()));
-
-    // Act and Assert
-    Object body =
-        new NotificationFilterController(filteringNotifier).addFilter("42", "Name", 1L).getBody();
-    assertTrue(body instanceof InstanceIdNotificationFilter);
-    InstanceId instanceId = ((InstanceIdNotificationFilter) body).getInstanceId();
-    assertEquals("42", instanceId.getValue());
-    assertEquals("42", instanceId.toString());
-  }
-
-  /**
-   * Test {@link NotificationFilterController#addFilter(String, String, Long)}.
-   *
    * <ul>
    *   <li>Given {@link FilteringNotifier}.
    *   <li>When zero.
@@ -168,6 +150,39 @@ class NotificationFilterControllerDiffblueTest {
         "Either 'instanceId' or 'applicationName' must be set", actualAddFilterResult.getBody());
     assertEquals(400, actualAddFilterResult.getStatusCodeValue());
     assertEquals(HttpStatus.BAD_REQUEST, statusCode);
+  }
+
+  /**
+   * Test {@link NotificationFilterController#addFilter(String, String, Long)}.
+   *
+   * <ul>
+   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       three.
+   * </ul>
+   *
+   * <p>Method under test: {@link NotificationFilterController#addFilter(String, String, Long)}
+   */
+  @Test
+  @DisplayName(
+      "Test addFilter(String, String, Long); given InMemoryEventStore(int) with maxLogSizePerAggregate is three")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"ResponseEntity NotificationFilterController.addFilter(String, String, Long)"})
+  void testAddFilter_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree() {
+    // Arrange
+    Notifier delegate = mock(Notifier.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    FilteringNotifier filteringNotifier = new FilteringNotifier(delegate, repository);
+
+    // Act and Assert
+    Object body =
+        new NotificationFilterController(filteringNotifier).addFilter("42", "Name", 1L).getBody();
+    assertTrue(body instanceof InstanceIdNotificationFilter);
+    InstanceId instanceId = ((InstanceIdNotificationFilter) body).getInstanceId();
+    assertEquals("42", instanceId.getValue());
+    assertEquals("42", instanceId.toString());
   }
 
   /**
@@ -305,37 +320,6 @@ class NotificationFilterControllerDiffblueTest {
   /**
    * Test {@link NotificationFilterController#deleteFilter(String)}.
    *
-   * <p>Method under test: {@link NotificationFilterController#deleteFilter(String)}
-   */
-  @Test
-  @DisplayName("Test deleteFilter(String)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"ResponseEntity NotificationFilterController.deleteFilter(String)"})
-  void testDeleteFilter() {
-    // Arrange
-    Notifier delegate = mock(Notifier.class);
-    FilteringNotifier filteringNotifier =
-        new FilteringNotifier(
-            delegate, new EventsourcingInstanceRepository(new InMemoryEventStore()));
-
-    // Act
-    ResponseEntity<Void> actualDeleteFilterResult =
-        new NotificationFilterController(filteringNotifier).deleteFilter("42");
-
-    // Assert
-    HttpStatusCode statusCode = actualDeleteFilterResult.getStatusCode();
-    assertTrue(statusCode instanceof HttpStatus);
-    assertNull(actualDeleteFilterResult.getBody());
-    assertEquals(404, actualDeleteFilterResult.getStatusCodeValue());
-    assertEquals(HttpStatus.NOT_FOUND, statusCode);
-    assertFalse(actualDeleteFilterResult.hasBody());
-    assertTrue(actualDeleteFilterResult.getHeaders().isEmpty());
-  }
-
-  /**
-   * Test {@link NotificationFilterController#deleteFilter(String)}.
-   *
    * <ul>
    *   <li>Given {@link FilteringNotifier} {@link FilteringNotifier#removeFilter(String)} return
    *       {@code null}.
@@ -358,6 +342,44 @@ class NotificationFilterControllerDiffblueTest {
 
     // Assert
     verify(filteringNotifier).removeFilter("42");
+    HttpStatusCode statusCode = actualDeleteFilterResult.getStatusCode();
+    assertTrue(statusCode instanceof HttpStatus);
+    assertNull(actualDeleteFilterResult.getBody());
+    assertEquals(404, actualDeleteFilterResult.getStatusCodeValue());
+    assertEquals(HttpStatus.NOT_FOUND, statusCode);
+    assertFalse(actualDeleteFilterResult.hasBody());
+    assertTrue(actualDeleteFilterResult.getHeaders().isEmpty());
+  }
+
+  /**
+   * Test {@link NotificationFilterController#deleteFilter(String)}.
+   *
+   * <ul>
+   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       three.
+   * </ul>
+   *
+   * <p>Method under test: {@link NotificationFilterController#deleteFilter(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test deleteFilter(String); given InMemoryEventStore(int) with maxLogSizePerAggregate is three")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"ResponseEntity NotificationFilterController.deleteFilter(String)"})
+  void testDeleteFilter_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree() {
+    // Arrange
+    Notifier delegate = mock(Notifier.class);
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    FilteringNotifier filteringNotifier = new FilteringNotifier(delegate, repository);
+
+    // Act
+    ResponseEntity<Void> actualDeleteFilterResult =
+        new NotificationFilterController(filteringNotifier).deleteFilter("42");
+
+    // Assert
     HttpStatusCode statusCode = actualDeleteFilterResult.getStatusCode();
     assertTrue(statusCode instanceof HttpStatus);
     assertNull(actualDeleteFilterResult.getBody());

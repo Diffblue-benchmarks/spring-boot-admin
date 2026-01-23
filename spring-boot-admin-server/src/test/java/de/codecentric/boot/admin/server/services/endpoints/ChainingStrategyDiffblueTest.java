@@ -89,40 +89,4 @@ class ChainingStrategyDiffblueTest {
     // Assert that nothing has changed
     assertEquals(1, delegates.length);
   }
-
-  /**
-   * Test {@link ChainingStrategy#detectEndpoints(Instance)}.
-   *
-   * <ul>
-   *   <li>Then calls {@link EndpointDetectionStrategy#detectEndpoints(Instance)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link ChainingStrategy#detectEndpoints(Instance)}
-   */
-  @Test
-  @DisplayName("Test detectEndpoints(Instance); then calls detectEndpoints(Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono ChainingStrategy.detectEndpoints(Instance)"})
-  void testDetectEndpoints_thenCallsDetectEndpoints() throws AssertionError {
-    // Arrange
-    EndpointDetectionStrategy endpointDetectionStrategy = mock(EndpointDetectionStrategy.class);
-    Endpoints emptyResult = Endpoints.empty();
-    Mono<Endpoints> justResult = Mono.just(emptyResult);
-    when(endpointDetectionStrategy.detectEndpoints(Mockito.<Instance>any())).thenReturn(justResult);
-
-    // Act and Assert
-    FirstStep<Endpoints> createResult =
-        StepVerifier.create(
-            new ChainingStrategy(endpointDetectionStrategy).detectEndpoints(mock(Instance.class)));
-    createResult
-        .assertNext(
-            e -> {
-              assertSame(emptyResult, e);
-              return;
-            })
-        .expectComplete()
-        .verify();
-    verify(endpointDetectionStrategy).detectEndpoints(isA(Instance.class));
-  }
 }

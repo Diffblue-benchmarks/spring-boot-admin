@@ -15,9 +15,7 @@ import de.codecentric.boot.admin.server.domain.entities.EventsourcingInstanceRep
 import de.codecentric.boot.admin.server.domain.entities.Instance;
 import de.codecentric.boot.admin.server.domain.entities.InstanceRepository;
 import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceEndpointsDetectedEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceRegistrationUpdatedEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import de.codecentric.boot.admin.server.domain.values.Registration;
@@ -111,134 +109,24 @@ class RocketChatNotifierDiffblueTest {
   }
 
   /**
-   * Test {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}.
-   *
-   * <p>Method under test: {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test doNotify(InstanceEvent, Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "reactor.core.publisher.Mono RocketChatNotifier.doNotify(InstanceEvent, Instance)"
-  })
-  void testDoNotify2() throws AssertionError {
-    // Arrange
-    InstanceId instance = InstanceId.of("42X-User-Id");
-    Registration registration =
-        Registration.builder()
-            .healthUrl("https://example.org/example")
-            .managementUrl("https://example.org/example")
-            .name("Name")
-            .serviceUrl("https://example.org/example")
-            .source("Source")
-            .build();
-
-    InstanceRegistrationUpdatedEvent event =
-        new InstanceRegistrationUpdatedEvent(instance, Long.MAX_VALUE, registration);
-
-    // Act and Assert
-    FirstStep<Void> createResult =
-        StepVerifier.create(rocketChatNotifier.doNotify(event, mock(Instance.class)));
-    createResult.expectError().verify();
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>When {@link InstanceId} with value is {@code 42}.
-   * </ul>
-   *
-   * <p>Method under test: {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test doNotify(InstanceEvent, Instance); when InstanceId with value is '42'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "reactor.core.publisher.Mono RocketChatNotifier.doNotify(InstanceEvent, Instance)"
-  })
-  void testDoNotify_whenInstanceIdWithValueIs42() throws AssertionError {
-    // Arrange
-    InstanceId instance = InstanceId.of("42");
-    Registration registration =
-        Registration.builder()
-            .healthUrl("https://example.org/example")
-            .managementUrl("https://example.org/example")
-            .name("Name")
-            .serviceUrl("https://example.org/example")
-            .source("Source")
-            .build();
-
-    // Act and Assert
-    FirstStep<Void> createResult =
-        StepVerifier.create(
-            rocketChatNotifier.doNotify(
-                new InstanceRegistrationUpdatedEvent(instance, 1L, registration),
-                mock(Instance.class)));
-    createResult.expectError().verify();
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>When {@link InstanceId} with value is {@code 42X-User-Id}.
-   * </ul>
-   *
-   * <p>Method under test: {@link RocketChatNotifier#doNotify(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName(
-      "Test doNotify(InstanceEvent, Instance); when InstanceId with value is '42X-User-Id'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "reactor.core.publisher.Mono RocketChatNotifier.doNotify(InstanceEvent, Instance)"
-  })
-  void testDoNotify_whenInstanceIdWithValueIs42xUserId() throws AssertionError {
-    // Arrange
-    InstanceId instance = InstanceId.of("42X-User-Id");
-    Registration registration =
-        Registration.builder()
-            .healthUrl("https://example.org/example")
-            .managementUrl("https://example.org/example")
-            .name("Name")
-            .serviceUrl("https://example.org/example")
-            .source("Source")
-            .build();
-
-    // Act and Assert
-    FirstStep<Void> createResult =
-        StepVerifier.create(
-            rocketChatNotifier.doNotify(
-                new InstanceRegistrationUpdatedEvent(instance, 1L, registration),
-                mock(Instance.class)));
-    createResult.expectError().verify();
-  }
-
-  /**
    * Test {@link RocketChatNotifier#createMessage(InstanceEvent, Instance)}.
    *
    * <ul>
+   *   <li>Given {@code Status}.
+   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Status}.
    *   <li>Then return {@link Map}.
    * </ul>
    *
    * <p>Method under test: {@link RocketChatNotifier#createMessage(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName("Test createMessage(InstanceEvent, Instance); then return Map")
+  @DisplayName(
+      "Test createMessage(InstanceEvent, Instance); given 'Status'; when StatusInfo getStatus() return 'Status'; then return Map")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Object RocketChatNotifier.createMessage(InstanceEvent, Instance)"})
-  void testCreateMessage_thenReturnMap() {
+  void testCreateMessage_givenStatus_whenStatusInfoGetStatusReturnStatus_thenReturnMap() {
     // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
-    RocketChatNotifier rocketChatNotifier =
-        new RocketChatNotifier(repository, mock(RestTemplate.class));
-
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.getStatus()).thenReturn("Status");
     InstanceStatusChangedEvent event =
@@ -287,7 +175,7 @@ class RocketChatNotifierDiffblueTest {
   @MethodsUnderTest({"Object RocketChatNotifier.createMessage(InstanceEvent, Instance)"})
   void testCreateMessage_thenThrowIllegalStateException() {
     // Arrange
-    InstanceEndpointsDetectedEvent event = mock(InstanceEndpointsDetectedEvent.class);
+    InstanceEvent event = mock(InstanceEvent.class);
     when(event.getInstance()).thenThrow(new IllegalStateException());
 
     // Act and Assert
@@ -295,75 +183,6 @@ class RocketChatNotifierDiffblueTest {
         IllegalStateException.class,
         () -> rocketChatNotifier.createMessage(event, mock(Instance.class)));
     verify(event).getInstance();
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <p>Method under test: {@link RocketChatNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String RocketChatNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(2));
-
-    RocketChatNotifier rocketChatNotifier =
-        new RocketChatNotifier(repository, mock(RestTemplate.class));
-    rocketChatNotifier.setIgnoreChanges(new String[] {"roomId"});
-    rocketChatNotifier.setMessage("Message");
-    rocketChatNotifier.setUserId("42");
-    rocketChatNotifier.setUrl("42");
-
-    InstanceEndpointsDetectedEvent event = mock(InstanceEndpointsDetectedEvent.class);
-    when(event.getInstance()).thenReturn(InstanceId.of("Value"));
-
-    // Act
-    String actualText = rocketChatNotifier.getText(event, null);
-
-    // Assert
-    verify(event).getInstance();
-    assertEquals("Message", actualText);
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Then return {@code Message}.
-   * </ul>
-   *
-   * <p>Method under test: {@link RocketChatNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance); then return 'Message'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String RocketChatNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_thenReturnMessage() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(2));
-
-    RocketChatNotifier rocketChatNotifier =
-        new RocketChatNotifier(repository, mock(RestTemplate.class));
-    rocketChatNotifier.setMessage("Message");
-    rocketChatNotifier.setUserId("42");
-    rocketChatNotifier.setUrl("42");
-
-    InstanceEndpointsDetectedEvent event = mock(InstanceEndpointsDetectedEvent.class);
-    when(event.getInstance()).thenReturn(InstanceId.of("Value"));
-
-    // Act
-    String actualText = rocketChatNotifier.getText(event, null);
-
-    // Assert
-    verify(event).getInstance();
-    assertEquals("Message", actualText);
   }
 
   /**
@@ -393,42 +212,6 @@ class RocketChatNotifierDiffblueTest {
     assertEquals(
         "Not all who wander are lost",
         rocketChatNotifier.getText(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), null));
-  }
-
-  /**
-   * Test {@link RocketChatNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Then return {@code Not all who wander are lost}.
-   * </ul>
-   *
-   * <p>Method under test: {@link RocketChatNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance); then return 'Not all who wander are lost'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String RocketChatNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_thenReturnNotAllWhoWanderAreLost2() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
-
-    RocketChatNotifier rocketChatNotifier =
-        new RocketChatNotifier(repository, mock(RestTemplate.class));
-    rocketChatNotifier.setMessage("Not all who wander are lost");
-    rocketChatNotifier.setUserId("42");
-    rocketChatNotifier.setUrl("42");
-
-    InstanceEndpointsDetectedEvent event = mock(InstanceEndpointsDetectedEvent.class);
-    when(event.getInstance()).thenReturn(InstanceId.of("Value"));
-
-    // Act
-    String actualText = rocketChatNotifier.getText(event, null);
-
-    // Assert
-    verify(event).getInstance();
-    assertEquals("Not all who wander are lost", actualText);
   }
 
   /**
@@ -538,15 +321,15 @@ class RocketChatNotifierDiffblueTest {
   @MethodsUnderTest({"void RocketChatNotifier.setMessage(String)"})
   void testSetMessage2() throws EvaluationException {
     // Arrange and Act
-    rocketChatNotifier.setMessage("msgNot all who wander are lostMessage");
+    rocketChatNotifier.setMessage("java.lang.VoidNot all who wander are lostmsg");
 
     // Assert
     Expression message = rocketChatNotifier.getMessage();
     assertTrue(message instanceof LiteralExpression);
     TypeDescriptor valueTypeDescriptor = message.getValueTypeDescriptor();
     assertEquals("java.lang.String", valueTypeDescriptor.getName());
-    assertEquals("msgNot all who wander are lostMessage", message.getExpressionString());
-    assertEquals("msgNot all who wander are lostMessage", message.getValue());
+    assertEquals("java.lang.VoidNot all who wander are lostmsg", message.getExpressionString());
+    assertEquals("java.lang.VoidNot all who wander are lostmsg", message.getValue());
     assertNull(valueTypeDescriptor.getElementTypeDescriptor());
     assertEquals(0, valueTypeDescriptor.getAnnotations().length);
     assertFalse(valueTypeDescriptor.isArray());
@@ -565,27 +348,28 @@ class RocketChatNotifierDiffblueTest {
    * Test {@link RocketChatNotifier#setMessage(String)}.
    *
    * <ul>
-   *   <li>Then {@link RocketChatNotifier} Message ExpressionString is {@code 4242Message}.
+   *   <li>When {@code 4242}.
+   *   <li>Then {@link RocketChatNotifier} Message ExpressionString is {@code 4242}.
    * </ul>
    *
    * <p>Method under test: {@link RocketChatNotifier#setMessage(String)}
    */
   @Test
   @DisplayName(
-      "Test setMessage(String); then RocketChatNotifier Message ExpressionString is '4242Message'")
+      "Test setMessage(String); when '4242'; then RocketChatNotifier Message ExpressionString is '4242'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void RocketChatNotifier.setMessage(String)"})
-  void testSetMessage_thenRocketChatNotifierMessageExpressionStringIs4242Message()
+  void testSetMessage_when4242_thenRocketChatNotifierMessageExpressionStringIs4242()
       throws EvaluationException {
     // Arrange and Act
-    rocketChatNotifier.setMessage("4242Message");
+    rocketChatNotifier.setMessage("4242");
 
     // Assert
     Expression message = rocketChatNotifier.getMessage();
     assertTrue(message instanceof LiteralExpression);
-    assertEquals("4242Message", message.getExpressionString());
-    assertEquals("4242Message", message.getValue());
+    assertEquals("4242", message.getExpressionString());
+    assertEquals("4242", message.getValue());
     TypeDescriptor valueTypeDescriptor = message.getValueTypeDescriptor();
     assertEquals("java.lang.String", valueTypeDescriptor.getName());
     assertNull(valueTypeDescriptor.getElementTypeDescriptor());

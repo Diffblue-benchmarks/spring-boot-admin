@@ -393,6 +393,45 @@ class AbstractEventHandlerDiffblueTest {
    * Test {@link AbstractEventHandler#start()}.
    *
    * <ul>
+   *   <li>Given {@link Notifier} {@link Notifier#notify(InstanceEvent)} return {@code null}.
+   *   <li>Then calls {@link Notifier#notify(InstanceEvent)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link AbstractEventHandler#start()}
+   */
+  @Test
+  @DisplayName(
+      "Test start(); given Notifier notify(InstanceEvent) return 'null'; then calls notify(InstanceEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void AbstractEventHandler.start()"})
+  void testStart_givenNotifierNotifyReturnNull_thenCallsNotify() {
+    // Arrange
+    Notifier notifier = mock(Notifier.class);
+    when(notifier.notify(Mockito.<InstanceEvent>any())).thenReturn(null);
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<InstanceEvent> events = mock(DirectProcessor.class);
+    when(events.subscribeOn(Mockito.<Scheduler>any())).thenReturn(fromIterableResult);
+
+    HazelcastNotificationTrigger hazelcastNotificationTrigger =
+        new HazelcastNotificationTrigger(notifier, events, new ConcurrentHashMap<>());
+
+    // Act
+    hazelcastNotificationTrigger.start();
+
+    // Assert
+    verify(notifier).notify(isA(InstanceEvent.class));
+    verify(events).subscribeOn(isA(Scheduler.class));
+  }
+
+  /**
+   * Test {@link AbstractEventHandler#start()}.
+   *
+   * <ul>
    *   <li>Given {@link Publisher} {@link Publisher#subscribe(Subscriber)} does nothing.
    *   <li>Then calls {@link Publisher#subscribe(Subscriber)}.
    * </ul>

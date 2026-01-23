@@ -110,7 +110,7 @@ class InfoUpdaterDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -137,7 +137,7 @@ class InfoUpdaterDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     SnapshottingInstanceRepository repository =
-        new SnapshottingInstanceRepository(new InMemoryEventStore());
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());

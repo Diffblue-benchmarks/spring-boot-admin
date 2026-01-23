@@ -59,7 +59,7 @@ class AdminServerDiscoveryAutoConfigurationDiffblueTest {
    * DiscoveryClient, InstanceRegistry, InstanceRepository)}.
    *
    * <ul>
-   *   <li>Then return Services size is one.
+   *   <li>When {@link DefaultServiceInstanceConverter} (default constructor).
    * </ul>
    *
    * <p>Method under test: {@link
@@ -68,22 +68,68 @@ class AdminServerDiscoveryAutoConfigurationDiffblueTest {
    */
   @Test
   @DisplayName(
-      "Test instanceDiscoveryListener(ServiceInstanceConverter, DiscoveryClient, InstanceRegistry, InstanceRepository); then return Services size is one")
+      "Test instanceDiscoveryListener(ServiceInstanceConverter, DiscoveryClient, InstanceRegistry, InstanceRepository); when DefaultServiceInstanceConverter (default constructor)")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({
     "InstanceDiscoveryListener AdminServerDiscoveryAutoConfiguration.instanceDiscoveryListener(ServiceInstanceConverter, DiscoveryClient, InstanceRegistry, InstanceRepository)"
   })
-  void testInstanceDiscoveryListener_thenReturnServicesSizeIsOne() {
-    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
-    //   Run dcover create --keep-partial-tests to gain insights into why
-    //   a non-Spring test was created.
-
+  void testInstanceDiscoveryListener_whenDefaultServiceInstanceConverter() {
     // Arrange
     AdminServerDiscoveryAutoConfiguration adminServerDiscoveryAutoConfiguration =
         new AdminServerDiscoveryAutoConfiguration();
     DefaultServiceInstanceConverter serviceInstanceConverter =
         new DefaultServiceInstanceConverter();
+    CompositeDiscoveryClient discoveryClient = new CompositeDiscoveryClient(new ArrayList<>());
+    InstanceRegistry registry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+
+    // Act
+    InstanceDiscoveryListener actualInstanceDiscoveryListenerResult =
+        adminServerDiscoveryAutoConfiguration.instanceDiscoveryListener(
+            serviceInstanceConverter,
+            discoveryClient,
+            registry,
+            new EventsourcingInstanceRepository(new InMemoryEventStore()));
+
+    // Assert
+    Set<String> services = actualInstanceDiscoveryListenerResult.getServices();
+    assertEquals(1, services.size());
+    assertTrue(actualInstanceDiscoveryListenerResult.getIgnoredInstancesMetadata().isEmpty());
+    assertTrue(actualInstanceDiscoveryListenerResult.getInstancesMetadata().isEmpty());
+    assertTrue(services.contains("*"));
+    assertTrue(actualInstanceDiscoveryListenerResult.getIgnoredServices().isEmpty());
+  }
+
+  /**
+   * Test {@link
+   * AdminServerDiscoveryAutoConfiguration#instanceDiscoveryListener(ServiceInstanceConverter,
+   * DiscoveryClient, InstanceRegistry, InstanceRepository)}.
+   *
+   * <ul>
+   *   <li>When {@link ServiceInstanceConverter}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * AdminServerDiscoveryAutoConfiguration#instanceDiscoveryListener(ServiceInstanceConverter,
+   * DiscoveryClient, InstanceRegistry, InstanceRepository)}
+   */
+  @Test
+  @DisplayName(
+      "Test instanceDiscoveryListener(ServiceInstanceConverter, DiscoveryClient, InstanceRegistry, InstanceRepository); when ServiceInstanceConverter")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "InstanceDiscoveryListener AdminServerDiscoveryAutoConfiguration.instanceDiscoveryListener(ServiceInstanceConverter, DiscoveryClient, InstanceRegistry, InstanceRepository)"
+  })
+  void testInstanceDiscoveryListener_whenServiceInstanceConverter() {
+    // Arrange
+    AdminServerDiscoveryAutoConfiguration adminServerDiscoveryAutoConfiguration =
+        new AdminServerDiscoveryAutoConfiguration();
+    ServiceInstanceConverter serviceInstanceConverter = mock(ServiceInstanceConverter.class);
     CompositeDiscoveryClient discoveryClient = new CompositeDiscoveryClient(new ArrayList<>());
     InstanceRegistry registry =
         new InstanceRegistry(

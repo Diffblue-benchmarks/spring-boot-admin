@@ -18,10 +18,14 @@ import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEndpointsDetectedEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent;
+import de.codecentric.boot.admin.server.domain.values.Endpoints;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import de.codecentric.boot.admin.server.domain.values.StatusInfo;
 import de.codecentric.boot.admin.server.eventstore.InMemoryEventStore;
 import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -78,6 +82,27 @@ class SlackNotifierDiffblueTest {
   /**
    * Test {@link SlackNotifier#doNotify(InstanceEvent, Instance)}.
    *
+   * <p>Method under test: {@link SlackNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName("Test doNotify(InstanceEvent, Instance)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"reactor.core.publisher.Mono SlackNotifier.doNotify(InstanceEvent, Instance)"})
+  void testDoNotify() throws AssertionError {
+    // Arrange, Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(
+            slackNotifier.doNotify(
+                new InstanceDeregisteredEvent(
+                    InstanceId.of("42'webhookUrl' must not be null."), 0L),
+                mock(Instance.class)));
+    createResult.expectError().verify();
+  }
+
+  /**
+   * Test {@link SlackNotifier#doNotify(InstanceEvent, Instance)}.
+   *
    * <ul>
    *   <li>Given {@link SlackNotifier} WebhookUrl is {@link PagerdutyNotifier#DEFAULT_URI}.
    *   <li>When {@code null}.
@@ -107,22 +132,80 @@ class SlackNotifierDiffblueTest {
    *
    * <ul>
    *   <li>Given {@link SlackNotifier}.
-   *   <li>When {@link Instance}.
+   *   <li>When {@link InstanceId} with value is {@code 42}.
    * </ul>
    *
    * <p>Method under test: {@link SlackNotifier#doNotify(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName("Test doNotify(InstanceEvent, Instance); given SlackNotifier; when Instance")
+  @DisplayName(
+      "Test doNotify(InstanceEvent, Instance); given SlackNotifier; when InstanceId with value is '42'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"reactor.core.publisher.Mono SlackNotifier.doNotify(InstanceEvent, Instance)"})
-  void testDoNotify_givenSlackNotifier_whenInstance() throws AssertionError {
+  void testDoNotify_givenSlackNotifier_whenInstanceIdWithValueIs42() throws AssertionError {
     // Arrange, Act and Assert
     FirstStep<Void> createResult =
         StepVerifier.create(
             slackNotifier.doNotify(
                 new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), mock(Instance.class)));
+    createResult.expectError().verify();
+  }
+
+  /**
+   * Test {@link SlackNotifier#doNotify(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>When {@link InstanceId} with value is {@code 42'webhookUrl' must not be null.}.
+   * </ul>
+   *
+   * <p>Method under test: {@link SlackNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName(
+      "Test doNotify(InstanceEvent, Instance); when InstanceId with value is '42'webhookUrl' must not be null.'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"reactor.core.publisher.Mono SlackNotifier.doNotify(InstanceEvent, Instance)"})
+  void testDoNotify_whenInstanceIdWithValueIs42WebhookUrlMustNotBeNull() throws AssertionError {
+    // Arrange, Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(
+            slackNotifier.doNotify(
+                new InstanceDeregisteredEvent(
+                    InstanceId.of("42'webhookUrl' must not be null."), 1L),
+                mock(Instance.class)));
+    createResult.expectError().verify();
+  }
+
+  /**
+   * Test {@link SlackNotifier#doNotify(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>When {@link LocalDate} with {@code 1970} and one and one atStartOfDay atZone {@link
+   *       ZoneOffset#UTC} toInstant.
+   * </ul>
+   *
+   * <p>Method under test: {@link SlackNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName(
+      "Test doNotify(InstanceEvent, Instance); when LocalDate with '1970' and one and one atStartOfDay atZone UTC toInstant")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"reactor.core.publisher.Mono SlackNotifier.doNotify(InstanceEvent, Instance)"})
+  void testDoNotify_whenLocalDateWith1970AndOneAndOneAtStartOfDayAtZoneUtcToInstant()
+      throws AssertionError {
+    // Arrange
+    InstanceId instance = InstanceId.of("42");
+    Instant timestamp = LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant();
+
+    // Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(
+            slackNotifier.doNotify(
+                new InstanceEndpointsDetectedEvent(instance, -1L, timestamp, Endpoints.empty()),
+                mock(Instance.class)));
     createResult.expectError().verify();
   }
 
@@ -193,58 +276,6 @@ class SlackNotifierDiffblueTest {
   /**
    * Test {@link SlackNotifier#getText(InstanceEvent, Instance)}.
    *
-   * <p>Method under test: {@link SlackNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String SlackNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
-
-    SlackNotifier slackNotifier = new SlackNotifier(repository, mock(RestTemplate.class));
-    slackNotifier.setIcon("Icon");
-
-    InstanceEndpointsDetectedEvent event = mock(InstanceEndpointsDetectedEvent.class);
-    when(event.getInstance()).thenThrow(new IllegalStateException());
-
-    // Act and Assert
-    assertThrows(IllegalStateException.class, () -> slackNotifier.getText(event, null));
-    verify(event).getInstance();
-  }
-
-  /**
-   * Test {@link SlackNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <p>Method under test: {@link SlackNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String SlackNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText2() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
-
-    SlackNotifier slackNotifier = new SlackNotifier(repository, mock(RestTemplate.class));
-    slackNotifier.setIcon("UP");
-
-    InstanceEndpointsDetectedEvent event = mock(InstanceEndpointsDetectedEvent.class);
-    when(event.getInstance()).thenThrow(new IllegalStateException());
-
-    // Act and Assert
-    assertThrows(IllegalStateException.class, () -> slackNotifier.getText(event, null));
-    verify(event).getInstance();
-  }
-
-  /**
-   * Test {@link SlackNotifier#getText(InstanceEvent, Instance)}.
-   *
    * <ul>
    *   <li>Then return {@code Not all who wander are lost}.
    * </ul>
@@ -271,49 +302,27 @@ class SlackNotifierDiffblueTest {
   }
 
   /**
-   * Test {@link SlackNotifier#getText(InstanceEvent, Instance)}.
+   * Test {@link SlackNotifier#getColor(InstanceEvent)}.
    *
    * <ul>
-   *   <li>Then throw {@link IllegalStateException}.
+   *   <li>Given empty string.
+   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return empty string.
    * </ul>
-   *
-   * <p>Method under test: {@link SlackNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance); then throw IllegalStateException")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String SlackNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_thenThrowIllegalStateException() {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
-    SlackNotifier slackNotifier = new SlackNotifier(repository, mock(RestTemplate.class));
-
-    InstanceEndpointsDetectedEvent event = mock(InstanceEndpointsDetectedEvent.class);
-    when(event.getInstance()).thenThrow(new IllegalStateException());
-
-    // Act and Assert
-    assertThrows(IllegalStateException.class, () -> slackNotifier.getText(event, null));
-    verify(event).getInstance();
-  }
-
-  /**
-   * Test {@link SlackNotifier#getColor(InstanceEvent)}.
    *
    * <p>Method under test: {@link SlackNotifier#getColor(InstanceEvent)}
    */
   @Test
-  @DisplayName("Test getColor(InstanceEvent)")
+  @DisplayName(
+      "Test getColor(InstanceEvent); given empty string; when StatusInfo getStatus() return empty string")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"String SlackNotifier.getColor(InstanceEvent)"})
-  void testGetColor() {
+  void testGetColor_givenEmptyString_whenStatusInfoGetStatusReturnEmptyString() {
     // Arrange
     StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
+    when(statusInfo.getStatus()).thenReturn("");
     InstanceStatusChangedEvent event =
-        new InstanceStatusChangedEvent(InstanceId.of("42"), Long.MIN_VALUE, statusInfo);
+        new InstanceStatusChangedEvent(InstanceId.of("42"), Long.MAX_VALUE, statusInfo);
 
     // Act
     String actualColor = slackNotifier.getColor(event);
@@ -348,38 +357,6 @@ class SlackNotifierDiffblueTest {
     // Act
     String actualColor =
         slackNotifier.getColor(new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, statusInfo));
-
-    // Assert
-    verify(statusInfo).getStatus();
-    assertEquals("danger", actualColor);
-  }
-
-  /**
-   * Test {@link SlackNotifier#getColor(InstanceEvent)}.
-   *
-   * <ul>
-   *   <li>Given {@code Status}.
-   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Status}.
-   *   <li>Then return {@code danger}.
-   * </ul>
-   *
-   * <p>Method under test: {@link SlackNotifier#getColor(InstanceEvent)}
-   */
-  @Test
-  @DisplayName(
-      "Test getColor(InstanceEvent); given 'Status'; when StatusInfo getStatus() return 'Status'; then return 'danger'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String SlackNotifier.getColor(InstanceEvent)"})
-  void testGetColor_givenStatus_whenStatusInfoGetStatusReturnStatus_thenReturnDanger2() {
-    // Arrange
-    StatusInfo statusInfo = mock(StatusInfo.class);
-    when(statusInfo.getStatus()).thenReturn("Status");
-
-    // Act
-    String actualColor =
-        slackNotifier.getColor(
-            new InstanceStatusChangedEvent(mock(InstanceId.class), 1L, statusInfo));
 
     // Assert
     verify(statusInfo).getStatus();
@@ -583,32 +560,6 @@ class SlackNotifierDiffblueTest {
   @ManagedByDiffblue
   @MethodsUnderTest({"void SlackNotifier.setMessage(String)"})
   void testSetMessage() {
-    // Arrange and Act
-    slackNotifier.setMessage(
-        "Not all who wander are lostjava.lang.VoidNot all who wander are lost");
-
-    // Assert
-    assertEquals(
-        "Not all who wander are lostjava.lang.VoidNot all who wander are lost",
-        slackNotifier.getMessage());
-  }
-
-  /**
-   * Test {@link SlackNotifier#setMessage(String)}.
-   *
-   * <ul>
-   *   <li>Then {@link SlackNotifier} Message is {@code Not all who wander are lost}.
-   * </ul>
-   *
-   * <p>Method under test: {@link SlackNotifier#setMessage(String)}
-   */
-  @Test
-  @DisplayName(
-      "Test setMessage(String); then SlackNotifier Message is 'Not all who wander are lost'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"void SlackNotifier.setMessage(String)"})
-  void testSetMessage_thenSlackNotifierMessageIsNotAllWhoWanderAreLost() {
     // Arrange and Act
     slackNotifier.setMessage("Not all who wander are lost");
 

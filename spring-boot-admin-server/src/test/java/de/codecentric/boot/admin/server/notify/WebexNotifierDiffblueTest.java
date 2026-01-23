@@ -15,15 +15,17 @@ import com.diffblue.cover.annotations.MethodsUnderTest;
 import de.codecentric.boot.admin.server.domain.entities.EventsourcingInstanceRepository;
 import de.codecentric.boot.admin.server.domain.entities.Instance;
 import de.codecentric.boot.admin.server.domain.entities.InstanceRepository;
+import de.codecentric.boot.admin.server.domain.entities.SnapshottingInstanceRepository;
 import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceRegisteredEvent;
+import de.codecentric.boot.admin.server.domain.events.InstanceRegistrationUpdatedEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import de.codecentric.boot.admin.server.domain.values.Registration;
 import de.codecentric.boot.admin.server.domain.values.StatusInfo;
 import de.codecentric.boot.admin.server.eventstore.InMemoryEventStore;
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -37,9 +39,6 @@ import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.CompositeStringExpression;
 import org.springframework.expression.common.LiteralExpression;
-import org.springframework.expression.spel.SpelNode;
-import org.springframework.expression.spel.ast.CompoundExpression;
-import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -64,14 +63,54 @@ class WebexNotifierDiffblueTest {
   /**
    * Test {@link WebexNotifier#WebexNotifier(InstanceRepository, RestTemplate)}.
    *
+   * <ul>
+   *   <li>Then first element return {@link LiteralExpression}.
+   * </ul>
+   *
    * <p>Method under test: {@link WebexNotifier#WebexNotifier(InstanceRepository, RestTemplate)}
    */
   @Test
-  @DisplayName("Test new WebexNotifier(InstanceRepository, RestTemplate)")
+  @DisplayName(
+      "Test new WebexNotifier(InstanceRepository, RestTemplate); then first element return LiteralExpression")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void WebexNotifier.<init>(InstanceRepository, RestTemplate)"})
-  void testNewWebexNotifier() throws EvaluationException {
+  void testNewWebexNotifier_thenFirstElementReturnLiteralExpression() {
+    // Arrange
+    SnapshottingInstanceRepository repository =
+        new SnapshottingInstanceRepository(new InMemoryEventStore(100));
+
+    // Act
+    WebexNotifier actualWebexNotifier = new WebexNotifier(repository, mock(RestTemplate.class));
+
+    // Assert
+    Expression message = actualWebexNotifier.getMessage();
+    assertTrue(message instanceof CompositeStringExpression);
+    Expression[] expressions = ((CompositeStringExpression) message).getExpressions();
+    assertTrue(expressions[0] instanceof LiteralExpression);
+    assertTrue(expressions[2] instanceof LiteralExpression);
+    assertTrue(expressions[4] instanceof LiteralExpression);
+    assertTrue(expressions[6] instanceof LiteralExpression);
+    assertEquals(7, expressions.length);
+  }
+
+  /**
+   * Test {@link WebexNotifier#WebexNotifier(InstanceRepository, RestTemplate)}.
+   *
+   * <ul>
+   *   <li>Then return Message ExpressionString is a string.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#WebexNotifier(InstanceRepository, RestTemplate)}
+   */
+  @Test
+  @DisplayName(
+      "Test new WebexNotifier(InstanceRepository, RestTemplate); then return Message ExpressionString is a string")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void WebexNotifier.<init>(InstanceRepository, RestTemplate)"})
+  void testNewWebexNotifier_thenReturnMessageExpressionStringIsAString()
+      throws EvaluationException {
     // Arrange and Act
     WebexNotifier actualWebexNotifier =
         new WebexNotifier(instanceRepository, mock(RestTemplate.class));
@@ -91,59 +130,6 @@ class WebexNotifierDiffblueTest {
     Class<String> expectedValueType = String.class;
     assertEquals(expectedValueType, message.getValueType());
     assertArrayEquals(new String[] {"UNKNOWN:UP"}, actualWebexNotifier.getIgnoreChanges());
-  }
-
-  /**
-   * Test {@link WebexNotifier#doNotify(InstanceEvent, Instance)}.
-   *
-   * <p>Method under test: {@link WebexNotifier#doNotify(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test doNotify(InstanceEvent, Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"reactor.core.publisher.Mono WebexNotifier.doNotify(InstanceEvent, Instance)"})
-  void testDoNotify() throws AssertionError {
-    // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
-
-    WebexNotifier webexNotifier = new WebexNotifier(repository, mock(RestTemplate.class));
-    webexNotifier.setAuthToken("42");
-
-    // Act and Assert
-    FirstStep<Void> createResult =
-        StepVerifier.create(
-            webexNotifier.doNotify(
-                new InstanceDeregisteredEvent(
-                    InstanceId.of("42"),
-                    1L,
-                    LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant()),
-                mock(Instance.class)));
-    createResult.expectError().verify();
-  }
-
-  /**
-   * Test {@link WebexNotifier#doNotify(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Given {@link WebexNotifier}.
-   * </ul>
-   *
-   * <p>Method under test: {@link WebexNotifier#doNotify(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test doNotify(InstanceEvent, Instance); given WebexNotifier")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"reactor.core.publisher.Mono WebexNotifier.doNotify(InstanceEvent, Instance)"})
-  void testDoNotify_givenWebexNotifier() throws AssertionError {
-    // Arrange, Act and Assert
-    FirstStep<Void> createResult =
-        StepVerifier.create(
-            webexNotifier.doNotify(
-                new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), mock(Instance.class)));
-    createResult.expectError().verify();
   }
 
   /**
@@ -201,6 +187,31 @@ class WebexNotifierDiffblueTest {
    * Test {@link WebexNotifier#doNotify(InstanceEvent, Instance)}.
    *
    * <ul>
+   *   <li>Given {@link WebexNotifier}.
+   *   <li>When {@link InstanceId} with value is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#doNotify(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName(
+      "Test doNotify(InstanceEvent, Instance); given WebexNotifier; when InstanceId with value is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"reactor.core.publisher.Mono WebexNotifier.doNotify(InstanceEvent, Instance)"})
+  void testDoNotify_givenWebexNotifier_whenInstanceIdWithValueIs42() throws AssertionError {
+    // Arrange, Act and Assert
+    FirstStep<Void> createResult =
+        StepVerifier.create(
+            webexNotifier.doNotify(
+                new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), mock(Instance.class)));
+    createResult.expectError().verify();
+  }
+
+  /**
+   * Test {@link WebexNotifier#doNotify(InstanceEvent, Instance)}.
+   *
+   * <ul>
    *   <li>Then throw {@link IllegalStateException}.
    * </ul>
    *
@@ -217,7 +228,7 @@ class WebexNotifierDiffblueTest {
         new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     WebexNotifier webexNotifier = new WebexNotifier(repository, mock(RestTemplate.class));
-    webexNotifier.setAuthToken("https://webexapis.com/v1/messages");
+    webexNotifier.setAuthToken("ABC123");
 
     InstanceDeregisteredEvent event = mock(InstanceDeregisteredEvent.class);
     when(event.getInstance()).thenThrow(new IllegalStateException());
@@ -232,50 +243,21 @@ class WebexNotifierDiffblueTest {
    * Test {@link WebexNotifier#createMessage(InstanceEvent, Instance)}.
    *
    * <ul>
-   *   <li>Given {@link IllegalStateException#IllegalStateException()}.
-   *   <li>Then throw {@link IllegalStateException}.
-   * </ul>
-   *
-   * <p>Method under test: {@link WebexNotifier#createMessage(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName(
-      "Test createMessage(InstanceEvent, Instance); given IllegalStateException(); then throw IllegalStateException")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Object WebexNotifier.createMessage(InstanceEvent, Instance)"})
-  void testCreateMessage_givenIllegalStateException_thenThrowIllegalStateException() {
-    // Arrange
-    InstanceEvent event = mock(InstanceEvent.class);
-    when(event.getInstance()).thenThrow(new IllegalStateException());
-
-    // Act and Assert
-    assertThrows(
-        IllegalStateException.class,
-        () -> webexNotifier.createMessage(event, mock(Instance.class)));
-    verify(event).getInstance();
-  }
-
-  /**
-   * Test {@link WebexNotifier#createMessage(InstanceEvent, Instance)}.
-   *
-   * <ul>
+   *   <li>Given {@code Status}.
+   *   <li>When {@link StatusInfo} {@link StatusInfo#getStatus()} return {@code Status}.
    *   <li>Then return {@link Map}.
    * </ul>
    *
    * <p>Method under test: {@link WebexNotifier#createMessage(InstanceEvent, Instance)}
    */
   @Test
-  @DisplayName("Test createMessage(InstanceEvent, Instance); then return Map")
+  @DisplayName(
+      "Test createMessage(InstanceEvent, Instance); given 'Status'; when StatusInfo getStatus() return 'Status'; then return Map")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Object WebexNotifier.createMessage(InstanceEvent, Instance)"})
-  void testCreateMessage_thenReturnMap() {
+  void testCreateMessage_givenStatus_whenStatusInfoGetStatusReturnStatus_thenReturnMap() {
     // Arrange
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
-    WebexNotifier webexNotifier = new WebexNotifier(repository, mock(RestTemplate.class));
-
     StatusInfo statusInfo = mock(StatusInfo.class);
     when(statusInfo.getStatus()).thenReturn("Status");
     InstanceStatusChangedEvent event =
@@ -301,32 +283,76 @@ class WebexNotifierDiffblueTest {
     verify(instance).getRegistration();
     verify(statusInfo).getStatus();
     assertTrue(actualCreateMessageResult instanceof Map);
-    Expression message = webexNotifier.getMessage();
-    assertTrue(message instanceof CompositeStringExpression);
-    Expression[] expressions = ((CompositeStringExpression) message).getExpressions();
-    Expression expression = expressions[1];
-    SpelNode aST = ((SpelExpression) expression).getAST();
-    assertTrue(aST instanceof CompoundExpression);
-    Expression expression2 = expressions[3];
-    SpelNode aST2 = ((SpelExpression) expression2).getAST();
-    assertTrue(aST2 instanceof CompoundExpression);
-    Expression expression3 = expressions[5];
-    SpelNode aST3 = ((SpelExpression) expression3).getAST();
-    assertTrue(aST3 instanceof CompoundExpression);
-    assertTrue(expression instanceof SpelExpression);
-    assertTrue(expression2 instanceof SpelExpression);
-    assertTrue(expression3 instanceof SpelExpression);
     assertEquals(2, ((Map<String, String>) actualCreateMessageResult).size());
     assertEquals(
         "<strong>Name</strong>/42 is <strong>Status</strong>",
         ((Map<String, String>) actualCreateMessageResult).get("markdown"));
+    assertNull(((Map<String, String>) actualCreateMessageResult).get("roomId"));
+  }
+
+  /**
+   * Test {@link WebexNotifier#createMessage(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>Then throw {@link IllegalStateException}.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#createMessage(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName("Test createMessage(InstanceEvent, Instance); then throw IllegalStateException")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Object WebexNotifier.createMessage(InstanceEvent, Instance)"})
+  void testCreateMessage_thenThrowIllegalStateException() {
+    // Arrange
+    InstanceEvent event = mock(InstanceEvent.class);
+    when(event.getInstance()).thenThrow(new IllegalStateException());
+
+    // Act and Assert
+    assertThrows(
+        IllegalStateException.class,
+        () -> webexNotifier.createMessage(event, mock(Instance.class)));
+    verify(event).getInstance();
+  }
+
+  /**
+   * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
+   *
+   * <ul>
+   *   <li>Then return {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
+   */
+  @Test
+  @DisplayName("Test getText(InstanceEvent, Instance); then return '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
+  void testGetText_thenReturn42() {
+    // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    WebexNotifier webexNotifier = new WebexNotifier(repository, mock(RestTemplate.class));
+    webexNotifier.setMessage("42");
+    InstanceId instance = InstanceId.of("42");
+    Instant timestamp = LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant();
+    Registration registration =
+        Registration.builder()
+            .healthUrl("https://example.org/example")
+            .managementUrl("https://example.org/example")
+            .name("Name")
+            .serviceUrl("https://example.org/example")
+            .source("Source")
+            .build();
+
+    // Act and Assert
     assertEquals(
-        "Lde/codecentric/boot/admin/server/domain/values/InstanceId",
-        ((CompoundExpression) aST2).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST).getExitDescriptor());
-    assertEquals("Ljava/lang/String", ((CompoundExpression) aST3).getExitDescriptor());
-    assertEquals(7, expressions.length);
-    assertTrue(((Map<String, String>) actualCreateMessageResult).containsKey("roomId"));
+        "42",
+        webexNotifier.getText(
+            new InstanceRegistrationUpdatedEvent(instance, 1L, timestamp, registration), null));
   }
 
   /**
@@ -355,31 +381,6 @@ class WebexNotifierDiffblueTest {
     assertEquals(
         "Not all who wander are lost",
         webexNotifier.getText(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L), null));
-  }
-
-  /**
-   * Test {@link WebexNotifier#getText(InstanceEvent, Instance)}.
-   *
-   * <ul>
-   *   <li>Then throw {@link IllegalStateException}.
-   * </ul>
-   *
-   * <p>Method under test: {@link WebexNotifier#getText(InstanceEvent, Instance)}
-   */
-  @Test
-  @DisplayName("Test getText(InstanceEvent, Instance); then throw IllegalStateException")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"String WebexNotifier.getText(InstanceEvent, Instance)"})
-  void testGetText_thenThrowIllegalStateException() {
-    // Arrange
-    InstanceRegisteredEvent event = mock(InstanceRegisteredEvent.class);
-    when(event.getInstance()).thenThrow(new IllegalStateException());
-
-    // Act and Assert
-    assertThrows(
-        IllegalStateException.class, () -> webexNotifier.getText(event, mock(Instance.class)));
-    verify(event).getInstance();
   }
 
   /**
@@ -449,6 +450,89 @@ class WebexNotifierDiffblueTest {
   @ManagedByDiffblue
   @MethodsUnderTest({"void WebexNotifier.setMessage(String)"})
   void testSetMessage() throws EvaluationException {
+    // Arrange and Act
+    webexNotifier.setMessage(
+        "de.codecentric.boot.admin.server.notify.WebexNotifierNot all who wander are lost");
+
+    // Assert
+    Expression message = webexNotifier.getMessage();
+    assertTrue(message instanceof LiteralExpression);
+    assertEquals(
+        "de.codecentric.boot.admin.server.notify.WebexNotifierNot all who wander are lost",
+        message.getExpressionString());
+    assertEquals(
+        "de.codecentric.boot.admin.server.notify.WebexNotifierNot all who wander are lost",
+        message.getValue());
+    TypeDescriptor valueTypeDescriptor = message.getValueTypeDescriptor();
+    assertEquals("java.lang.String", valueTypeDescriptor.getName());
+    assertNull(valueTypeDescriptor.getElementTypeDescriptor());
+    assertEquals(0, valueTypeDescriptor.getAnnotations().length);
+    assertFalse(valueTypeDescriptor.isArray());
+    assertFalse(valueTypeDescriptor.isCollection());
+    assertFalse(valueTypeDescriptor.isMap());
+    assertFalse(valueTypeDescriptor.isPrimitive());
+    Class<String> expectedObjectType = String.class;
+    assertEquals(expectedObjectType, valueTypeDescriptor.getObjectType());
+    Class<String> expectedType = String.class;
+    assertEquals(expectedType, valueTypeDescriptor.getType());
+    Class<String> expectedValueType = String.class;
+    assertEquals(expectedValueType, message.getValueType());
+  }
+
+  /**
+   * Test {@link WebexNotifier#setMessage(String)}.
+   *
+   * <p>Method under test: {@link WebexNotifier#setMessage(String)}
+   */
+  @Test
+  @DisplayName("Test setMessage(String)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void WebexNotifier.setMessage(String)"})
+  void testSetMessage2() throws EvaluationException {
+    // Arrange and Act
+    webexNotifier.setMessage("de.codecentric.boot.admin.server.notify.WebexNotifier42");
+
+    // Assert
+    Expression message = webexNotifier.getMessage();
+    assertTrue(message instanceof LiteralExpression);
+    assertEquals(
+        "de.codecentric.boot.admin.server.notify.WebexNotifier42", message.getExpressionString());
+    assertEquals("de.codecentric.boot.admin.server.notify.WebexNotifier42", message.getValue());
+    TypeDescriptor valueTypeDescriptor = message.getValueTypeDescriptor();
+    assertEquals("java.lang.String", valueTypeDescriptor.getName());
+    assertNull(valueTypeDescriptor.getElementTypeDescriptor());
+    assertEquals(0, valueTypeDescriptor.getAnnotations().length);
+    assertFalse(valueTypeDescriptor.isArray());
+    assertFalse(valueTypeDescriptor.isCollection());
+    assertFalse(valueTypeDescriptor.isMap());
+    assertFalse(valueTypeDescriptor.isPrimitive());
+    Class<String> expectedObjectType = String.class;
+    assertEquals(expectedObjectType, valueTypeDescriptor.getObjectType());
+    Class<String> expectedType = String.class;
+    assertEquals(expectedType, valueTypeDescriptor.getType());
+    Class<String> expectedValueType = String.class;
+    assertEquals(expectedValueType, message.getValueType());
+  }
+
+  /**
+   * Test {@link WebexNotifier#setMessage(String)}.
+   *
+   * <ul>
+   *   <li>Then {@link WebexNotifier} Message ExpressionString is {@code Not all who wander are
+   *       lost}.
+   * </ul>
+   *
+   * <p>Method under test: {@link WebexNotifier#setMessage(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test setMessage(String); then WebexNotifier Message ExpressionString is 'Not all who wander are lost'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void WebexNotifier.setMessage(String)"})
+  void testSetMessage_thenWebexNotifierMessageExpressionStringIsNotAllWhoWanderAreLost()
+      throws EvaluationException {
     // Arrange and Act
     webexNotifier.setMessage("Not all who wander are lost");
 

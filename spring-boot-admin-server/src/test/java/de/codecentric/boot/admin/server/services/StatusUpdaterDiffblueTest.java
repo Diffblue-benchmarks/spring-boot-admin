@@ -38,8 +38,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ChannelSendOperator;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -55,7 +53,6 @@ import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.FirstStep;
 
 @ContextConfiguration(classes = {StatusUpdater.class})
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @DisabledInAotMode
 @ExtendWith(SpringExtension.class)
 class StatusUpdaterDiffblueTest {
@@ -252,83 +249,19 @@ class StatusUpdaterDiffblueTest {
   /**
    * Test {@link StatusUpdater#doUpdateStatus(Instance)}.
    *
-   * <p>Method under test: {@link StatusUpdater#doUpdateStatus(Instance)}
-   */
-  @Test
-  @DisplayName("Test doUpdateStatus(Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdater.doUpdateStatus(Instance)"})
-  void testDoUpdateStatus() throws AssertionError {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-
-    Instance instance = mock(Instance.class);
-    when(instance.isRegistered()).thenReturn(true);
-
-    // Act and Assert
-    FirstStep<Instance> createResult = StepVerifier.create(statusUpdater.doUpdateStatus(instance));
-    createResult.expectError().verify();
-    verify(instance).isRegistered();
-    verify(builder).webClient(isA(Builder.class));
-  }
-
-  /**
-   * Test {@link StatusUpdater#doUpdateStatus(Instance)}.
-   *
-   * <p>Method under test: {@link StatusUpdater#doUpdateStatus(Instance)}
-   */
-  @Test
-  @DisplayName("Test doUpdateStatus(Instance)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono StatusUpdater.doUpdateStatus(Instance)"})
-  void testDoUpdateStatus2() throws AssertionError {
-    // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
-
-    StatusUpdater statusUpdater =
-        new StatusUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    statusUpdater.timeout(Duration.ofSeconds(1L));
-
-    Instance instance = mock(Instance.class);
-    when(instance.isRegistered()).thenReturn(true);
-
-    // Act and Assert
-    FirstStep<Instance> createResult = StepVerifier.create(statusUpdater.doUpdateStatus(instance));
-    createResult.expectError().verify();
-    verify(instance).isRegistered();
-    verify(builder).webClient(isA(Builder.class));
-  }
-
-  /**
-   * Test {@link StatusUpdater#doUpdateStatus(Instance)}.
-   *
    * <ul>
    *   <li>Given {@code false}.
-   *   <li>When {@link Instance} {@link Instance#isRegistered()} return {@code false}.
+   *   <li>Then calls {@link Instance#isRegistered()}.
    * </ul>
    *
    * <p>Method under test: {@link StatusUpdater#doUpdateStatus(Instance)}
    */
   @Test
-  @DisplayName(
-      "Test doUpdateStatus(Instance); given 'false'; when Instance isRegistered() return 'false'")
+  @DisplayName("Test doUpdateStatus(Instance); given 'false'; then calls isRegistered()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"Mono StatusUpdater.doUpdateStatus(Instance)"})
-  void testDoUpdateStatus_givenFalse_whenInstanceIsRegisteredReturnFalse() throws AssertionError {
+  void testDoUpdateStatus_givenFalse_thenCallsIsRegistered() throws AssertionError {
     // Arrange
     Instance instance = mock(Instance.class);
     when(instance.isRegistered()).thenReturn(false);

@@ -65,12 +65,14 @@ class InstanceRegistryDiffblueTest {
     "void InstanceRegistry.<init>(InstanceRepository, InstanceIdGenerator, InstanceFilter)"
   })
   void testNewInstanceRegistry() throws AssertionError {
-    // Arrange and Act
+    // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    // Act
     InstanceRegistry actualInstanceRegistry =
         new InstanceRegistry(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Assert
     FirstStep<Instance> createResult = StepVerifier.create(actualInstanceRegistry.getInstances());
@@ -91,11 +93,11 @@ class InstanceRegistryDiffblueTest {
     // Arrange
     InstanceIdGenerator generator = mock(InstanceIdGenerator.class);
     when(generator.generateId(Mockito.<Registration>any())).thenReturn(InstanceId.of("42"));
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
     InstanceRegistry instanceRegistry =
-        new InstanceRegistry(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            generator,
-            mock(InstanceFilter.class));
+        new InstanceRegistry(repository, generator, mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<InstanceId> createResult =
@@ -118,11 +120,11 @@ class InstanceRegistryDiffblueTest {
     // Arrange
     InstanceIdGenerator generator = mock(InstanceIdGenerator.class);
     when(generator.generateId(Mockito.<Registration>any())).thenReturn(InstanceId.of("42"));
+    SnapshottingInstanceRepository repository =
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
+
     InstanceRegistry instanceRegistry =
-        new InstanceRegistry(
-            new SnapshottingInstanceRepository(new InMemoryEventStore()),
-            generator,
-            mock(InstanceFilter.class));
+        new InstanceRegistry(repository, generator, mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<InstanceId> createResult =
@@ -214,11 +216,11 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Flux InstanceRegistry.getInstances()"})
   void testGetInstances() throws AssertionError {
     // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances());
@@ -237,11 +239,11 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Flux InstanceRegistry.getInstances()"})
   void testGetInstances2() throws AssertionError {
     // Arrange
+    SnapshottingInstanceRepository repository =
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new SnapshottingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances());
@@ -281,11 +283,11 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
   void testGetInstancesWithString2() throws AssertionError {
     // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances("Name"));
@@ -304,15 +306,77 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
   void testGetInstancesWithString3() throws AssertionError {
     // Arrange
+    SnapshottingInstanceRepository repository =
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new SnapshottingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances("Name"));
     createResult.expectComplete().verify();
+  }
+
+  /**
+   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
+   *
+   * <ul>
+   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#filter(Predicate)} return {@link
+   *       DirectProcessor}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getInstances(String) with 'String'; given DirectProcessor filter(Predicate) return DirectProcessor")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
+  void testGetInstancesWithString_givenDirectProcessorFilterReturnDirectProcessor() {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any()))
+        .thenReturn(mock(DirectProcessor.class));
+    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act
+    instanceRegistry.getInstances("NameName");
+
+    // Assert
+    verify(instanceRepository).findByName("NameName");
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
+   *
+   * <ul>
+   *   <li>Given {@link DirectProcessor} {@link DirectProcessor#filter(Predicate)} return
+   *       fromIterable {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
+   */
+  @Test
+  @DisplayName(
+      "Test getInstances(String) with 'String'; given DirectProcessor filter(Predicate) return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
+  void testGetInstancesWithString_givenDirectProcessorFilterReturnFromIterableArrayList()
+      throws AssertionError {
+    // Arrange
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
+
+    // Act and Assert
+    FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances("Name"));
+    createResult.expectComplete().verify();
+    verify(instanceRepository).findByName("Name");
+    verify(directProcessor).filter(isA(Predicate.class));
   }
 
   /**
@@ -341,34 +405,6 @@ class InstanceRegistryDiffblueTest {
 
     // Assert
     verify(instanceRepository).findByName("Name");
-  }
-
-  /**
-   * Test {@link InstanceRegistry#getInstances(String)} with {@code String}.
-   *
-   * <ul>
-   *   <li>Then calls {@link DirectProcessor#filter(Predicate)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link InstanceRegistry#getInstances(String)}
-   */
-  @Test
-  @DisplayName("Test getInstances(String) with 'String'; then calls filter(Predicate)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Flux InstanceRegistry.getInstances(String)"})
-  void testGetInstancesWithString_thenCallsFilter() throws AssertionError {
-    // Arrange
-    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
-    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
-    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
-    when(instanceRepository.findByName(Mockito.<String>any())).thenReturn(directProcessor);
-
-    // Act and Assert
-    FirstStep<Instance> createResult = StepVerifier.create(instanceRegistry.getInstances("Name"));
-    createResult.expectComplete().verify();
-    verify(instanceRepository).findByName("Name");
-    verify(directProcessor).filter(isA(Predicate.class));
   }
 
   /**
@@ -566,11 +602,11 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Mono InstanceRegistry.getInstance(InstanceId)"})
   void testGetInstance() throws AssertionError {
     // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<Instance> createResult =
@@ -590,11 +626,11 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Mono InstanceRegistry.getInstance(InstanceId)"})
   void testGetInstance2() throws AssertionError {
     // Arrange
+    SnapshottingInstanceRepository repository =
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new SnapshottingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<Instance> createResult =
@@ -706,11 +742,11 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Mono InstanceRegistry.deregister(InstanceId)"})
   void testDeregister() throws AssertionError {
     // Arrange
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new EventsourcingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<InstanceId> createResult =
@@ -730,11 +766,11 @@ class InstanceRegistryDiffblueTest {
   @MethodsUnderTest({"Mono InstanceRegistry.deregister(InstanceId)"})
   void testDeregister2() throws AssertionError {
     // Arrange
+    SnapshottingInstanceRepository repository =
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
     InstanceRegistry instanceRegistry =
         new InstanceRegistry(
-            new SnapshottingInstanceRepository(new InMemoryEventStore()),
-            mock(InstanceIdGenerator.class),
-            mock(InstanceFilter.class));
+            repository, mock(InstanceIdGenerator.class), mock(InstanceFilter.class));
 
     // Act and Assert
     FirstStep<InstanceId> createResult =

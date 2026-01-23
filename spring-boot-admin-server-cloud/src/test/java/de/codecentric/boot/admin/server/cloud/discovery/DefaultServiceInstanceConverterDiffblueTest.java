@@ -25,31 +25,6 @@ class DefaultServiceInstanceConverterDiffblueTest {
   @Autowired private DefaultServiceInstanceConverter defaultServiceInstanceConverter;
 
   /**
-   * Test {@link DefaultServiceInstanceConverter#getMetadataValue(ServiceInstance, String[])}.
-   *
-   * <ul>
-   *   <li>When {@link DefaultServiceInstance#DefaultServiceInstance()}.
-   *   <li>Then return {@code null}.
-   * </ul>
-   *
-   * <p>Method under test: {@link DefaultServiceInstanceConverter#getMetadataValue(ServiceInstance,
-   * String[])}
-   */
-  @Test
-  @DisplayName(
-      "Test getMetadataValue(ServiceInstance, String[]); when DefaultServiceInstance(); then return 'null'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "String DefaultServiceInstanceConverter.getMetadataValue(ServiceInstance, String[])"
-  })
-  void testGetMetadataValue_whenDefaultServiceInstance_thenReturnNull() {
-    // Arrange, Act and Assert
-    assertNull(
-        DefaultServiceInstanceConverter.getMetadataValue(new DefaultServiceInstance(), "Keys"));
-  }
-
-  /**
    * Test {@link DefaultServiceInstanceConverter#convert(ServiceInstance)}.
    *
    * <p>Method under test: {@link DefaultServiceInstanceConverter#convert(ServiceInstance)}

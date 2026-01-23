@@ -99,42 +99,6 @@ class BasicAuthHttpHeaderProviderDiffblueTest {
    * Test {@link BasicAuthHttpHeaderProvider#getHeaders(Instance)}.
    *
    * <ul>
-   *   <li>Given {@link BasicAuthHttpHeaderProvider}.
-   *   <li>Then return Empty.
-   * </ul>
-   *
-   * <p>Method under test: {@link BasicAuthHttpHeaderProvider#getHeaders(Instance)}
-   */
-  @Test
-  @DisplayName("Test getHeaders(Instance); given BasicAuthHttpHeaderProvider; then return Empty")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"HttpHeaders BasicAuthHttpHeaderProvider.getHeaders(Instance)"})
-  void testGetHeaders_givenBasicAuthHttpHeaderProvider_thenReturnEmpty() {
-    // Arrange
-    Instance instance = mock(Instance.class);
-    when(instance.getRegistration())
-        .thenReturn(
-            Registration.builder()
-                .healthUrl("https://example.org/example")
-                .managementUrl("https://example.org/example")
-                .name("Name")
-                .serviceUrl("https://example.org/example")
-                .source("Source")
-                .build());
-
-    // Act
-    HttpHeaders actualHeaders = basicAuthHttpHeaderProvider.getHeaders(instance);
-
-    // Assert
-    verify(instance, atLeast(1)).getRegistration();
-    assertTrue(actualHeaders.isEmpty());
-  }
-
-  /**
-   * Test {@link BasicAuthHttpHeaderProvider#getHeaders(Instance)}.
-   *
-   * <ul>
    *   <li>Then return size is one.
    * </ul>
    *

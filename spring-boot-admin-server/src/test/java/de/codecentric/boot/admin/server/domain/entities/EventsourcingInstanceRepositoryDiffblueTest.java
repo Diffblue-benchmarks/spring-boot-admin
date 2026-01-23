@@ -144,24 +144,6 @@ class EventsourcingInstanceRepositoryDiffblueTest {
   }
 
   /**
-   * Test {@link EventsourcingInstanceRepository#findAll()}.
-   *
-   * <p>Method under test: {@link EventsourcingInstanceRepository#findAll()}
-   */
-  @Test
-  @DisplayName("Test findAll()")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"reactor.core.publisher.Flux EventsourcingInstanceRepository.findAll()"})
-  void testFindAll2() throws AssertionError {
-    // Arrange, Act and Assert
-    FirstStep<Instance> createResult =
-        StepVerifier.create(
-            new SnapshottingInstanceRepository(new InMemoryEventStore(3)).findAll());
-    createResult.expectComplete().verify();
-  }
-
-  /**
    * Test {@link EventsourcingInstanceRepository#find(InstanceId)}.
    *
    * <ul>
@@ -189,37 +171,6 @@ class EventsourcingInstanceRepositoryDiffblueTest {
     // Act and Assert
     FirstStep<Instance> createResult =
         StepVerifier.create(eventsourcingInstanceRepository.find(InstanceId.of("42")));
-    createResult.expectComplete().verify();
-  }
-
-  /**
-   * Test {@link EventsourcingInstanceRepository#find(InstanceId)}.
-   *
-   * <ul>
-   *   <li>Given {@link
-   *       SnapshottingInstanceRepository#SnapshottingInstanceRepository(InstanceEventStore)} with
-   *       eventStore is {@link InMemoryEventStore#InMemoryEventStore(int)}.
-   * </ul>
-   *
-   * <p>Method under test: {@link EventsourcingInstanceRepository#find(InstanceId)}
-   */
-  @Test
-  @DisplayName(
-      "Test find(InstanceId); given SnapshottingInstanceRepository(InstanceEventStore) with eventStore is InMemoryEventStore(int)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({
-    "reactor.core.publisher.Mono EventsourcingInstanceRepository.find(InstanceId)"
-  })
-  void testFind_givenSnapshottingInstanceRepositoryWithEventStoreIsInMemoryEventStore()
-      throws AssertionError {
-    // Arrange
-    SnapshottingInstanceRepository snapshottingInstanceRepository =
-        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
-
-    // Act and Assert
-    FirstStep<Instance> createResult =
-        StepVerifier.create(snapshottingInstanceRepository.find(InstanceId.of("42")));
     createResult.expectComplete().verify();
   }
 

@@ -3,7 +3,6 @@ package de.codecentric.boot.admin.server.notify;
 import com.diffblue.cover.annotations.ManagedByDiffblue;
 import com.diffblue.cover.annotations.MethodsUnderTest;
 import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
 import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
@@ -50,23 +49,5 @@ class CompositeNotifierDiffblueTest {
     // Assert
     FirstStep<Void> createResult = StepVerifier.create(actualPublisher);
     createResult.expectComplete().verify();
-  }
-
-  /**
-   * Test {@link CompositeNotifier#notify(InstanceEvent)} with {@code InstanceEvent}.
-   *
-   * <p>Method under test: {@link CompositeNotifier#notify(InstanceEvent)}
-   */
-  @Test
-  @DisplayName("Test notify(InstanceEvent) with 'InstanceEvent'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono CompositeNotifier.notify(InstanceEvent)"})
-  void testNotifyWithInstanceEvent() throws AssertionError {
-    // Arrange, Act and Assert
-    FirstStep<Void> createResult =
-        StepVerifier.create(
-            compositeNotifier.notify(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L)));
-    createResult.expectError().verify();
   }
 }

@@ -39,10 +39,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebApplicationContext;
@@ -57,10 +59,6 @@ import org.springframework.cloud.kubernetes.commons.discovery.DefaultKubernetesS
 import org.springframework.http.server.reactive.ChannelSendOperator;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.aot.DisabledInAotMode;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
@@ -69,18 +67,16 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.FirstStep;
 
-@ContextConfiguration(classes = {InstanceDiscoveryListener.class, DiscoveryClient.class})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@DisabledInAotMode
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class InstanceDiscoveryListenerDiffblueTest {
-  @MockitoBean private DiscoveryClient discoveryClient;
+  @Mock private DiscoveryClient discoveryClient;
 
-  @Autowired private InstanceDiscoveryListener instanceDiscoveryListener;
+  @InjectMocks private InstanceDiscoveryListener instanceDiscoveryListener;
 
-  @MockitoBean private InstanceRegistry instanceRegistry;
+  @Mock private InstanceRegistry instanceRegistry;
 
-  @MockitoBean private InstanceRepository instanceRepository;
+  @Mock private InstanceRepository instanceRepository;
 
   /**
    * Test {@link InstanceDiscoveryListener#InstanceDiscoveryListener(DiscoveryClient,
@@ -103,10 +99,26 @@ class InstanceDiscoveryListenerDiffblueTest {
     "void InstanceDiscoveryListener.<init>(DiscoveryClient, InstanceRegistry, InstanceRepository)"
   })
   void testNewInstanceDiscoveryListener_thenReturnServicesSizeIsOne() {
-    // Arrange and Act
+    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
+    //   Run dcover create --keep-partial-tests to gain insights into why
+    //   a non-Spring test was created.
+
+    // Arrange
+    ArrayList<DiscoveryClient> discoveryClients = new ArrayList<>();
+    discoveryClients.add(new CompositeDiscoveryClient(new ArrayList<>()));
+    CompositeDiscoveryClient discoveryClient = new CompositeDiscoveryClient(discoveryClients);
+    InstanceRegistry registry =
+        new InstanceRegistry(
+            new EventsourcingInstanceRepository(new InMemoryEventStore()),
+            mock(InstanceIdGenerator.class),
+            mock(InstanceFilter.class));
+
+    // Act
     InstanceDiscoveryListener actualInstanceDiscoveryListener =
         new InstanceDiscoveryListener(
-            new CompositeDiscoveryClient(new ArrayList<>()), instanceRegistry, instanceRepository);
+            discoveryClient,
+            registry,
+            new EventsourcingInstanceRepository(new InMemoryEventStore()));
 
     // Assert
     Set<String> services = actualInstanceDiscoveryListener.getServices();
@@ -631,6 +643,63 @@ class InstanceDiscoveryListenerDiffblueTest {
   /**
    * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
    *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}
+   */
+  @Test
+  @DisplayName("Test onApplicationReady(ApplicationReadyEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationReady(ApplicationReadyEvent)"})
+  void testOnApplicationReady7() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(justResult);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+    Class<Object> forNameResult = Object.class;
+    SpringApplication application = new SpringApplication(forNameResult);
+    String[] args = new String[] {"Args"};
+
+    ApplicationReadyEvent event =
+        new ApplicationReadyEvent(
+            application,
+            args,
+            new AnnotationConfigReactiveWebApplicationContext(),
+            Duration.ofSeconds(1L));
+
+    // Act
+    instanceDiscoveryListener.onApplicationReady(event);
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
+   *
    * <ul>
    *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
    *   <li>Then calls {@link DirectProcessor#map(Function)}.
@@ -705,6 +774,54 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(flux).flatMap(isA(Function.class));
     verify(directProcessor5).groupBy(isA(Function.class));
     verify(directProcessor2).map(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@link
+   *       DefaultServiceInstance#DefaultServiceInstance()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationReady(ApplicationReadyEvent); given ArrayList() add DefaultServiceInstance()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationReady(ApplicationReadyEvent)"})
+  void testOnApplicationReady_givenArrayListAddDefaultServiceInstance() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+
+    ArrayList<ServiceInstance> serviceInstanceList = new ArrayList<>();
+    serviceInstanceList.add(new DefaultServiceInstance());
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(serviceInstanceList);
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+    Class<Object> forNameResult = Object.class;
+    SpringApplication application = new SpringApplication(forNameResult);
+    String[] args = new String[] {"Args"};
+
+    ApplicationReadyEvent event =
+        new ApplicationReadyEvent(
+            application,
+            args,
+            new AnnotationConfigReactiveWebApplicationContext(),
+            Duration.ofSeconds(1L));
+
+    // Act
+    instanceDiscoveryListener.onApplicationReady(event);
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -2058,6 +2175,217 @@ class InstanceDiscoveryListenerDiffblueTest {
    * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#deregister(InstanceId)} return
+   *       {@code null}.
+   *   <li>Then calls {@link Instance#getId()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationReady(ApplicationReadyEvent); given InstanceRegistry deregister(InstanceId) return 'null'; then calls getId()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationReady(ApplicationReadyEvent)"})
+  void testOnApplicationReady_givenInstanceRegistryDeregisterReturnNull_thenCallsGetId() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(null);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+    Class<Object> forNameResult = Object.class;
+    SpringApplication application = new SpringApplication(forNameResult);
+    String[] args = new String[] {"Args"};
+
+    ApplicationReadyEvent event =
+        new ApplicationReadyEvent(
+            application,
+            args,
+            new AnnotationConfigReactiveWebApplicationContext(),
+            Duration.ofSeconds(1L));
+
+    // Act
+    instanceDiscoveryListener.onApplicationReady(event);
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRegistry}.
+   *   <li>Then calls {@link Instance#getRegistration()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationReady(ApplicationReadyEvent); given InstanceRegistry; then calls getRegistration()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationReady(ApplicationReadyEvent)"})
+  void testOnApplicationReady_givenInstanceRegistry_thenCallsGetRegistration() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+    when(instance.isRegistered()).thenReturn(true);
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+    Class<Object> forNameResult = Object.class;
+    SpringApplication application = new SpringApplication(forNameResult);
+    String[] args = new String[] {"Args"};
+
+    ApplicationReadyEvent event =
+        new ApplicationReadyEvent(
+            application,
+            args,
+            new AnnotationConfigReactiveWebApplicationContext(),
+            Duration.ofSeconds(1L));
+
+    // Act
+    instanceDiscoveryListener.onApplicationReady(event);
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instance).isRegistered();
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationReady(ApplicationReadyEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationReady(ApplicationReadyEvent)"})
+  void testOnApplicationReady_givenInstanceRepositoryFindAllReturnFromIterableArrayList() {
+    // Arrange
+    when(discoveryClient.getServices()).thenReturn(new ArrayList<>());
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+    Class<Object> forNameResult = Object.class;
+    SpringApplication application = new SpringApplication(forNameResult);
+    String[] args = new String[] {"Args"};
+
+    ApplicationReadyEvent event =
+        new ApplicationReadyEvent(
+            application,
+            args,
+            new AnnotationConfigReactiveWebApplicationContext(),
+            Duration.ofSeconds(1L));
+
+    // Act
+    instanceDiscoveryListener.onApplicationReady(event);
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationReady(ApplicationReadyEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationReady(ApplicationReadyEvent)"})
+  void testOnApplicationReady_givenInstanceRepositoryFindAllReturnFromIterableArrayList2() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+    Class<Object> forNameResult = Object.class;
+    SpringApplication application = new SpringApplication(forNameResult);
+    String[] args = new String[] {"Args"};
+
+    ApplicationReadyEvent event =
+        new ApplicationReadyEvent(
+            application,
+            args,
+            new AnnotationConfigReactiveWebApplicationContext(),
+            Duration.ofSeconds(1L));
+
+    // Act
+    instanceDiscoveryListener.onApplicationReady(event);
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationReady(ApplicationReadyEvent)}.
+   *
+   * <ul>
    *   <li>Given {@link Publisher} {@link Publisher#subscribe(Subscriber)} does nothing.
    *   <li>Then calls {@link Publisher#subscribe(Subscriber)}.
    * </ul>
@@ -2658,6 +2986,116 @@ class InstanceDiscoveryListenerDiffblueTest {
   /**
    * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
    *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}
+   */
+  @Test
+  @DisplayName("Test onInstanceRegistered(InstanceRegisteredEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InstanceDiscoveryListener.onInstanceRegistered(InstanceRegisteredEvent)"
+  })
+  void testOnInstanceRegistered8() {
+    // Arrange
+    when(discoveryClient.getServices()).thenReturn(new ArrayList<>());
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onInstanceRegistered(
+        new InstanceRegisteredEvent<>("Source", "Config"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}
+   */
+  @Test
+  @DisplayName("Test onInstanceRegistered(InstanceRegisteredEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InstanceDiscoveryListener.onInstanceRegistered(InstanceRegisteredEvent)"
+  })
+  void testOnInstanceRegistered9() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onInstanceRegistered(
+        new InstanceRegisteredEvent<>("Source", "Config"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}
+   */
+  @Test
+  @DisplayName("Test onInstanceRegistered(InstanceRegisteredEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InstanceDiscoveryListener.onInstanceRegistered(InstanceRegisteredEvent)"
+  })
+  void testOnInstanceRegistered10() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(justResult);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onInstanceRegistered(
+        new InstanceRegisteredEvent<>("Source", "Config"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
+   *
    * <ul>
    *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
    *   <li>Then calls {@link DirectProcessor#map(Function)}.
@@ -2725,6 +3163,47 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(flux).flatMap(isA(Function.class));
     verify(directProcessor5).groupBy(isA(Function.class));
     verify(directProcessor2).map(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@link
+   *       DefaultServiceInstance#DefaultServiceInstance()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onInstanceRegistered(InstanceRegisteredEvent); given ArrayList() add DefaultServiceInstance()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InstanceDiscoveryListener.onInstanceRegistered(InstanceRegisteredEvent)"
+  })
+  void testOnInstanceRegistered_givenArrayListAddDefaultServiceInstance() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+
+    ArrayList<ServiceInstance> serviceInstanceList = new ArrayList<>();
+    serviceInstanceList.add(new DefaultServiceInstance());
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(serviceInstanceList);
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onInstanceRegistered(
+        new InstanceRegisteredEvent<>("Source", "Config"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -3894,6 +4373,116 @@ class InstanceDiscoveryListenerDiffblueTest {
    * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#deregister(InstanceId)} return
+   *       {@code null}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onInstanceRegistered(InstanceRegisteredEvent); given InstanceRegistry deregister(InstanceId) return 'null'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InstanceDiscoveryListener.onInstanceRegistered(InstanceRegisteredEvent)"
+  })
+  void testOnInstanceRegistered_givenInstanceRegistryDeregisterReturnNull() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(null);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onInstanceRegistered(
+        new InstanceRegisteredEvent<>("Source", "Config"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRegistry}.
+   *   <li>Then calls {@link Instance#getRegistration()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onInstanceRegistered(InstanceRegisteredEvent); given InstanceRegistry; then calls getRegistration()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InstanceDiscoveryListener.onInstanceRegistered(InstanceRegisteredEvent)"
+  })
+  void testOnInstanceRegistered_givenInstanceRegistry_thenCallsGetRegistration() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+    when(instance.isRegistered()).thenReturn(true);
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onInstanceRegistered(
+        new InstanceRegisteredEvent<>("Source", "Config"));
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instance).isRegistered();
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onInstanceRegistered(InstanceRegisteredEvent)}.
+   *
+   * <ul>
    *   <li>Given {@link Publisher} {@link Publisher#subscribe(Subscriber)} does nothing.
    *   <li>Then calls {@link Publisher#subscribe(Subscriber)}.
    * </ul>
@@ -4432,6 +5021,53 @@ class InstanceDiscoveryListenerDiffblueTest {
   /**
    * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
    *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}
+   */
+  @Test
+  @DisplayName("Test onRefreshInstances(RefreshInstancesEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onRefreshInstances(RefreshInstancesEvent)"})
+  void testOnRefreshInstances7() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(justResult);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onRefreshInstances(new RefreshInstancesEvent("Source"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
+   *
    * <ul>
    *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
    *   <li>Then calls {@link DirectProcessor#map(Function)}.
@@ -4496,6 +5132,44 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(flux).flatMap(isA(Function.class));
     verify(directProcessor5).groupBy(isA(Function.class));
     verify(directProcessor2).map(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@link
+   *       DefaultServiceInstance#DefaultServiceInstance()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onRefreshInstances(RefreshInstancesEvent); given ArrayList() add DefaultServiceInstance()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onRefreshInstances(RefreshInstancesEvent)"})
+  void testOnRefreshInstances_givenArrayListAddDefaultServiceInstance() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+
+    ArrayList<ServiceInstance> serviceInstanceList = new ArrayList<>();
+    serviceInstanceList.add(new DefaultServiceInstance());
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(serviceInstanceList);
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onRefreshInstances(new RefreshInstancesEvent("Source"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -5649,6 +6323,177 @@ class InstanceDiscoveryListenerDiffblueTest {
    * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#deregister(InstanceId)} return
+   *       {@code null}.
+   *   <li>Then calls {@link Instance#getId()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onRefreshInstances(RefreshInstancesEvent); given InstanceRegistry deregister(InstanceId) return 'null'; then calls getId()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onRefreshInstances(RefreshInstancesEvent)"})
+  void testOnRefreshInstances_givenInstanceRegistryDeregisterReturnNull_thenCallsGetId() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(null);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onRefreshInstances(new RefreshInstancesEvent("Source"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRegistry}.
+   *   <li>Then calls {@link Instance#getRegistration()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onRefreshInstances(RefreshInstancesEvent); given InstanceRegistry; then calls getRegistration()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onRefreshInstances(RefreshInstancesEvent)"})
+  void testOnRefreshInstances_givenInstanceRegistry_thenCallsGetRegistration() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+    when(instance.isRegistered()).thenReturn(true);
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onRefreshInstances(new RefreshInstancesEvent("Source"));
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instance).isRegistered();
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onRefreshInstances(RefreshInstancesEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onRefreshInstances(RefreshInstancesEvent)"})
+  void testOnRefreshInstances_givenInstanceRepositoryFindAllReturnFromIterableArrayList() {
+    // Arrange
+    when(discoveryClient.getServices()).thenReturn(new ArrayList<>());
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onRefreshInstances(new RefreshInstancesEvent("Source"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link
+   * InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onRefreshInstances(RefreshInstancesEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onRefreshInstances(RefreshInstancesEvent)"})
+  void testOnRefreshInstances_givenInstanceRepositoryFindAllReturnFromIterableArrayList2() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onRefreshInstances(new RefreshInstancesEvent("Source"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onRefreshInstances(RefreshInstancesEvent)}.
+   *
+   * <ul>
    *   <li>Given {@link Publisher} {@link Publisher#subscribe(Subscriber)} does nothing.
    *   <li>Then calls {@link Publisher#subscribe(Subscriber)}.
    * </ul>
@@ -6141,6 +6986,52 @@ class InstanceDiscoveryListenerDiffblueTest {
   /**
    * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
    *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}
+   */
+  @Test
+  @DisplayName("Test onParentHeartbeat(ParentHeartbeatEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onParentHeartbeat(ParentHeartbeatEvent)"})
+  void testOnParentHeartbeat6() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(justResult);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onParentHeartbeat(new ParentHeartbeatEvent("Source", "Value"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
+   *
    * <ul>
    *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
    *   <li>Then calls {@link DirectProcessor#map(Function)}.
@@ -6204,6 +7095,43 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(flux).flatMap(isA(Function.class));
     verify(directProcessor5).groupBy(isA(Function.class));
     verify(directProcessor2).map(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@link
+   *       DefaultServiceInstance#DefaultServiceInstance()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onParentHeartbeat(ParentHeartbeatEvent); given ArrayList() add DefaultServiceInstance()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onParentHeartbeat(ParentHeartbeatEvent)"})
+  void testOnParentHeartbeat_givenArrayListAddDefaultServiceInstance() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+
+    ArrayList<ServiceInstance> serviceInstanceList = new ArrayList<>();
+    serviceInstanceList.add(new DefaultServiceInstance());
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(serviceInstanceList);
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onParentHeartbeat(new ParentHeartbeatEvent("Source", "Value"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -7380,6 +8308,122 @@ class InstanceDiscoveryListenerDiffblueTest {
    * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#deregister(InstanceId)} return
+   *       {@code null}.
+   *   <li>Then calls {@link Instance#getId()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onParentHeartbeat(ParentHeartbeatEvent); given InstanceRegistry deregister(InstanceId) return 'null'; then calls getId()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onParentHeartbeat(ParentHeartbeatEvent)"})
+  void testOnParentHeartbeat_givenInstanceRegistryDeregisterReturnNull_thenCallsGetId() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(null);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onParentHeartbeat(new ParentHeartbeatEvent("Source", "Value"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onParentHeartbeat(ParentHeartbeatEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onParentHeartbeat(ParentHeartbeatEvent)"})
+  void testOnParentHeartbeat_givenInstanceRepositoryFindAllReturnFromIterableArrayList() {
+    // Arrange
+    when(discoveryClient.getServices()).thenReturn(new ArrayList<>());
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onParentHeartbeat(new ParentHeartbeatEvent("Source", "Value"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onParentHeartbeat(ParentHeartbeatEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onParentHeartbeat(ParentHeartbeatEvent)"})
+  void testOnParentHeartbeat_givenInstanceRepositoryFindAllReturnFromIterableArrayList2() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onParentHeartbeat(new ParentHeartbeatEvent("Source", "Value"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
+   *
+   * <ul>
    *   <li>Given {@link Publisher} {@link Publisher#subscribe(Subscriber)} does nothing.
    *   <li>Then calls {@link Publisher#subscribe(Subscriber)}.
    * </ul>
@@ -7458,6 +8502,55 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(directProcessor8).groupBy(isA(Function.class));
     verify(directProcessor5).map(isA(Function.class));
     verify(directProcessor).then();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Then calls {@link Instance#getRegistration()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onParentHeartbeat(ParentHeartbeatEvent)}
+   */
+  @Test
+  @DisplayName("Test onParentHeartbeat(ParentHeartbeatEvent); then calls getRegistration()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onParentHeartbeat(ParentHeartbeatEvent)"})
+  void testOnParentHeartbeat_thenCallsGetRegistration() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+    when(instance.isRegistered()).thenReturn(true);
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onParentHeartbeat(new ParentHeartbeatEvent("Source", "Value"));
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instance).isRegistered();
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -7871,6 +8964,52 @@ class InstanceDiscoveryListenerDiffblueTest {
   /**
    * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
    *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}
+   */
+  @Test
+  @DisplayName("Test onApplicationEvent(HeartbeatEvent)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationEvent(HeartbeatEvent)"})
+  void testOnApplicationEvent6() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(justResult);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onApplicationEvent(new HeartbeatEvent("Source", "State"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
+   *
    * <ul>
    *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
    *   <li>Then calls {@link DirectProcessor#map(Function)}.
@@ -7934,6 +9073,43 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(flux).flatMap(isA(Function.class));
     verify(directProcessor5).groupBy(isA(Function.class));
     verify(directProcessor2).map(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@link
+   *       DefaultServiceInstance#DefaultServiceInstance()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationEvent(HeartbeatEvent); given ArrayList() add DefaultServiceInstance()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationEvent(HeartbeatEvent)"})
+  void testOnApplicationEvent_givenArrayListAddDefaultServiceInstance() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+
+    ArrayList<ServiceInstance> serviceInstanceList = new ArrayList<>();
+    serviceInstanceList.add(new DefaultServiceInstance());
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(serviceInstanceList);
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onApplicationEvent(new HeartbeatEvent("Source", "State"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -9110,6 +10286,122 @@ class InstanceDiscoveryListenerDiffblueTest {
    * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#deregister(InstanceId)} return
+   *       {@code null}.
+   *   <li>Then calls {@link Instance#getId()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationEvent(HeartbeatEvent); given InstanceRegistry deregister(InstanceId) return 'null'; then calls getId()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationEvent(HeartbeatEvent)"})
+  void testOnApplicationEvent_givenInstanceRegistryDeregisterReturnNull_thenCallsGetId() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(null);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.onApplicationEvent(new HeartbeatEvent("Source", "State"));
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationEvent(HeartbeatEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationEvent(HeartbeatEvent)"})
+  void testOnApplicationEvent_givenInstanceRepositoryFindAllReturnFromIterableArrayList() {
+    // Arrange
+    when(discoveryClient.getServices()).thenReturn(new ArrayList<>());
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onApplicationEvent(new HeartbeatEvent("Source", "State"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}
+   */
+  @Test
+  @DisplayName(
+      "Test onApplicationEvent(HeartbeatEvent); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationEvent(HeartbeatEvent)"})
+  void testOnApplicationEvent_givenInstanceRepositoryFindAllReturnFromIterableArrayList2() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onApplicationEvent(new HeartbeatEvent("Source", "State"));
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
+   *
+   * <ul>
    *   <li>Given {@link Publisher} {@link Publisher#subscribe(Subscriber)} does nothing.
    *   <li>Then calls {@link Publisher#subscribe(Subscriber)}.
    * </ul>
@@ -9188,6 +10480,55 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(directProcessor8).groupBy(isA(Function.class));
     verify(directProcessor5).map(isA(Function.class));
     verify(directProcessor).then();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}.
+   *
+   * <ul>
+   *   <li>Then calls {@link Instance#getRegistration()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#onApplicationEvent(HeartbeatEvent)}
+   */
+  @Test
+  @DisplayName("Test onApplicationEvent(HeartbeatEvent); then calls getRegistration()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.onApplicationEvent(HeartbeatEvent)"})
+  void testOnApplicationEvent_thenCallsGetRegistration() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+    when(instance.isRegistered()).thenReturn(true);
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.onApplicationEvent(new HeartbeatEvent("Source", "State"));
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instance).isRegistered();
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -9700,6 +11041,44 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(flux).flatMap(isA(Function.class));
     verify(directProcessor5).groupBy(isA(Function.class));
     verify(directProcessor2).map(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#discover()}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@link
+   *       DefaultServiceInstance#DefaultServiceInstance()}.
+   *   <li>Then calls {@link DiscoveryClient#getInstances(String)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#discover()}
+   */
+  @Test
+  @DisplayName(
+      "Test discover(); given ArrayList() add DefaultServiceInstance(); then calls getInstances(String)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.discover()"})
+  void testDiscover_givenArrayListAddDefaultServiceInstance_thenCallsGetInstances() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+
+    ArrayList<ServiceInstance> serviceInstanceList = new ArrayList<>();
+    serviceInstanceList.add(new DefaultServiceInstance());
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(serviceInstanceList);
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.discover();
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
   }
 
   /**
@@ -10834,6 +12213,224 @@ class InstanceDiscoveryListenerDiffblueTest {
    * Test {@link InstanceDiscoveryListener#discover()}.
    *
    * <ul>
+   *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#deregister(InstanceId)} return
+   *       just {@link InstanceId} with value is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#discover()}
+   */
+  @Test
+  @DisplayName(
+      "Test discover(); given InstanceRegistry deregister(InstanceId) return just InstanceId with value is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.discover()"})
+  void testDiscover_givenInstanceRegistryDeregisterReturnJustInstanceIdWithValueIs42() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(justResult);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.discover();
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#discover()}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRegistry} {@link InstanceRegistry#deregister(InstanceId)} return
+   *       {@code null}.
+   *   <li>Then calls {@link Instance#getId()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#discover()}
+   */
+  @Test
+  @DisplayName(
+      "Test discover(); given InstanceRegistry deregister(InstanceId) return 'null'; then calls getId()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.discover()"})
+  void testDiscover_givenInstanceRegistryDeregisterReturnNull_thenCallsGetId() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    when(instanceRegistry.deregister(Mockito.<InstanceId>any())).thenReturn(null);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getId()).thenReturn(InstanceId.of("42"));
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+
+    DirectProcessor<Instance> directProcessor = mock(DirectProcessor.class);
+    when(directProcessor.filter(Mockito.<Predicate<Instance>>any())).thenReturn(fromIterableResult);
+
+    DirectProcessor<Instance> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor);
+    when(instanceRepository.findAll()).thenReturn(directProcessor2);
+
+    // Act
+    instanceDiscoveryListener.discover();
+
+    // Assert
+    verify(instance).getId();
+    verify(instanceRepository).findAll();
+    verify(instanceRegistry).deregister(isA(InstanceId.class));
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+    verify(directProcessor2).filter(isA(Predicate.class));
+    verify(directProcessor).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#discover()}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRegistry}.
+   *   <li>Then calls {@link Instance#getRegistration()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#discover()}
+   */
+  @Test
+  @DisplayName("Test discover(); given InstanceRegistry; then calls getRegistration()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.discover()"})
+  void testDiscover_givenInstanceRegistry_thenCallsGetRegistration() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+
+    Instance instance = mock(Instance.class);
+    when(instance.getRegistration())
+        .thenReturn(
+            Registration.builder()
+                .healthUrl("https://example.org/example")
+                .managementUrl("https://example.org/example")
+                .name("Name")
+                .serviceUrl("https://example.org/example")
+                .source("Source")
+                .build());
+    when(instance.isRegistered()).thenReturn(true);
+
+    ArrayList<Instance> it = new ArrayList<>();
+    it.add(instance);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(it);
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.discover();
+
+    // Assert
+    verify(instance).getRegistration();
+    verify(instance).isRegistered();
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#discover()}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#discover()}
+   */
+  @Test
+  @DisplayName(
+      "Test discover(); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.discover()"})
+  void testDiscover_givenInstanceRepositoryFindAllReturnFromIterableArrayList() {
+    // Arrange
+    when(discoveryClient.getServices()).thenReturn(new ArrayList<>());
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.discover();
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#discover()}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceRepository} {@link InstanceRepository#findAll()} return fromIterable
+   *       {@link ArrayList#ArrayList()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#discover()}
+   */
+  @Test
+  @DisplayName(
+      "Test discover(); given InstanceRepository findAll() return fromIterable ArrayList()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InstanceDiscoveryListener.discover()"})
+  void testDiscover_givenInstanceRepositoryFindAllReturnFromIterableArrayList2() {
+    // Arrange
+    ArrayList<String> stringList = new ArrayList<>();
+    stringList.add("Discovering new instances from DiscoveryClient");
+    when(discoveryClient.getInstances(Mockito.<String>any())).thenReturn(new ArrayList<>());
+    when(discoveryClient.getServices()).thenReturn(stringList);
+    Flux<Instance> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(instanceRepository.findAll()).thenReturn(fromIterableResult);
+
+    // Act
+    instanceDiscoveryListener.discover();
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(discoveryClient).getInstances("Discovering new instances from DiscoveryClient");
+    verify(discoveryClient).getServices();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#discover()}.
+   *
+   * <ul>
    *   <li>Given {@link Publisher} {@link Publisher#subscribe(Subscriber)} does nothing.
    *   <li>Then calls {@link Publisher#subscribe(Subscriber)}.
    * </ul>
@@ -11395,6 +12992,132 @@ class InstanceDiscoveryListenerDiffblueTest {
     verify(directProcessor3).filter(isA(Predicate.class));
     verify(directProcessor2).filter(isA(Predicate.class));
     verify(directProcessor).map(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#removeStaleInstances(Set)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceId} with value is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#removeStaleInstances(Set)}
+   */
+  @Test
+  @DisplayName("Test removeStaleInstances(Set); given InstanceId with value is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceDiscoveryListener.removeStaleInstances(Set)"})
+  void testRemoveStaleInstances_givenInstanceIdWithValueIs42() {
+    // Arrange
+    DirectProcessor<Object> directProcessor = mock(DirectProcessor.class);
+    Flux<?> source = Flux.fromIterable(new ArrayList<>());
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+    when(directProcessor.then()).thenReturn(channelSendOperator);
+
+    DirectProcessor<Object> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.flatMap(Mockito.<Function<Object, Publisher<Object>>>any()))
+        .thenReturn(directProcessor);
+
+    DirectProcessor<Object> directProcessor3 = mock(DirectProcessor.class);
+    when(directProcessor3.doOnNext(Mockito.<Consumer<Object>>any())).thenReturn(directProcessor2);
+
+    DirectProcessor<Object> directProcessor4 = mock(DirectProcessor.class);
+    when(directProcessor4.filter(Mockito.<Predicate<Object>>any())).thenReturn(directProcessor3);
+
+    DirectProcessor<Instance> directProcessor5 = mock(DirectProcessor.class);
+    when(directProcessor5.map(Mockito.<Function<Instance, Object>>any()))
+        .thenReturn(directProcessor4);
+
+    DirectProcessor<Instance> directProcessor6 = mock(DirectProcessor.class);
+    when(directProcessor6.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor5);
+
+    DirectProcessor<Instance> directProcessor7 = mock(DirectProcessor.class);
+    when(directProcessor7.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor6);
+    when(instanceRepository.findAll()).thenReturn(directProcessor7);
+
+    HashSet<InstanceId> registeredInstanceIds = new HashSet<>();
+    registeredInstanceIds.add(InstanceId.of("42"));
+
+    // Act
+    Mono<Void> actualRemoveStaleInstancesResult =
+        instanceDiscoveryListener.removeStaleInstances(registeredInstanceIds);
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(directProcessor3).doOnNext(isA(Consumer.class));
+    verify(directProcessor7).filter(isA(Predicate.class));
+    verify(directProcessor6).filter(isA(Predicate.class));
+    verify(directProcessor4).filter(isA(Predicate.class));
+    verify(directProcessor2).flatMap(isA(Function.class));
+    verify(directProcessor5).map(isA(Function.class));
+    verify(directProcessor).then();
+    assertSame(channelSendOperator, actualRemoveStaleInstancesResult);
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#removeStaleInstances(Set)}.
+   *
+   * <ul>
+   *   <li>Given {@code null}.
+   *   <li>When {@link HashSet#HashSet()} add {@code null}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#removeStaleInstances(Set)}
+   */
+  @Test
+  @DisplayName("Test removeStaleInstances(Set); given 'null'; when HashSet() add 'null'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceDiscoveryListener.removeStaleInstances(Set)"})
+  void testRemoveStaleInstances_givenNull_whenHashSetAddNull() {
+    // Arrange
+    DirectProcessor<Object> directProcessor = mock(DirectProcessor.class);
+    Flux<?> source = Flux.fromIterable(new ArrayList<>());
+    ChannelSendOperator<Object> channelSendOperator =
+        new ChannelSendOperator<>(source, mock(Function.class));
+    when(directProcessor.then()).thenReturn(channelSendOperator);
+
+    DirectProcessor<Object> directProcessor2 = mock(DirectProcessor.class);
+    when(directProcessor2.flatMap(Mockito.<Function<Object, Publisher<Object>>>any()))
+        .thenReturn(directProcessor);
+
+    DirectProcessor<Object> directProcessor3 = mock(DirectProcessor.class);
+    when(directProcessor3.doOnNext(Mockito.<Consumer<Object>>any())).thenReturn(directProcessor2);
+
+    DirectProcessor<Object> directProcessor4 = mock(DirectProcessor.class);
+    when(directProcessor4.filter(Mockito.<Predicate<Object>>any())).thenReturn(directProcessor3);
+
+    DirectProcessor<Instance> directProcessor5 = mock(DirectProcessor.class);
+    when(directProcessor5.map(Mockito.<Function<Instance, Object>>any()))
+        .thenReturn(directProcessor4);
+
+    DirectProcessor<Instance> directProcessor6 = mock(DirectProcessor.class);
+    when(directProcessor6.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor5);
+
+    DirectProcessor<Instance> directProcessor7 = mock(DirectProcessor.class);
+    when(directProcessor7.filter(Mockito.<Predicate<Instance>>any())).thenReturn(directProcessor6);
+    when(instanceRepository.findAll()).thenReturn(directProcessor7);
+
+    HashSet<InstanceId> registeredInstanceIds = new HashSet<>();
+    registeredInstanceIds.add(null);
+    registeredInstanceIds.add(InstanceId.of("42"));
+
+    // Act
+    Mono<Void> actualRemoveStaleInstancesResult =
+        instanceDiscoveryListener.removeStaleInstances(registeredInstanceIds);
+
+    // Assert
+    verify(instanceRepository).findAll();
+    verify(directProcessor3).doOnNext(isA(Consumer.class));
+    verify(directProcessor7).filter(isA(Predicate.class));
+    verify(directProcessor6).filter(isA(Predicate.class));
+    verify(directProcessor4).filter(isA(Predicate.class));
+    verify(directProcessor2).flatMap(isA(Function.class));
+    verify(directProcessor5).map(isA(Function.class));
+    verify(directProcessor).then();
+    assertSame(channelSendOperator, actualRemoveStaleInstancesResult);
   }
 
   /**
@@ -12032,6 +13755,59 @@ class InstanceDiscoveryListenerDiffblueTest {
   /**
    * Test {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}.
    *
+   * <p>Method under test: {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}
+   */
+  @Test
+  @DisplayName("Test registerInstance(ServiceInstance)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceDiscoveryListener.registerInstance(ServiceInstance)"})
+  void testRegisterInstance7() throws AssertionError {
+    // Arrange
+    DefaultServiceInstance instance =
+        new DefaultServiceInstance(
+            "42", "42", "Converting service '{}' running at '{}' with metadata {}", 8080, true);
+
+    // Act and Assert
+    FirstStep<InstanceId> createResult =
+        StepVerifier.create(instanceDiscoveryListener.registerInstance(instance));
+    createResult.expectComplete().verify();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}.
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}
+   */
+  @Test
+  @DisplayName("Test registerInstance(ServiceInstance)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceDiscoveryListener.registerInstance(ServiceInstance)"})
+  void testRegisterInstance8() throws AssertionError {
+    // Arrange
+    HashMap<String, String> metadata = new HashMap<>();
+    DefaultKubernetesServiceInstance instance =
+        new DefaultKubernetesServiceInstance(
+            "42",
+            "",
+            "localhost",
+            8080,
+            metadata,
+            true,
+            "Converting service '{}' running at '{}' with metadata {}",
+            "Converting service '{}' running at '{}' with metadata {}",
+            new HashMap<>());
+
+    // Act and Assert
+    FirstStep<InstanceId> createResult =
+        StepVerifier.create(instanceDiscoveryListener.registerInstance(instance));
+    createResult.expectComplete().verify();
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}.
+   *
    * <ul>
    *   <li>Given {@link
    *       EventsourcingInstanceRepository#EventsourcingInstanceRepository(InstanceEventStore)} with
@@ -12122,6 +13898,74 @@ class InstanceDiscoveryListenerDiffblueTest {
     createResult.expectComplete().verify();
     verify(repository).compute(isA(InstanceId.class), isA(BiFunction.class));
     verify(generator).generateId(isA(Registration.class));
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}.
+   *
+   * <ul>
+   *   <li>Given {@code Key}.
+   *   <li>When {@link HashMap#HashMap()} {@code Key} is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}
+   */
+  @Test
+  @DisplayName("Test registerInstance(ServiceInstance); given 'Key'; when HashMap() 'Key' is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceDiscoveryListener.registerInstance(ServiceInstance)"})
+  void testRegisterInstance_givenKey_whenHashMapKeyIs42() {
+    // Arrange
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.register(Mockito.<Registration>any())).thenReturn(justResult);
+
+    HashMap<String, String> metadata = new HashMap<>();
+    metadata.put("Key", "42");
+    DefaultServiceInstance instance =
+        new DefaultServiceInstance("42", "42", "localhost", 8080, true, metadata);
+
+    // Act
+    Mono<InstanceId> actualRegisterInstanceResult =
+        instanceDiscoveryListener.registerInstance(instance);
+
+    // Assert
+    verify(instanceRegistry).register(isA(Registration.class));
+    assertSame(justResult, actualRegisterInstanceResult);
+  }
+
+  /**
+   * Test {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}.
+   *
+   * <ul>
+   *   <li>Given {@code localhost}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InstanceDiscoveryListener#registerInstance(ServiceInstance)}
+   */
+  @Test
+  @DisplayName("Test registerInstance(ServiceInstance); given 'localhost'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InstanceDiscoveryListener.registerInstance(ServiceInstance)"})
+  void testRegisterInstance_givenLocalhost() {
+    // Arrange
+    Mono<InstanceId> justResult = Mono.just(InstanceId.of("42"));
+    when(instanceRegistry.register(Mockito.<Registration>any())).thenReturn(justResult);
+
+    HashMap<String, String> metadata = new HashMap<>();
+    metadata.put("localhost", "Converting service '{}' running at '{}' with metadata {}");
+    metadata.put("Key", "42");
+    DefaultServiceInstance instance =
+        new DefaultServiceInstance("42", "42", "localhost", 8080, true, metadata);
+
+    // Act
+    Mono<InstanceId> actualRegisterInstanceResult =
+        instanceDiscoveryListener.registerInstance(instance);
+
+    // Assert
+    verify(instanceRegistry).register(isA(Registration.class));
+    assertSame(justResult, actualRegisterInstanceResult);
   }
 
   /**

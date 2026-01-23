@@ -1,8 +1,8 @@
 package de.codecentric.boot.admin.server.services;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -12,17 +12,14 @@ import com.diffblue.cover.annotations.MethodsUnderTest;
 import de.codecentric.boot.admin.server.domain.entities.EventsourcingInstanceRepository;
 import de.codecentric.boot.admin.server.domain.entities.SnapshottingInstanceRepository;
 import de.codecentric.boot.admin.server.domain.events.InstanceDeregisteredEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceEndpointsDetectedEvent;
 import de.codecentric.boot.admin.server.domain.events.InstanceEvent;
-import de.codecentric.boot.admin.server.domain.events.InstanceStatusChangedEvent;
+import de.codecentric.boot.admin.server.domain.events.InstanceRegisteredEvent;
 import de.codecentric.boot.admin.server.domain.values.InstanceId;
-import de.codecentric.boot.admin.server.domain.values.StatusInfo;
+import de.codecentric.boot.admin.server.domain.values.Registration;
 import de.codecentric.boot.admin.server.eventstore.HazelcastEventStore;
 import de.codecentric.boot.admin.server.eventstore.InMemoryEventStore;
 import de.codecentric.boot.admin.server.web.client.InstanceWebClient;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,7 +27,11 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.springframework.http.server.reactive.ChannelSendOperator;
@@ -41,33 +42,182 @@ import org.springframework.web.reactive.function.client.WebClient.Builder;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ReplayProcessor;
 import reactor.core.publisher.SignalType;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.FirstStep;
 
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@ExtendWith(MockitoExtension.class)
 class InfoUpdateTriggerDiffblueTest {
+  @Mock private Duration duration;
+
+  @InjectMocks private InfoUpdateTrigger infoUpdateTrigger;
+
+  @Mock private Publisher<InstanceEvent> publisher;
+
   /**
    * Test {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration,
    * Duration)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceId} with value is {@code 42}.
+   * </ul>
    *
    * <p>Method under test: {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher,
    * Duration, Duration, Duration)}
    */
   @Test
-  @DisplayName("Test new InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration, Duration)")
+  @DisplayName(
+      "Test new InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration, Duration); given InstanceId with value is '42'")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({
     "void InfoUpdateTrigger.<init>(InfoUpdater, Publisher, Duration, Duration, Duration)"
   })
-  void testNewInfoUpdateTrigger() {
+  void testNewInfoUpdateTrigger_givenInstanceIdWithValueIs42() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient =
+        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
+
+    // Act
+    new InfoUpdateTrigger(
+        infoUpdater,
+        publisher,
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L));
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration,
+   * Duration)}.
+   *
+   * <ul>
+   *   <li>When {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       one.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher,
+   * Duration, Duration, Duration)}
+   */
+  @Test
+  @DisplayName(
+      "Test new InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration, Duration); when InMemoryEventStore(int) with maxLogSizePerAggregate is one")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InfoUpdateTrigger.<init>(InfoUpdater, Publisher, Duration, Duration, Duration)"
+  })
+  void testNewInfoUpdateTrigger_whenInMemoryEventStoreWithMaxLogSizePerAggregateIsOne() {
     // Arrange
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(1));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    // Act
+    new InfoUpdateTrigger(
+        infoUpdater,
+        publisher,
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration,
+   * Duration)}.
+   *
+   * <ul>
+   *   <li>When {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       one.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher,
+   * Duration, Duration, Duration)}
+   */
+  @Test
+  @DisplayName(
+      "Test new InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration, Duration); when InMemoryEventStore(int) with maxLogSizePerAggregate is one")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InfoUpdateTrigger.<init>(InfoUpdater, Publisher, Duration, Duration, Duration)"
+  })
+  void testNewInfoUpdateTrigger_whenInMemoryEventStoreWithMaxLogSizePerAggregateIsOne2() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(1));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    // Act
+    new InfoUpdateTrigger(
+        infoUpdater,
+        publisher,
+        Duration.ofSeconds(Long.MAX_VALUE),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration,
+   * Duration)}.
+   *
+   * <ul>
+   *   <li>When {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       three.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#InfoUpdateTrigger(InfoUpdater, Publisher,
+   * Duration, Duration, Duration)}
+   */
+  @Test
+  @DisplayName(
+      "Test new InfoUpdateTrigger(InfoUpdater, Publisher, Duration, Duration, Duration); when InMemoryEventStore(int) with maxLogSizePerAggregate is three")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({
+    "void InfoUpdateTrigger.<init>(InfoUpdater, Publisher, Duration, Duration, Duration)"
+  })
+  void testNewInfoUpdateTrigger_whenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -83,6 +233,53 @@ class InfoUpdateTriggerDiffblueTest {
 
     // Assert
     verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#handle(Flux)}.
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#handle(Flux)}
+   */
+  @Test
+  @DisplayName("Test handle(Flux)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Publisher InfoUpdateTrigger.handle(Flux)"})
+  void testHandle() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    DirectProcessor<InstanceEvent> directProcessor = mock(DirectProcessor.class);
+    Flux<Object> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(directProcessor.flatMap(Mockito.<Function<InstanceEvent, Publisher<Object>>>any()))
+        .thenReturn(fromIterableResult);
+
+    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
+    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(directProcessor);
+
+    // Act
+    Publisher<Void> actualHandleResult = infoUpdateTrigger.handle(publisher2);
+
+    // Assert
+    verify(builder).build();
+    verify(publisher2).filter(isA(Predicate.class));
+    verify(directProcessor).flatMap(isA(Function.class));
+    assertSame(fromIterableResult, actualHandleResult);
   }
 
   /**
@@ -108,7 +305,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -150,11 +347,60 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
     Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    DirectProcessor<InstanceEvent> publisher2 = mock(DirectProcessor.class);
+    Flux<InstanceEvent> fromIterableResult = Flux.fromIterable(new ArrayList<>());
+    when(publisher2.filter(Mockito.<Predicate<InstanceEvent>>any())).thenReturn(fromIterableResult);
+
+    // Act
+    infoUpdateTrigger.handle(publisher2);
+
+    // Assert
+    verify(builder).build();
+    verify(publisher2).filter(isA(Predicate.class));
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#handle(Flux)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceId} with value is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#handle(Flux)}
+   */
+  @Test
+  @DisplayName("Test handle(Flux); given InstanceId with value is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Publisher InfoUpdateTrigger.handle(Flux)"})
+  void testHandle_givenInstanceIdWithValueIs42() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
@@ -196,7 +442,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -249,7 +495,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -287,7 +533,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -324,7 +570,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     SnapshottingInstanceRepository repository =
-        new SnapshottingInstanceRepository(new InMemoryEventStore());
+        new SnapshottingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -488,15 +734,14 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L));
 
     // Act
@@ -522,9 +767,8 @@ class InfoUpdateTriggerDiffblueTest {
   void testUpdateInfo7() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -534,8 +778,7 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
@@ -544,7 +787,6 @@ class InfoUpdateTriggerDiffblueTest {
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Act
     Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
@@ -569,9 +811,8 @@ class InfoUpdateTriggerDiffblueTest {
   void testUpdateInfo8() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -581,15 +822,15 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
-            mock(HazelcastEventStore.class),
+            publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Act
     Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
@@ -614,9 +855,8 @@ class InfoUpdateTriggerDiffblueTest {
   void testUpdateInfo9() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -626,19 +866,18 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
 
     // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
+    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("Value"));
 
     // Assert
     verify(infoUpdater).updateInfo(isA(InstanceId.class));
@@ -660,9 +899,8 @@ class InfoUpdateTriggerDiffblueTest {
   void testUpdateInfo10() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Mono<?> source = Mono.just("Data");
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -672,16 +910,15 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MIN_VALUE));
 
     // Act
     Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
@@ -706,9 +943,8 @@ class InfoUpdateTriggerDiffblueTest {
   void testUpdateInfo11() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -718,18 +954,18 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    Mono<InstanceEvent> publisher = Mono.just(mock(InstanceEndpointsDetectedEvent.class));
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
 
     // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
+    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("Value"));
 
     // Assert
     verify(infoUpdater).updateInfo(isA(InstanceId.class));
@@ -751,9 +987,8 @@ class InfoUpdateTriggerDiffblueTest {
   void testUpdateInfo12() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
+        new ChannelSendOperator<>(mock(ChannelSendOperator.class), mock(Function.class));
     when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
         .thenReturn(channelSendOperator2);
 
@@ -763,19 +998,19 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceStatusChangedEvent(InstanceId.of("42"), 1L, mock(StatusInfo.class)));
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
+            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
+    infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
 
     // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
+    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("Value"));
 
     // Assert
     verify(infoUpdater).updateInfo(isA(InstanceId.class));
@@ -797,6 +1032,150 @@ class InfoUpdateTriggerDiffblueTest {
   void testUpdateInfo13() {
     // Arrange
     ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
+    ChannelSendOperator<Object> channelSendOperator2 =
+        new ChannelSendOperator<>(mock(ReplayProcessor.class), mock(Function.class));
+    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
+        .thenReturn(channelSendOperator2);
+
+    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
+    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
+        .thenReturn(channelSendOperator);
+
+    InfoUpdater infoUpdater = mock(InfoUpdater.class);
+    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
+
+    // Assert
+    verify(infoUpdater).updateInfo(isA(InstanceId.class));
+    verify(channelSendOperator).doFinally(isA(Consumer.class));
+    verify(channelSendOperator3).onErrorResume(isA(Function.class));
+    assertSame(channelSendOperator2, actualUpdateInfoResult);
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link ChannelSendOperator} {@link ChannelSendOperator#doFinally(Consumer)} return
+   *       {@link ChannelSendOperator}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
+   */
+  @Test
+  @DisplayName(
+      "Test updateInfo(InstanceId); given ChannelSendOperator doFinally(Consumer) return ChannelSendOperator")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
+  void testUpdateInfo_givenChannelSendOperatorDoFinallyReturnChannelSendOperator() {
+    // Arrange
+    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
+    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
+        .thenReturn(mock(ChannelSendOperator.class));
+
+    ChannelSendOperator<Object> channelSendOperator2 = mock(ChannelSendOperator.class);
+    when(channelSendOperator2.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
+        .thenReturn(channelSendOperator);
+
+    InfoUpdater infoUpdater = mock(InfoUpdater.class);
+    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator2);
+    DirectProcessor<InstanceEvent> publisher = DirectProcessor.create();
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(Long.MAX_VALUE),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+    infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.updateInfo(InstanceId.of("Value"));
+
+    // Assert
+    verify(infoUpdater).updateInfo(isA(InstanceId.class));
+    verify(channelSendOperator).doFinally(isA(Consumer.class));
+    verify(channelSendOperator2).onErrorResume(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link ChannelSendOperator} {@link ChannelSendOperator#doFinally(Consumer)} return
+   *       {@link Mono}.
+   *   <li>Then calls {@link ChannelSendOperator#doFinally(Consumer)}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
+   */
+  @Test
+  @DisplayName(
+      "Test updateInfo(InstanceId); given ChannelSendOperator doFinally(Consumer) return Mono; then calls doFinally(Consumer)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
+  void testUpdateInfo_givenChannelSendOperatorDoFinallyReturnMono_thenCallsDoFinally() {
+    // Arrange
+    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
+    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
+        .thenReturn(mock(Mono.class));
+
+    ChannelSendOperator<Object> channelSendOperator2 = mock(ChannelSendOperator.class);
+    when(channelSendOperator2.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
+        .thenReturn(channelSendOperator);
+
+    InfoUpdater infoUpdater = mock(InfoUpdater.class);
+    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator2);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.updateInfo(InstanceId.of("42"));
+
+    // Assert
+    verify(infoUpdater).updateInfo(isA(InstanceId.class));
+    verify(channelSendOperator).doFinally(isA(Consumer.class));
+    verify(channelSendOperator2).onErrorResume(isA(Function.class));
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
+   *
+   * <ul>
+   *   <li>Given {@link InstanceId} with value is {@code 42}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
+   */
+  @Test
+  @DisplayName("Test updateInfo(InstanceId); given InstanceId with value is '42'")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
+  void testUpdateInfo_givenInstanceIdWithValueIs42() {
+    // Arrange
+    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
     Flux<?> source = Flux.fromIterable(new ArrayList<>());
     ChannelSendOperator<Object> channelSendOperator2 =
         new ChannelSendOperator<>(source, mock(Function.class));
@@ -809,235 +1188,6 @@ class InfoUpdateTriggerDiffblueTest {
 
     InfoUpdater infoUpdater = mock(InfoUpdater.class);
     when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-
-    InfoUpdateTrigger infoUpdateTrigger =
-        new InfoUpdateTrigger(
-            infoUpdater,
-            mock(HazelcastEventStore.class),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-    infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
-
-    // Assert
-    verify(infoUpdater).updateInfo(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateInfoResult);
-  }
-
-  /**
-   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
-   *
-   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateInfo(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
-  void testUpdateInfo14() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Mono<?> source = Mono.just("Data");
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    InfoUpdater infoUpdater = mock(InfoUpdater.class);
-    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    InfoUpdateTrigger infoUpdateTrigger =
-        new InfoUpdateTrigger(
-            infoUpdater,
-            mock(Publisher.class),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
-
-    // Assert
-    verify(infoUpdater).updateInfo(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateInfoResult);
-  }
-
-  /**
-   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
-   *
-   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateInfo(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
-  void testUpdateInfo15() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Mono<?> source = Mono.just("Data");
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    InfoUpdater infoUpdater = mock(InfoUpdater.class);
-    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    InfoUpdateTrigger infoUpdateTrigger =
-        new InfoUpdateTrigger(
-            infoUpdater,
-            mock(Publisher.class),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(0L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
-
-    // Assert
-    verify(infoUpdater).updateInfo(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateInfoResult);
-  }
-
-  /**
-   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
-   *
-   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateInfo(InstanceId)")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
-  void testUpdateInfo16() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    Mono<?> source = Mono.just("Data");
-    ChannelSendOperator<Object> channelSendOperator2 =
-        new ChannelSendOperator<>(source, mock(Function.class));
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator2);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    InfoUpdater infoUpdater = mock(InfoUpdater.class);
-    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    InfoUpdateTrigger infoUpdateTrigger =
-        new InfoUpdateTrigger(
-            infoUpdater,
-            mock(Publisher.class),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L));
-
-    // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
-
-    // Assert
-    verify(infoUpdater).updateInfo(isA(InstanceId.class));
-    verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator2, actualUpdateInfoResult);
-  }
-
-  /**
-   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
-   *
-   * <ul>
-   *   <li>Given {@link ArrayList#ArrayList()} add {@code 42}.
-   * </ul>
-   *
-   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
-   */
-  @Test
-  @DisplayName("Test updateInfo(InstanceId); given ArrayList() add '42'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
-  void testUpdateInfo_givenArrayListAdd42() {
-    // Arrange
-    ArrayList<Object> it = new ArrayList<>();
-    it.add("42");
-    Flux<?> source = Flux.fromIterable(it);
-    ChannelSendOperator<Object> channelSendOperator =
-        new ChannelSendOperator<>(source, mock(Function.class));
-
-    ChannelSendOperator<Object> channelSendOperator2 = mock(ChannelSendOperator.class);
-    when(channelSendOperator2.doFinally(Mockito.<Consumer<SignalType>>any()))
-        .thenReturn(channelSendOperator);
-
-    ChannelSendOperator<Object> channelSendOperator3 = mock(ChannelSendOperator.class);
-    when(channelSendOperator3.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator2);
-
-    InfoUpdater infoUpdater = mock(InfoUpdater.class);
-    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator3);
-    Mono<InstanceEvent> publisher = Mono.just(mock(InstanceEndpointsDetectedEvent.class));
-
-    InfoUpdateTrigger infoUpdateTrigger =
-        new InfoUpdateTrigger(
-            infoUpdater,
-            publisher,
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L),
-            Duration.ofSeconds(1L));
-
-    // Act
-    Mono<Void> actualUpdateInfoResult = infoUpdateTrigger.updateInfo(InstanceId.of("42"));
-
-    // Assert
-    verify(infoUpdater).updateInfo(isA(InstanceId.class));
-    verify(channelSendOperator2).doFinally(isA(Consumer.class));
-    verify(channelSendOperator3).onErrorResume(isA(Function.class));
-    assertSame(channelSendOperator, actualUpdateInfoResult);
-  }
-
-  /**
-   * Test {@link InfoUpdateTrigger#updateInfo(InstanceId)}.
-   *
-   * <ul>
-   *   <li>Given {@link ChannelSendOperator} {@link ChannelSendOperator#doFinally(Consumer)} return
-   *       {@code null}.
-   *   <li>Then return {@code null}.
-   * </ul>
-   *
-   * <p>Method under test: {@link InfoUpdateTrigger#updateInfo(InstanceId)}
-   */
-  @Test
-  @DisplayName(
-      "Test updateInfo(InstanceId); given ChannelSendOperator doFinally(Consumer) return 'null'; then return 'null'")
-  @Tag("ContributionFromDiffblue")
-  @ManagedByDiffblue
-  @MethodsUnderTest({"Mono InfoUpdateTrigger.updateInfo(InstanceId)"})
-  void testUpdateInfo_givenChannelSendOperatorDoFinallyReturnNull_thenReturnNull() {
-    // Arrange
-    ChannelSendOperator<Object> channelSendOperator = mock(ChannelSendOperator.class);
-    when(channelSendOperator.doFinally(Mockito.<Consumer<SignalType>>any())).thenReturn(null);
-
-    ChannelSendOperator<Object> channelSendOperator2 = mock(ChannelSendOperator.class);
-    when(channelSendOperator2.onErrorResume(Mockito.<Function<Throwable, Mono<Void>>>any()))
-        .thenReturn(channelSendOperator);
-
-    InfoUpdater infoUpdater = mock(InfoUpdater.class);
-    when(infoUpdater.updateInfo(Mockito.<InstanceId>any())).thenReturn(channelSendOperator2);
     Mono<InstanceEvent> publisher =
         Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
 
@@ -1055,8 +1205,8 @@ class InfoUpdateTriggerDiffblueTest {
     // Assert
     verify(infoUpdater).updateInfo(isA(InstanceId.class));
     verify(channelSendOperator).doFinally(isA(Consumer.class));
-    verify(channelSendOperator2).onErrorResume(isA(Function.class));
-    assertNull(actualUpdateInfoResult);
+    verify(channelSendOperator3).onErrorResume(isA(Function.class));
+    assertSame(channelSendOperator2, actualUpdateInfoResult);
   }
 
   /**
@@ -1120,7 +1270,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -1157,7 +1307,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -1197,7 +1347,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -1235,14 +1385,18 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
-            new InMemoryEventStore(),
+            publisher,
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
@@ -1251,6 +1405,7 @@ class InfoUpdateTriggerDiffblueTest {
     infoUpdateTrigger.start();
 
     // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
     verify(builder).build();
   }
 
@@ -1270,7 +1425,7 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -1283,10 +1438,8 @@ class InfoUpdateTriggerDiffblueTest {
             infoUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(1L));
-    infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
-    infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(Long.MAX_VALUE));
 
     // Act
     infoUpdateTrigger.start();
@@ -1312,6 +1465,81 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L),
+            Duration.ofSeconds(Long.MAX_VALUE));
+
+    // Act
+    infoUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.start()"})
+  void testStart7() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            new InMemoryEventStore(3),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.start();
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#start()}.
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.start()"})
+  void testStart8() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
         new EventsourcingInstanceRepository(mock(HazelcastEventStore.class));
 
     InfoUpdater infoUpdater =
@@ -1325,9 +1553,130 @@ class InfoUpdateTriggerDiffblueTest {
             infoUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(1L),
             Duration.ofSeconds(Long.MAX_VALUE));
     infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#start()}.
+   *
+   * <ul>
+   *   <li>Given {@link Duration} {@link Duration#toNanos()} return one.
+   *   <li>Then calls {@link Duration#toNanos()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start(); given Duration toNanos() return one; then calls toNanos()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.start()"})
+  void testStart_givenDurationToNanosReturnOne_thenCallsToNanos() {
+    // Arrange
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+    when(duration.toNanos()).thenReturn(1L);
+
+    // Act
+    infoUpdateTrigger.start();
+
+    // Assert
+    verify(duration, atLeast(1)).toNanos();
+    verify(publisher).subscribe(isA(Subscriber.class));
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#start()}.
+   *
+   * <ul>
+   *   <li>Given {@link
+   *       EventsourcingInstanceRepository#EventsourcingInstanceRepository(InstanceEventStore)} with
+   *       eventStore is {@link InMemoryEventStore}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName(
+      "Test start(); given EventsourcingInstanceRepository(InstanceEventStore) with eventStore is InMemoryEventStore")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.start()"})
+  void testStart_givenEventsourcingInstanceRepositoryWithEventStoreIsInMemoryEventStore() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+    infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.start();
+
+    // Assert
+    verify(publisher).subscribe(isA(Subscriber.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#start()}.
+   *
+   * <ul>
+   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       zero.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#start()}
+   */
+  @Test
+  @DisplayName("Test start(); given InMemoryEventStore(int) with maxLogSizePerAggregate is zero")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.start()"})
+  void testStart_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsZero() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(0));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Publisher<InstanceEvent> publisher = mock(Publisher.class);
+    doNothing().when(publisher).subscribe(Mockito.<Subscriber<InstanceEvent>>any());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
     infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
@@ -1350,11 +1699,13 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -1387,22 +1738,23 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop2() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
-            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
 
@@ -1425,24 +1777,25 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop3() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(-1L),
-            Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L));
 
     // Act
     infoUpdateTrigger.stop();
@@ -1463,23 +1816,27 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop4() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE),
             Duration.ofSeconds(1L));
 
     // Act
@@ -1504,22 +1861,19 @@ class InfoUpdateTriggerDiffblueTest {
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(1L));
-    infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L));
 
     // Act
     infoUpdateTrigger.stop();
@@ -1540,24 +1894,29 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop6() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+    InstanceWebClient instanceWebClient =
+        new InstanceWebClient.Builder().webClient(builder).build();
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(Long.MAX_VALUE));
+            Duration.ofSeconds(1L));
 
     // Act
     infoUpdateTrigger.stop();
@@ -1578,25 +1937,37 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop7() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    InstanceId instance = InstanceId.of("42");
+    Registration registration =
+        Registration.builder()
+            .healthUrl("https://example.org/example")
+            .managementUrl("https://example.org/example")
+            .name("Name")
+            .serviceUrl("https://example.org/example")
+            .source("Source")
+            .build();
+    it.add(new InstanceRegisteredEvent(instance, 1L, registration));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE),
             Duration.ofSeconds(1L));
-    infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     infoUpdateTrigger.stop();
@@ -1617,27 +1988,26 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop8() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(
-            new InstanceStatusChangedEvent(
-                InstanceId.of("42"),
-                1L,
-                LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant(),
-                mock(StatusInfo.class)));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
-            Duration.ofSeconds(1L),
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L));
 
@@ -1664,21 +2034,19 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient =
         new InstanceWebClient.Builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(Long.MAX_VALUE));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L));
 
     // Act
     infoUpdateTrigger.stop();
@@ -1699,22 +2067,27 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop10() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(null);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MIN_VALUE),
             Duration.ofSeconds(Long.MAX_VALUE));
 
     // Act
@@ -1736,25 +2109,37 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop11() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    InstanceId instance = InstanceId.of("42");
+    Registration registration =
+        Registration.builder()
+            .healthUrl("https://example.org/example")
+            .managementUrl("")
+            .name("Name")
+            .serviceUrl("https://example.org/example")
+            .source("Source")
+            .build();
+    it.add(new InstanceRegisteredEvent(instance, 1L, registration));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MAX_VALUE),
             Duration.ofSeconds(1L));
-    infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     infoUpdateTrigger.stop();
@@ -1775,28 +2160,36 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop12() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(
-            new InstanceStatusChangedEvent(
-                InstanceId.of("42"),
-                1L,
-                LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant(),
-                mock(StatusInfo.class)));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    InstanceId instance = InstanceId.of("42");
+    Registration registration =
+        Registration.builder()
+            .healthUrl("https://example.org/example")
+            .managementUrl("https://example.org/example")
+            .name("Name")
+            .serviceUrl("https://example.org/example")
+            .source("java.lang.String")
+            .build();
+    it.add(new InstanceRegisteredEvent(instance, 1L, registration));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
+            Duration.ofSeconds(-1L),
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(0L),
             Duration.ofSeconds(1L));
 
     // Act
@@ -1818,12 +2211,98 @@ class InfoUpdateTriggerDiffblueTest {
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
   void testStop13() {
     // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
     Builder builder = mock(Builder.class);
     when(builder.build()).thenReturn(mock(WebClient.class));
-    InstanceWebClient instanceWebClient =
-        InstanceWebClient.builder(mock(Builder.class)).webClient(builder).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    InstanceId instance = InstanceId.of("42");
+    Registration registration =
+        Registration.builder()
+            .healthUrl("https://example.org/example")
+            .managementUrl("https://example.org/example")
+            .name("Name")
+            .serviceUrl("https://example.org/example")
+            .source("Source")
+            .build();
+    it.add(new InstanceRegisteredEvent(instance, 1L, registration));
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L));
+
+    // Act
+    infoUpdateTrigger.stop();
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#stop()}.
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#stop()}
+   */
+  @Test
+  @DisplayName("Test stop()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
+  void testStop14() {
+    // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            new InMemoryEventStore(),
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.stop();
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#stop()}.
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#stop()}
+   */
+  @Test
+  @DisplayName("Test stop()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
+  void testStop15() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    SnapshottingInstanceRepository repository = mock(SnapshottingInstanceRepository.class);
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
@@ -1833,9 +2312,9 @@ class InfoUpdateTriggerDiffblueTest {
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
-            Duration.ofSeconds(1L),
             Duration.ofSeconds(Long.MIN_VALUE),
-            Duration.ofSeconds(Long.MAX_VALUE));
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(0L));
 
     // Act
     infoUpdateTrigger.stop();
@@ -1848,46 +2327,199 @@ class InfoUpdateTriggerDiffblueTest {
    * Test {@link InfoUpdateTrigger#stop()}.
    *
    * <ul>
-   *   <li>Given {@link InstanceWebClient.Builder} {@link
-   *       InstanceWebClient.Builder#webClient(Builder)} return builder.
-   *   <li>Then calls {@link InstanceWebClient.Builder#webClient(Builder)}.
+   *   <li>Given {@link ArrayList#ArrayList()} add {@code null}.
+   *   <li>Then calls {@link Builder#build()}.
    * </ul>
    *
    * <p>Method under test: {@link InfoUpdateTrigger#stop()}
    */
   @Test
-  @DisplayName(
-      "Test stop(); given Builder webClient(Builder) return builder; then calls webClient(Builder)")
+  @DisplayName("Test stop(); given ArrayList() add 'null'; then calls build()")
   @Tag("ContributionFromDiffblue")
   @ManagedByDiffblue
   @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
-  void testStop_givenBuilderWebClientReturnBuilder_thenCallsWebClient() {
+  void testStop_givenArrayListAddNull_thenCallsBuild() {
     // Arrange
-    InstanceWebClient.Builder builder = mock(InstanceWebClient.Builder.class);
-    when(builder.webClient(Mockito.<Builder>any())).thenReturn(InstanceWebClient.builder());
-    InstanceWebClient instanceWebClient = builder.webClient(mock(Builder.class)).build();
-    EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(mock(InMemoryEventStore.class));
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
-    Mono<InstanceEvent> publisher =
-        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(null);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.stop();
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#stop()}.
+   *
+   * <ul>
+   *   <li>Given {@link ArrayList#ArrayList()} add {@code null}.
+   *   <li>Then calls {@link Builder#build()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#stop()}
+   */
+  @Test
+  @DisplayName("Test stop(); given ArrayList() add 'null'; then calls build()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
+  void testStop_givenArrayListAddNull_thenCallsBuild2() {
+    // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(null);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
             infoUpdater,
             publisher,
             Duration.ofSeconds(1L),
-            Duration.ofSeconds(Long.MAX_VALUE),
+            Duration.ofSeconds(1L),
             Duration.ofSeconds(1L));
-    infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
 
     // Act
     infoUpdateTrigger.stop();
 
     // Assert
-    verify(builder).webClient(isA(Builder.class));
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#stop()}.
+   *
+   * <ul>
+   *   <li>Given builder serviceUrl {@code https://example.org/example}.
+   *   <li>Then calls {@link Builder#build()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#stop()}
+   */
+  @Test
+  @DisplayName(
+      "Test stop(); given builder serviceUrl 'https://example.org/example'; then calls build()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
+  void testStop_givenBuilderServiceUrlHttpsExampleOrgExample_thenCallsBuild() {
+    // Arrange
+    InMemoryEventStore eventStore = new InMemoryEventStore();
+    eventStore.append(new ArrayList<>());
+    EventsourcingInstanceRepository repository = new EventsourcingInstanceRepository(eventStore);
+
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+
+    Registration.Builder builderResult = Registration.builder();
+    builderResult.serviceUrl("https://example.org/example");
+    Registration registration =
+        builderResult
+            .healthUrl("https://example.org/example")
+            .managementUrl("https://example.org/example")
+            .name("Name")
+            .serviceUrl("https://example.org/example")
+            .source("Source")
+            .build();
+    InstanceRegisteredEvent instanceRegisteredEvent =
+        new InstanceRegisteredEvent(InstanceId.of("42"), 1L, registration);
+
+    ArrayList<InstanceEvent> it = new ArrayList<>();
+    it.add(instanceRegisteredEvent);
+    Flux<InstanceEvent> publisher = Flux.fromIterable(it);
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(-1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.stop();
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#stop()}.
+   *
+   * <ul>
+   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       three.
+   *   <li>Then calls {@link Builder#build()}.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#stop()}
+   */
+  @Test
+  @DisplayName(
+      "Test stop(); given InMemoryEventStore(int) with maxLogSizePerAggregate is three; then calls build()")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.stop()"})
+  void testStop_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree_thenCallsBuild() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.stop();
+
+    // Assert
+    verify(builder).build();
   }
 
   /**
@@ -1906,11 +2538,48 @@ class InfoUpdateTriggerDiffblueTest {
     when(builder.build()).thenReturn(mock(WebClient.class));
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
-        new EventsourcingInstanceRepository(new InMemoryEventStore());
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
     Flux<InstanceEvent> publisher = Flux.fromIterable(new ArrayList<>());
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.setInterval(Duration.ofSeconds(1L));
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#setInterval(Duration)}.
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#setInterval(Duration)}
+   */
+  @Test
+  @DisplayName("Test setInterval(Duration)")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.setInterval(Duration)"})
+  void testSetInterval2() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    ReplayProcessor<InstanceEvent> publisher = ReplayProcessor.create(3, true);
 
     InfoUpdateTrigger infoUpdateTrigger =
         new InfoUpdateTrigger(
@@ -1944,6 +2613,50 @@ class InfoUpdateTriggerDiffblueTest {
     InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
     EventsourcingInstanceRepository repository =
         new EventsourcingInstanceRepository(new InMemoryEventStore());
+
+    InfoUpdater infoUpdater =
+        new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
+    Mono<InstanceEvent> publisher =
+        Mono.just(new InstanceDeregisteredEvent(InstanceId.of("42"), 1L));
+
+    InfoUpdateTrigger infoUpdateTrigger =
+        new InfoUpdateTrigger(
+            infoUpdater,
+            publisher,
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L),
+            Duration.ofSeconds(1L));
+
+    // Act
+    infoUpdateTrigger.setLifetime(Duration.ofSeconds(1L));
+
+    // Assert
+    verify(builder).build();
+  }
+
+  /**
+   * Test {@link InfoUpdateTrigger#setLifetime(Duration)}.
+   *
+   * <ul>
+   *   <li>Given {@link InMemoryEventStore#InMemoryEventStore(int)} with maxLogSizePerAggregate is
+   *       three.
+   * </ul>
+   *
+   * <p>Method under test: {@link InfoUpdateTrigger#setLifetime(Duration)}
+   */
+  @Test
+  @DisplayName(
+      "Test setLifetime(Duration); given InMemoryEventStore(int) with maxLogSizePerAggregate is three")
+  @Tag("ContributionFromDiffblue")
+  @ManagedByDiffblue
+  @MethodsUnderTest({"void InfoUpdateTrigger.setLifetime(Duration)"})
+  void testSetLifetime_givenInMemoryEventStoreWithMaxLogSizePerAggregateIsThree() {
+    // Arrange
+    Builder builder = mock(Builder.class);
+    when(builder.build()).thenReturn(mock(WebClient.class));
+    InstanceWebClient instanceWebClient = InstanceWebClient.builder().webClient(builder).build();
+    EventsourcingInstanceRepository repository =
+        new EventsourcingInstanceRepository(new InMemoryEventStore(3));
 
     InfoUpdater infoUpdater =
         new InfoUpdater(repository, instanceWebClient, new ApiMediaTypeHandler());
